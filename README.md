@@ -24,9 +24,11 @@ etc.) en vez de inventar contenido lingüístico.
 
 ## Estado actual
 
-Esta es la base del proyecto (fases 1–3): estructura, navegación y modelo de
-datos. **Todavía no incluye cámara, detección de manos ni clasificador de
-señas** — eso llega en fases posteriores (ver Roadmap).
+Fases 1–5 completas: estructura, navegación, modelo de datos, cámara y
+detección de manos en vivo (MediaPipe HandLandmarker). **Todavía no incluye
+normalización de landmarks ni clasificador de señas** — la app detecta y
+dibuja la mano, pero no identifica todavía qué vocal se está formando (ver
+Roadmap).
 
 ## Arquitectura
 
@@ -52,7 +54,7 @@ CameraService → HandTrackingService → LandmarkProcessor → SignRecognitionS
 
 - React + TypeScript + Vite
 - `react-router-dom` (HashRouter)
-- `@mediapipe/tasks-vision` (a partir de la fase de cámara/hand tracking)
+- `@mediapipe/tasks-vision` (HandLandmarker) para detección de manos
 - Sin backend, sin base de datos, sin autenticación (ver Privacidad)
 
 ## Estructura del proyecto
@@ -64,29 +66,45 @@ src/
 ├── components/          # Componentes reutilizables (selectores, tarjetas, layout)
 ├── data/languages/       # Datos de cada lengua, físicamente separados (LSC/LSM/LSEC)
 ├── models/              # Tipos de dominio (Language, Sign, ...)
-├── features/            # (a partir de la fase de cámara) lógica por modo
-├── services/            # (a partir de la fase de cámara) cámara, MediaPipe, reconocimiento
-├── hooks/                # (a partir de la fase de cámara)
+├── features/camera/      # CameraView, HandLandmarksCanvas (UI de cámara + overlay)
+├── services/
+│   ├── camera/           # CameraService (getUserMedia)
+│   └── mediapipe/        # HandTrackingService (HandLandmarker)
+├── hooks/                # useCamera, useHandLandmarker
 └── utils/                # (a partir de la fase de normalización)
 ```
 
-Las carpetas `features/`, `services/`, `hooks/` y `utils/` se crean cuando
-tienen contenido real, para no dejar carpetas vacías en el repositorio.
+Las carpetas `services/`, `hooks/` y `utils/` se crean cuando tienen
+contenido real, para no dejar carpetas vacías en el repositorio.
 
 ## Reconocimiento (cómo se llegará de landmarks a una vocal)
 
-1. **Detección**: `HandLandmarker` entrega 21 landmarks `{x, y, z}` por mano.
-2. **Normalización**: traslación (origen en la muñeca), escala (respecto a
-   una distancia de referencia de la mano) y ángulos articulares por dedo,
-   para que el resultado no dependa del tamaño de la mano ni de la distancia
-   a la cámara.
-3. **Clasificador por lengua**: heurístico/geométrico en su primera versión,
-   detrás de una interfaz común, para poder reemplazarlo por un modelo
-   entrenado sin tocar la interfaz.
-4. **Confianza**: se muestra como "confianza del reconocimiento" (una medida
-   del modelo), nunca como certeza de que la seña se ejecutó correctamente.
+1. **Detección** (ya implementada): `HandLandmarker` entrega hasta 21
+   landmarks `{x, y, z}` por mano, en cada cuadro de video, mientras la
+   cámara está activa. El WASM del runtime y el modelo (`hand_landmarker.task`)
+   se cargan una sola vez desde CDN (jsDelivr / Google Storage) — son activos
+   estáticos, no un envío de datos del usuario (ver Privacidad).
+2. **Normalización** (pendiente): traslación (origen en la muñeca), escala
+   (respecto a una distancia de referencia de la mano) y ángulos articulares
+   por dedo, para que el resultado no dependa del tamaño de la mano ni de la
+   distancia a la cámara.
+3. **Clasificador por lengua** (pendiente): heurístico/geométrico en su
+   primera versión, detrás de una interfaz común, para poder reemplazarlo por
+   un modelo entrenado sin tocar la interfaz.
+4. **Confianza** (pendiente): se mostrará como "confianza del reconocimiento"
+   (una medida del modelo), nunca como certeza de que la seña se ejecutó
+   correctamente.
 
 No se publicará ningún porcentaje de precisión sin una evaluación formal.
+
+### Espejo y landmarks
+
+El video se muestra en espejo (`transform: scaleX(-1)` en CSS) porque es más
+natural para quien practica frente a la cámara. `HandLandmarker` procesa el
+cuadro **real, sin espejar** — la detección no se ve afectada por el CSS. El
+canvas de landmarks (`HandLandmarksCanvas`) recibe el mismo espejo CSS que el
+video, así que los puntos quedan alineados visualmente sin tener que invertir
+ninguna coordenada a mano.
 
 ## Datos: cómo añadir una nueva letra o lengua
 
@@ -101,7 +119,10 @@ No se publicará ningún porcentaje de precisión sin una evaluación formal.
 
 - La cámara solo se activa cuando el usuario la enciende explícitamente.
 - No se guardan imágenes ni video, ni se envían frames a ningún servidor: todo
-  el procesamiento ocurre en el navegador.
+  el procesamiento (detección de manos incluida) ocurre en el navegador.
+- La única descarga externa es el modelo de `HandLandmarker` (WASM + archivo
+  `.task`) desde CDN, una sola vez por sesión de navegador: es un activo
+  estático de la librería, no contiene ni transmite datos del usuario.
 - No hay backend, base de datos ni autenticación en esta versión.
 
 ## Desarrollo local
@@ -139,7 +160,11 @@ El proyecto está configurado para publicarse en
 
 ## Limitaciones actuales
 
-- No hay cámara, detección de manos ni clasificador todavía.
+- Hay detección de manos (landmarks), pero **todavía no hay reconocimiento de
+  seña**: nada en la app identifica qué vocal se está formando.
+- La carga del modelo de `HandLandmarker` depende de acceso a Internet (CDN);
+  sin conexión, la detección no arrancará (el estado quedará en "cargando" o
+  pasará a error, nunca fingirá haber detectado algo).
 - Los recursos educativos (imagen, video, explicación, instrucciones) son
   placeholders hasta que el equipo entregue el material real por lengua.
 - El futuro clasificador por lengua no tendrá validación lingüística hasta

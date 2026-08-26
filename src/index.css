@@ -240,6 +240,16 @@ main {
   transform: scaleX(-1);
 }
 
+.hand-landmarks-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Mismo espejo que el video, para que los puntos queden alineados. */
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
 .camera-view__overlay-text {
   position: absolute;
   inset: 0;
@@ -260,4 +270,17 @@ main {
 .camera-view__error {
   color: #9c1c1c;
   font-weight: 600;
+}
+
+.camera-view__tracking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.camera-view__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
 }
