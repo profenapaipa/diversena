@@ -111,6 +111,13 @@ npm install
 npm run dev
 ```
 
+> **No abras `index.html` directamente con doble clic ni con un navegador de
+> archivos (`file://`).** El proyecto usa Vite para compilar TypeScript/JSX y
+> resolver módulos; abrir el archivo así deja la página en blanco (el
+> navegador bloquea `src="/src/main.tsx"` por CORS al no venir de un
+> servidor). Siempre entra por la URL que imprime `npm run dev`
+> (`http://localhost:5173/diversena/`).
+
 ## Comprobaciones
 
 ```bash
