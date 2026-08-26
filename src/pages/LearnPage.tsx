@@ -3,6 +3,7 @@ import { languages, getLanguageById } from '../data/languages';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { VowelSelector } from '../components/VowelSelector';
 import { SignCard } from '../components/SignCard';
+import { CameraView } from '../features/camera/CameraView';
 
 export function LearnPage() {
   const [languageId, setLanguageId] = useState<string | null>(null);
@@ -39,12 +40,10 @@ export function LearnPage() {
 
           <div className="practice-panel">
             <h2>¿Quieres practicar?</h2>
-            <button type="button" className="button" disabled>
-              🎥 Activar cámara (próximamente)
-            </button>
+            <CameraView />
             <p className="practice-panel__note">
-              La práctica frente a cámara y el análisis de la seña estarán
-              disponibles en una fase posterior del desarrollo.
+              La detección de la mano y el análisis de la seña llegarán en una
+              fase posterior; por ahora la cámara solo se muestra en vivo.
             </p>
           </div>
         </>

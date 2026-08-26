@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { languages, getLanguageById } from '../data/languages';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { CameraView } from '../features/camera/CameraView';
 
 export function IdentifyPage() {
   const [languageId, setLanguageId] = useState<string | null>(null);
@@ -16,12 +17,10 @@ export function IdentifyPage() {
       {language && (
         <div className="practice-panel">
           <h2>{language.name}</h2>
-          <button type="button" className="button" disabled>
-            🎥 Activar cámara (próximamente)
-          </button>
+          <CameraView />
           <p className="practice-panel__note">
-            La identificación en vivo mediante cámara y el clasificador de
-            señas se incorporarán en una fase posterior del desarrollo.
+            La detección de la mano y el clasificador de señas llegarán en una
+            fase posterior; por ahora la cámara solo se muestra en vivo.
           </p>
         </div>
       )}
