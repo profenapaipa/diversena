@@ -1,0 +1,230 @@
+:root {
+  color-scheme: light;
+  --color-bg: #ffffff;
+  --color-surface: #f6f5fb;
+  --color-text: #1f1b2e;
+  --color-text-muted: #4a445c;
+  --color-border: #d9d6e3;
+  --color-primary: #6b3fa0;
+  --color-primary-contrast: #ffffff;
+  --color-focus: #2757c9;
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-bar__brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.nav-bar__links {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-bar__link {
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
+.nav-bar__link--active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.app-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.page h1 {
+  margin-top: 0;
+}
+
+.lead {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.home-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button--secondary {
+  background: transparent;
+  color: var(--color-primary);
+}
+
+.option-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.option-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.6rem;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg);
+  cursor: pointer;
+  text-align: left;
+  min-width: 8rem;
+}
+
+.option-card--selected {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+.option-card__title {
+  font-weight: 600;
+}
+
+.option-card__subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.option-card__letter {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.sign-card {
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: var(--color-bg);
+}
+
+.sign-card__title {
+  margin-top: 0;
+}
+
+.sign-card__media {
+  margin: 0.5rem 0;
+}
+
+.sign-card__placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 0;
+}
+
+.practice-panel {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+}
+
+.practice-panel__note {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.camera-preview {
+  display: block;
+  width: min(100%, 40rem);
+  aspect-ratio: 4 / 3;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  background: #111111;
+  object-fit: cover;
+}
+
+.practice-panel__error {
+  color: #a12622;
+  font-weight: 600;
+}
