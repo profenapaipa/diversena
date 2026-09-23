@@ -209,19 +209,113 @@ main {
   background: var(--color-surface);
 }
 
+.practice-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.practice-panel__header h2 {
+  margin: 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: #ebe5f7;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-badge--active {
+  background: #e4f7e9;
+  color: #146a3a;
+}
+
 .practice-panel__note {
   color: var(--color-text-muted);
   font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.video-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.button--secondary {
+  background: #f4f1ff;
+  color: var(--color-primary);
+}
+
+.button--file {
+  position: relative;
+  overflow: hidden;
+}
+
+.button--file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.camera-preview-shell {
+  margin-top: 1rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: #111111;
 }
 
 .camera-preview {
   display: block;
   width: min(100%, 40rem);
   aspect-ratio: 4 / 3;
-  margin-top: 1rem;
-  border-radius: 0.5rem;
   background: #111111;
   object-fit: cover;
+}
+
+.camera-preview--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #dfe3ee;
+  font-size: 0.95rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1c1d22 0%, #0d0d11 100%);
+}
+
+.uploaded-video-box {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background: #f8f7ff;
+}
+
+.uploaded-video {
+  display: block;
+  width: 100%;
+  max-height: 18rem;
+  border-radius: 0.5rem;
+  background: #111111;
+}
+
+.uploaded-video__meta {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--color-text-muted);
 }
 
 .practice-panel__error {
