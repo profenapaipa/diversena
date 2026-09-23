@@ -24,11 +24,16 @@ etc.) en vez de inventar contenido lingüístico.
 
 ## Estado actual
 
-Fases 1–5 completas: estructura, navegación, modelo de datos, cámara y
-detección de manos en vivo (MediaPipe HandLandmarker). **Todavía no incluye
-normalización de landmarks ni clasificador de señas** — la app detecta y
-dibuja la mano, pero no identifica todavía qué vocal se está formando (ver
-Roadmap).
+Fases 1–6 completas: estructura, navegación, modelo de datos, cámara,
+detección de manos en vivo (MediaPipe HandLandmarker) y normalización /
+extracción de características geométricas. **Todavía no incluye clasificador
+de señas** — la app detecta y dibuja la mano, pero no identifica todavía qué
+vocal se está formando (ver Roadmap).
+
+Además de la cámara en vivo con seguimiento de manos, las pantallas Aprender
+e Identificar incluyen una función complementaria para **grabar o subir un
+video** de la práctica y revisarlo después (sin seguimiento de manos: es solo
+un video para guardar o compartir).
 
 ## Arquitectura
 
@@ -66,12 +71,14 @@ src/
 ├── components/          # Componentes reutilizables (selectores, tarjetas, layout)
 ├── data/languages/       # Datos de cada lengua, físicamente separados (LSC/LSM/LSEC)
 ├── models/              # Tipos de dominio (Language, Sign, ...)
-├── features/camera/      # CameraView, HandLandmarksCanvas (UI de cámara + overlay)
+├── features/camera/      # CameraView + HandLandmarksCanvas (seguimiento en vivo);
+│                         # VideoCaptureView (grabar/subir video)
 ├── services/
 │   ├── camera/           # CameraService (getUserMedia)
-│   └── mediapipe/        # HandTrackingService (HandLandmarker)
-├── hooks/                # useCamera, useHandLandmarker
-└── utils/                # (a partir de la fase de normalización)
+│   ├── mediapipe/        # HandTrackingService (HandLandmarker)
+│   └── recognition/      # LandmarkProcessor: normalización + features geométricas
+├── hooks/                # useCamera, useHandLandmarker, useVideoCapture
+└── utils/                # (a partir de la fase de clasificación)
 ```
 
 Las carpetas `services/`, `hooks/` y `utils/` se crean cuando tienen
@@ -84,13 +91,18 @@ contenido real, para no dejar carpetas vacías en el repositorio.
    cámara está activa. El WASM del runtime y el modelo (`hand_landmarker.task`)
    se cargan una sola vez desde CDN (jsDelivr / Google Storage) — son activos
    estáticos, no un envío de datos del usuario (ver Privacidad).
-2. **Normalización** (pendiente): traslación (origen en la muñeca), escala
-   (respecto a una distancia de referencia de la mano) y ángulos articulares
-   por dedo, para que el resultado no dependa del tamaño de la mano ni de la
-   distancia a la cámara.
+2. **Normalización** (ya implementada, `services/recognition/landmarkProcessor.ts`):
+   traslación (origen en la muñeca), escala (respecto a la distancia
+   muñeca→nudillo medio) y rotación (esa misma referencia queda "hacia
+   arriba"), para que el resultado no dependa del tamaño de la mano, la
+   distancia a la cámara ni su orientación en el plano de la imagen. Cubierto
+   con pruebas de Vitest (invariancia a escala/rotación, ángulos de flexión
+   por dedo) usando landmarks sintéticos, no una cámara real.
 3. **Clasificador por lengua** (pendiente): heurístico/geométrico en su
    primera versión, detrás de una interfaz común, para poder reemplazarlo por
-   un modelo entrenado sin tocar la interfaz.
+   un modelo entrenado sin tocar la interfaz. Necesita referencias
+   geométricas reales por seña y lengua que el equipo aún no ha entregado;
+   no se van a inventar umbrales ni datos lingüísticos mientras tanto.
 4. **Confianza** (pendiente): se mostrará como "confianza del reconocimiento"
    (una medida del modelo), nunca como certeza de que la seña se ejecutó
    correctamente.
@@ -125,6 +137,16 @@ ninguna coordenada a mano.
   estático de la librería, no contiene ni transmite datos del usuario.
 - No hay backend, base de datos ni autenticación en esta versión.
 
+## Colaboración
+
+`main` es la única rama de trabajo del proyecto: todo el desarrollo, y el
+despliegue a GitHub Pages, se hacen desde ahí. (Una rama `master` con una
+copia antigua del proyecto se generó por un `git init` independiente en otra
+cuenta; ya se integró a `main` — grabar/subir video, en las pantallas
+Aprender e Identificar, viene de ese trabajo. Evitemos que se repita:
+cualquiera que clone el repo debe hacerlo desde este remoto y trabajar sobre
+`main`, no crear un historial nuevo en `master`.)
+
 ## Desarrollo local
 
 ```bash
@@ -144,6 +166,7 @@ npm run dev
 ```bash
 npx tsc -b       # chequeo de tipos
 npm run lint     # oxlint
+npm test         # vitest (normalización y extracción de características)
 npm run build    # build de producción a dist/
 ```
 
