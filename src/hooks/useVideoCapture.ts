@@ -82,7 +82,9 @@ export function useVideoCapture(fileNamePrefix: string): UseVideoCaptureResult {
     setCameraError(null);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      // Sin audio: el video es para revisar la postura de la mano, no para
+      // narrar la seña, y el sonido podría inducir a malinterpretarla.
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;

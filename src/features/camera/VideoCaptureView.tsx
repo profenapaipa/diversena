@@ -50,16 +50,19 @@ export function VideoCaptureView({ capture }: VideoCaptureViewProps) {
       </div>
 
       <div className="camera-preview-shell">
-        {cameraEnabled ? (
-          <video
-            ref={videoRef}
-            className="camera-preview"
-            autoPlay
-            playsInline
-            muted
-            aria-label="Vista previa de la cámara"
-          />
-        ) : (
+        {/* Siempre montado (nunca condicionado a cameraEnabled): así el ref
+            ya existe cuando toggleCamera() asigna el stream, en vez de
+            quedarse en null porque el <video> todavía no se había creado. */}
+        <video
+          ref={videoRef}
+          className="camera-preview"
+          autoPlay
+          playsInline
+          muted
+          hidden={!cameraEnabled}
+          aria-label="Vista previa de la cámara"
+        />
+        {!cameraEnabled && (
           <div className="camera-preview camera-preview--placeholder">
             La vista previa de la cámara aparecerá aquí cuando la actives.
           </div>
