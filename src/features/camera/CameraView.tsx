@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import type { Language, Sign } from '../../models/language';
 import { useTrackedHand } from '../../hooks/useTrackedHand';
+import { useMediaRecorder } from '../../hooks/useMediaRecorder';
 import { getReference } from '../../services/recognition/referenceStore';
 import { classifyAgainstReferences } from '../../services/recognition/signClassifier';
 import { HandLandmarksCanvas } from './HandLandmarksCanvas';
+import { RecordingControls } from './RecordingControls';
 
 const STATUS_LABEL: Record<string, string> = {
   inactive: 'Cámara desactivada',
@@ -29,13 +31,16 @@ interface CameraViewProps {
    * contra todas las señas de la lengua (modo identificar).
    */
   targetSign?: Sign;
+  /** Prefijo del nombre de archivo para los videos grabados con esta vista. */
+  fileNamePrefix?: string;
 }
 
-export function CameraView({ language, targetSign }: CameraViewProps) {
+export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena' }: CameraViewProps) {
   const { camera, tracking, features } = useTrackedHand();
-  const { status, error, videoRef, start, stop } = camera;
+  const { status, error, videoRef, stream, start, stop } = camera;
   const { status: handStatus, hands } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
+  const recorder = useMediaRecorder(stream, fileNamePrefix);
 
   const referenceCandidates = useMemo(() => {
     if (!language) return [];
@@ -134,6 +139,8 @@ export function CameraView({ language, targetSign }: CameraViewProps) {
           )}
         </div>
       )}
+
+      <RecordingControls recorder={recorder} cameraActive={status === 'active'} />
     </div>
   );
 }

@@ -221,12 +221,6 @@ main {
   margin: 0;
 }
 
-.practice-panel__section + .practice-panel__section {
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
-}
-
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -355,37 +349,6 @@ main {
   inset: 0;
   opacity: 0;
   cursor: pointer;
-}
-
-.camera-preview-shell {
-  margin-top: 1rem;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: #111111;
-}
-
-.camera-preview {
-  display: block;
-  width: min(100%, 40rem);
-  aspect-ratio: 4 / 3;
-  background: #111111;
-  object-fit: cover;
-}
-
-.camera-preview[hidden] {
-  display: none;
-}
-
-.camera-preview--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-  color: #dfe3ee;
-  font-size: 0.95rem;
-  text-align: center;
-  background: linear-gradient(135deg, #1c1d22 0%, #0d0d11 100%);
 }
 
 .uploaded-video-box {

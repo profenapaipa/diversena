@@ -4,13 +4,10 @@ import { LanguageSelector } from '../components/LanguageSelector';
 import { VowelSelector } from '../components/VowelSelector';
 import { SignCard } from '../components/SignCard';
 import { CameraView } from '../features/camera/CameraView';
-import { VideoCaptureView } from '../features/camera/VideoCaptureView';
-import { useVideoCapture } from '../hooks/useVideoCapture';
 
 export function LearnPage() {
   const [languageId, setLanguageId] = useState<string | null>(null);
   const [signId, setSignId] = useState<string | null>(null);
-  const videoCapture = useVideoCapture('video-aprendizaje');
 
   const language = languageId ? getLanguageById(languageId) : undefined;
   const sign = language?.signs.find((s) => s.id === signId);
@@ -27,7 +24,6 @@ export function LearnPage() {
         onSelect={(id) => {
           setLanguageId(id);
           setSignId(null);
-          videoCapture.stopCamera();
         }}
       />
 
@@ -48,16 +44,7 @@ export function LearnPage() {
 
           <div className="practice-panel">
             <h2>¿Quieres practicar?</h2>
-
-            <div className="practice-panel__section">
-              <h3>Practica en vivo con seguimiento de manos</h3>
-              <CameraView language={language} targetSign={sign} />
-            </div>
-
-            <div className="practice-panel__section">
-              <h3>O graba o sube un video para revisar después</h3>
-              <VideoCaptureView capture={videoCapture} />
-            </div>
+            <CameraView language={language} targetSign={sign} fileNamePrefix="video-aprendizaje" />
           </div>
         </>
       )}

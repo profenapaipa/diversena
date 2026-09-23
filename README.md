@@ -32,10 +32,9 @@ capturadas por el equipo (ver "Capturar referencias" más abajo). Sin
 referencias guardadas para una lengua, la app lo dice explícitamente en vez
 de inventar un resultado.
 
-Además de la cámara en vivo con seguimiento de manos, las pantallas Aprender
-e Identificar incluyen una función complementaria para **grabar o subir un
-video** de la práctica y revisarlo después (sin seguimiento de manos: es solo
-un video para guardar o compartir).
+Hay **una sola cámara** por pantalla: el mismo video en vivo muestra los
+puntos de las articulaciones de la mano y sirve para grabar (o subir) un
+video de la práctica y revisarlo después — no dos cámaras independientes.
 
 ## Arquitectura
 
@@ -73,14 +72,14 @@ src/
 ├── components/          # Componentes reutilizables (selectores, tarjetas, layout)
 ├── data/languages/       # Datos de cada lengua, físicamente separados (LSC/LSM/LSEC)
 ├── models/              # Tipos de dominio (Language, Sign, ...)
-├── features/camera/      # CameraView + HandLandmarksCanvas (seguimiento en vivo + clasificación);
-│                         # VideoCaptureView (grabar/subir video)
+├── features/camera/      # CameraView (única cámara: landmarks + clasificación + grabar/subir);
+│                         # HandLandmarksCanvas, RecordingControls
 ├── services/
 │   ├── camera/           # CameraService (getUserMedia)
 │   ├── mediapipe/        # HandTrackingService (HandLandmarker)
 │   └── recognition/      # LandmarkProcessor (normalización + features),
 │                         # signClassifier (vecino más cercano), referenceStore (localStorage)
-├── hooks/                # useCamera, useHandLandmarker, useTrackedHand, useVideoCapture
+├── hooks/                # useCamera, useHandLandmarker, useTrackedHand, useMediaRecorder
 └── utils/                # (sin uso todavía)
 ```
 

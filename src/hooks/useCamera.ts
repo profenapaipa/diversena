@@ -7,6 +7,8 @@ export interface UseCameraResult {
   status: CameraStatus;
   error: CameraError | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
+  /** El MediaStream activo, o null si la cámara no está encendida. Útil para grabar (MediaRecorder). */
+  stream: MediaStream | null;
   start: () => void;
   stop: () => void;
 }
@@ -14,6 +16,7 @@ export interface UseCameraResult {
 export function useCamera(): UseCameraResult {
   const [status, setStatus] = useState<CameraStatus>('inactive');
   const [error, setError] = useState<CameraError | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const handleRef = useRef<CameraHandle | null>(null);
 
@@ -23,12 +26,14 @@ export function useCamera(): UseCameraResult {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    setStream(null);
     setStatus('inactive');
     setError(null);
   }, []);
 
   const handleLost = useCallback(() => {
     handleRef.current = null;
+    setStream(null);
     setStatus('error');
     setError({ reason: 'lost', message: 'Se perdió la conexión con la cámara.' });
   }, []);
@@ -43,6 +48,7 @@ export function useCamera(): UseCameraResult {
         if (videoRef.current) {
           videoRef.current.srcObject = handle.stream;
         }
+        setStream(handle.stream);
         setStatus('active');
       })
       .catch((err: CameraError) => {
@@ -57,5 +63,5 @@ export function useCamera(): UseCameraResult {
     };
   }, []);
 
-  return { status, error, videoRef, start, stop };
+  return { status, error, videoRef, stream, start, stop };
 }
