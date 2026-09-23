@@ -1,9 +1,12 @@
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import type { FingerName, HandFeatureVector } from '../../models/handFeatures';
 
 export interface Point2D {
   x: number;
   y: number;
 }
+
+export type { FingerName, HandFeatureVector };
 
 const WRIST = 0;
 const MIDDLE_MCP = 9;
@@ -19,8 +22,6 @@ const FINGER_CHAINS = {
   ring: [13, 14, 15, 16],
   pinky: [17, 18, 19, 20],
 } as const;
-
-export type FingerName = keyof typeof FINGER_CHAINS;
 
 /**
  * Traslada (origen = muñeca), escala (respecto a muñeca→nudillo medio) y
@@ -64,16 +65,6 @@ function angleAtVertexDegrees(a: Point2D, vertex: Point2D, b: Point2D): number {
   const mag2 = Math.hypot(v2.x, v2.y) || 1;
   const cos = (v1.x * v2.x + v1.y * v2.y) / (mag1 * mag2);
   return Math.acos(Math.min(1, Math.max(-1, cos))) * (180 / Math.PI);
-}
-
-export interface HandFeatureVector {
-  /**
-   * Ángulo de flexión en la articulación media de cada dedo, en grados:
-   * ~180° = dedo extendido, valores bajos = dedo doblado.
-   */
-  fingerCurl: Record<FingerName, number>;
-  /** Distancia (normalizada) de cada punta de dedo a la muñeca. */
-  fingertipDistance: Record<FingerName, number>;
 }
 
 /**

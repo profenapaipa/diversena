@@ -51,12 +51,7 @@ export function LearnPage() {
 
             <div className="practice-panel__section">
               <h3>Practica en vivo con seguimiento de manos</h3>
-              <CameraView />
-              <p className="practice-panel__note">
-                La detección de la mano y el análisis de la seña llegarán en
-                una fase posterior; por ahora la cámara solo se muestra en
-                vivo, con los puntos de referencia de la mano.
-              </p>
+              <CameraView language={language} targetSign={sign} />
             </div>
 
             <div className="practice-panel__section">

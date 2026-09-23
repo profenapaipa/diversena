@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { useCamera } from '../../hooks/useCamera';
-import { useHandLandmarker } from '../../hooks/useHandLandmarker';
+import { useMemo, useState } from 'react';
+import type { Language, Sign } from '../../models/language';
+import { useTrackedHand } from '../../hooks/useTrackedHand';
+import { getReference } from '../../services/recognition/referenceStore';
+import { classifyAgainstReferences } from '../../services/recognition/signClassifier';
 import { HandLandmarksCanvas } from './HandLandmarksCanvas';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -18,10 +20,35 @@ const HAND_STATUS_LABEL: Record<string, string> = {
   error: 'No se pudo cargar el detector de manos',
 };
 
-export function CameraView() {
-  const { status, error, videoRef, start, stop } = useCamera();
+interface CameraViewProps {
+  /** Si se da, además de mostrar la mano, clasifica en vivo contra las referencias guardadas de esta lengua. */
+  language?: Language;
+  /**
+   * Con `language`: si se da, compara solo contra esta seña (modo practicar,
+   * retroalimentación correcto/intenta de nuevo). Si se omite, compara
+   * contra todas las señas de la lengua (modo identificar).
+   */
+  targetSign?: Sign;
+}
+
+export function CameraView({ language, targetSign }: CameraViewProps) {
+  const { camera, tracking, features } = useTrackedHand();
+  const { status, error, videoRef, start, stop } = camera;
+  const { status: handStatus, hands } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
-  const { status: handStatus, hands } = useHandLandmarker(videoRef, status === 'active');
+
+  const referenceCandidates = useMemo(() => {
+    if (!language) return [];
+    const signs = targetSign ? [targetSign] : language.signs;
+    return signs.map((sign) => ({ sign, reference: getReference(language.id, sign.id) }));
+  }, [language, targetSign]);
+
+  const hasAnyReference = referenceCandidates.some((candidate) => candidate.reference !== null);
+
+  const classification = useMemo(() => {
+    if (!features || referenceCandidates.length === 0) return null;
+    return classifyAgainstReferences(features, referenceCandidates);
+  }, [features, referenceCandidates]);
 
   return (
     <div className="camera-view">
@@ -74,6 +101,37 @@ export function CameraView() {
           <p role="status" className="camera-view__status">
             {HAND_STATUS_LABEL[handStatus]}
           </p>
+
+          {language && (
+            <div className="camera-view__result" role="status">
+              {!hasAnyReference ? (
+                <p className="practice-panel__note">
+                  Todavía no hay referencias guardadas para {language.name}. Captúralas en
+                  «Herramientas → Referencias».
+                </p>
+              ) : targetSign ? (
+                classification ? (
+                  <p className="camera-view__result--match">
+                    ✓ ¡Correcto! Coincide con la vocal {targetSign.letter}.
+                  </p>
+                ) : (
+                  <p className="camera-view__result--no-match">
+                    Todavía no coincide. Revisa la posición de los dedos.
+                  </p>
+                )
+              ) : classification ? (
+                <p className="camera-view__result--match">
+                  Seña detectada: <strong>{classification.sign.letter}</strong> — confianza del
+                  reconocimiento: {Math.round(classification.confidence * 100)}%
+                </p>
+              ) : (
+                <p className="camera-view__result--no-match">
+                  No se pudo identificar la seña. Muestra claramente la mano dentro del área de
+                  cámara.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

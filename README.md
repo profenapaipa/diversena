@@ -24,11 +24,13 @@ etc.) en vez de inventar contenido lingüístico.
 
 ## Estado actual
 
-Fases 1–6 completas: estructura, navegación, modelo de datos, cámara,
-detección de manos en vivo (MediaPipe HandLandmarker) y normalización /
-extracción de características geométricas. **Todavía no incluye clasificador
-de señas** — la app detecta y dibuja la mano, pero no identifica todavía qué
-vocal se está formando (ver Roadmap).
+Fases 1–7 completas: estructura, navegación, modelo de datos, cámara,
+detección de manos en vivo (MediaPipe HandLandmarker), normalización /
+extracción de características geométricas, y un **clasificador por vecino
+más cercano** que compara la mano en vivo contra referencias reales
+capturadas por el equipo (ver "Capturar referencias" más abajo). Sin
+referencias guardadas para una lengua, la app lo dice explícitamente en vez
+de inventar un resultado.
 
 Además de la cámara en vivo con seguimiento de manos, las pantallas Aprender
 e Identificar incluyen una función complementaria para **grabar o subir un
@@ -71,14 +73,15 @@ src/
 ├── components/          # Componentes reutilizables (selectores, tarjetas, layout)
 ├── data/languages/       # Datos de cada lengua, físicamente separados (LSC/LSM/LSEC)
 ├── models/              # Tipos de dominio (Language, Sign, ...)
-├── features/camera/      # CameraView + HandLandmarksCanvas (seguimiento en vivo);
+├── features/camera/      # CameraView + HandLandmarksCanvas (seguimiento en vivo + clasificación);
 │                         # VideoCaptureView (grabar/subir video)
 ├── services/
 │   ├── camera/           # CameraService (getUserMedia)
 │   ├── mediapipe/        # HandTrackingService (HandLandmarker)
-│   └── recognition/      # LandmarkProcessor: normalización + features geométricas
-├── hooks/                # useCamera, useHandLandmarker, useVideoCapture
-└── utils/                # (a partir de la fase de clasificación)
+│   └── recognition/      # LandmarkProcessor (normalización + features),
+│                         # signClassifier (vecino más cercano), referenceStore (localStorage)
+├── hooks/                # useCamera, useHandLandmarker, useTrackedHand, useVideoCapture
+└── utils/                # (sin uso todavía)
 ```
 
 Las carpetas `services/`, `hooks/` y `utils/` se crean cuando tienen
@@ -98,16 +101,37 @@ contenido real, para no dejar carpetas vacías en el repositorio.
    distancia a la cámara ni su orientación en el plano de la imagen. Cubierto
    con pruebas de Vitest (invariancia a escala/rotación, ángulos de flexión
    por dedo) usando landmarks sintéticos, no una cámara real.
-3. **Clasificador por lengua** (pendiente): heurístico/geométrico en su
-   primera versión, detrás de una interfaz común, para poder reemplazarlo por
-   un modelo entrenado sin tocar la interfaz. Necesita referencias
-   geométricas reales por seña y lengua que el equipo aún no ha entregado;
-   no se van a inventar umbrales ni datos lingüísticos mientras tanto.
-4. **Confianza** (pendiente): se mostrará como "confianza del reconocimiento"
-   (una medida del modelo), nunca como certeza de que la seña se ejecutó
-   correctamente.
+3. **Clasificador por lengua** (ya implementada, `services/recognition/signClassifier.ts`):
+   compara el vector de características en vivo contra las referencias
+   guardadas de la lengua seleccionada y devuelve la más parecida —
+   **vecino más cercano geométrico, no una red entrenada**. Sin ninguna
+   referencia cargada, o si ninguna supera el umbral de confianza, devuelve
+   `null` explícitamente: nunca inventa una letra sin evidencia.
+4. **Confianza**: `similarityTo` da un valor 0-1 de qué tan parecida es la
+   postura en vivo a la referencia más cercana. Se muestra siempre como
+   "confianza del reconocimiento" (qué tan parecida es la forma de la mano),
+   nunca como certeza de que la seña se ejecutó lingüísticamente correcta.
 
-No se publicará ningún porcentaje de precisión sin una evaluación formal.
+No se publicará ningún porcentaje de precisión evaluado formalmente: este
+número es una medida de similitud geométrica, no una métrica de exactitud
+validada con usuarios reales.
+
+### Capturar referencias (cómo obtener el clasificador real, sin inventar datos)
+
+El clasificador necesita, por cada vocal y lengua, una referencia geométrica
+real. Como el equipo todavía no ha entregado ese material, se construyó una
+herramienta para capturarlo directamente en la app, en vez de inventar
+umbrales o usar señas de otra lengua (p. ej. ASL) como relleno:
+
+`http://localhost:5173/diversena/#/herramientas/referencias` (en producción,
+`https://<usuario>.github.io/diversena/#/herramientas/referencias`)
+
+Es una herramienta **interna del equipo**, no un enlace del menú principal
+para estudiantes. Flujo: alguien que sepa la lengua elige lengua + vocal,
+activa la cámara, y con la mano en la posición correcta pulsa "Guardar esta
+postura como referencia". Las referencias se guardan en el `localStorage` del
+navegador (no hay backend todavía); "Descargar referencias (.json)" e
+"Importar archivo .json" permiten pasarlas entre computadores del equipo.
 
 ### Espejo y landmarks
 
@@ -183,15 +207,20 @@ El proyecto está configurado para publicarse en
 
 ## Limitaciones actuales
 
-- Hay detección de manos (landmarks), pero **todavía no hay reconocimiento de
-  seña**: nada en la app identifica qué vocal se está formando.
+- El clasificador **solo funciona en las lenguas/vocales para las que alguien
+  haya capturado una referencia** con la herramienta interna; sin eso, la app
+  lo dice explícitamente en vez de adivinar.
+- Las referencias viven en `localStorage`: son por navegador, no se
+  sincronizan solas entre computadores (usar descargar/importar) y no hay
+  backend ni base de datos todavía.
+- Es un clasificador de **una sola postura estática** por vecino más cercano,
+  sin ninguna validación lingüística ni de precisión con usuarios reales —
+  la "confianza" es solo similitud geométrica a la referencia guardada.
 - La carga del modelo de `HandLandmarker` depende de acceso a Internet (CDN);
   sin conexión, la detección no arrancará (el estado quedará en "cargando" o
   pasará a error, nunca fingirá haber detectado algo).
 - Los recursos educativos (imagen, video, explicación, instrucciones) son
   placeholders hasta que el equipo entregue el material real por lengua.
-- El futuro clasificador por lengua no tendrá validación lingüística hasta
-  que existan referencias reales.
 
 ## Roadmap
 

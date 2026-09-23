@@ -30,12 +30,7 @@ export function IdentifyPage() {
 
           <div className="practice-panel__section">
             <h3>Identificación en vivo con seguimiento de manos</h3>
-            <CameraView />
-            <p className="practice-panel__note">
-              La detección de la mano y el clasificador de señas llegarán en
-              una fase posterior; por ahora la cámara solo se muestra en vivo,
-              con los puntos de referencia de la mano.
-            </p>
+            <CameraView language={language} />
           </div>
 
           <div className="practice-panel__section">
