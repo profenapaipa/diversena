@@ -9,7 +9,10 @@ export function ExplorePage() {
 
   return (
     <section className="page">
-      <h1>Explorar</h1>
+      <header className="page-head">
+        <p className="eyebrow">Explorar</p>
+        <h1>La misma letra, distintas lenguas</h1>
+      </header>
       <p>
         Recorre las lenguas de señas de DiverSeña. Cada una tiene sus propias
         referencias: la misma letra puede realizarse de forma distinta en cada

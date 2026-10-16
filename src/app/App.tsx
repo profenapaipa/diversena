@@ -7,6 +7,8 @@ import { ExplorePage } from '../pages/ExplorePage';
 import { ReferenceCapturePage } from '../pages/ReferenceCapturePage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { TrainingDataPage } from '../pages/TrainingDataPage';
+import { ProjectPage } from '../pages/ProjectPage';
+import { TeamPanelPage } from '../pages/TeamPanelPage';
 
 export function App() {
   return (
@@ -18,6 +20,8 @@ export function App() {
           <Route path="identificar" element={<IdentifyPage />} />
           <Route path="explorar" element={<ExplorePage />} />
           <Route path="perfil" element={<ProfilePage />} />
+          <Route path="proyecto" element={<ProjectPage />} />
+          <Route path="panel" element={<TeamPanelPage />} />
           {/* Herramientas internas del equipo: enlazadas desde el pie de página, no del menú principal. */}
           <Route path="herramientas/entrenar" element={<TrainingDataPage />} />
           <Route path="herramientas/referencias" element={<ReferenceCapturePage />} />

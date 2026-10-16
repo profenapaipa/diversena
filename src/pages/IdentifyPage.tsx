@@ -9,8 +9,14 @@ export function IdentifyPage() {
 
   return (
     <section className="page">
-      <h1>Identificar</h1>
-      <p>Selecciona la lengua de señas que quieres usar para la identificación automática.</p>
+      <header className="page-head">
+        <p className="eyebrow">Traducir</p>
+        <h1>Haz una seña y la convertimos en texto</h1>
+        <p className="lead">
+          Ponte frente a la cámara con la mano completa dentro del cuadro. Si no estamos seguros, te
+          sugerimos las señas más parecidas.
+        </p>
+      </header>
 
       <LanguageSelector languages={languages} selectedId={languageId} onSelect={setLanguageId} />
 

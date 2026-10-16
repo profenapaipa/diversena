@@ -45,7 +45,17 @@ export async function startCamera(
   try {
     stream = await navigator.mediaDevices.getUserMedia(constraints);
   } catch (err) {
-    throw toCameraError(err);
+    // Algunas cámaras (o celulares) rechazan la resolución o los fps
+    // pedidos: antes de rendirse, se pide "cualquier cámara frontal".
+    const name = (err as { name?: string } | null)?.name ?? '';
+    if (name !== 'OverconstrainedError' && name !== 'ConstraintNotSatisfiedError' && name !== 'NotReadableError') {
+      throw toCameraError(err);
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    } catch (retryErr) {
+      throw toCameraError(retryErr);
+    }
   }
 
   const stop = () => {

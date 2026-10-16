@@ -98,3 +98,25 @@ export function classifyAgainstReferences<TSign>(
     candidates.map(({ sign, reference }) => ({ sign, references: reference ? [reference] : [] })),
   );
 }
+
+/** Similitud mínima para proponer una seña como sugerencia ("¿quizás quisiste decir…?"). */
+export const SUGGESTION_FLOOR = 0.4;
+
+/**
+ * Señas ordenadas de la más a la menos parecida (por su referencia más
+ * cercana), solo las que superan `SUGGESTION_FLOOR`. Sirve para sugerir
+ * opciones cuando el reconocimiento no está seguro, en vez de no decir nada.
+ */
+export function rankSigns<TSign>(
+  live: HandFeatureVector,
+  candidates: Array<{ sign: TSign; references: HandFeatureVector[] }>,
+  limit = 3,
+): Array<SignMatch<TSign>> {
+  const ranked: Array<SignMatch<TSign>> = [];
+  for (const { sign, references } of candidates) {
+    let best = 0;
+    for (const reference of references) best = Math.max(best, similarityTo(live, reference));
+    if (references.length > 0 && best >= SUGGESTION_FLOOR) ranked.push({ sign, confidence: best });
+  }
+  return ranked.sort((a, b) => b.confidence - a.confidence).slice(0, limit);
+}

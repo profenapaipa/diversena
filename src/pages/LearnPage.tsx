@@ -14,8 +14,11 @@ export function LearnPage() {
 
   return (
     <section className="page">
-      <h1>Aprender</h1>
-      <p>Selecciona una lengua de señas y luego una vocal para ver su contenido educativo.</p>
+      <header className="page-head">
+        <p className="eyebrow">Aprender</p>
+        <h1>Elige una vocal y practícala</h1>
+        <p className="lead">Mira cómo se hace la seña y luego hazla frente a la cámara: DiverSeña te dice si coincide.</p>
+      </header>
 
       <h2>1. Lengua de señas</h2>
       <LanguageSelector

@@ -57,6 +57,18 @@ export function useCamera(): UseCameraResult {
       });
   }, [handleLost]);
 
+  // Conectar el stream al <video> y reproducirlo de forma explícita: en
+  // algunos navegadores `autoPlay` no arranca solo (la "cámara negra" que
+  // reportaba el equipo), y si el <video> se vuelve a montar pierde el stream.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !stream) return;
+    if (video.srcObject !== stream) video.srcObject = stream;
+    video.play().catch(() => {
+      // Bloqueado hasta que la persona interactúe: el siguiente clic lo arranca.
+    });
+  }, [stream]);
+
   useEffect(() => {
     return () => {
       handleRef.current?.stop();

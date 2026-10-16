@@ -18,9 +18,8 @@ import {
 import { recordClip, videoExtension } from '../services/dataset/clipRecorder';
 import { DATASET_SAMPLE_FPS, extractLandmarksFromVideo } from '../services/dataset/videoLandmarkExtractor';
 import { MIN_HAND_COVERAGE } from '../services/recognition/referenceSet';
+import { TARGET_CLIPS_PER_SIGN } from '../services/dataset/datasetGoals';
 
-/** Meta de clips por seña para una primera versión confiable (ver docs/ENTRENAMIENTO-IA.md). */
-const TARGET_CLIPS_PER_SIGN = 40;
 const CLIP_SECONDS = 3;
 const COUNTDOWN_SECONDS = 3;
 const CONTRIBUTOR_KEY = 'diversena.contributor.v1';

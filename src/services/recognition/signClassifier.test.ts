@@ -4,6 +4,7 @@ import {
   CONFIDENCE_FLOOR,
   classifyAgainstReferences,
   classifyWithReferenceSet,
+  rankSigns,
   similarityTo,
 } from './signClassifier';
 
@@ -85,5 +86,20 @@ describe('classifyWithReferenceSet', () => {
 
   it('devuelve null sin referencias', () => {
     expect(classifyWithReferenceSet(features(20, 0.1), [{ sign: 'A', references: [] }])).toBeNull();
+  });
+});
+
+describe('rankSigns', () => {
+  it('ordena las señas de la más a la menos parecida y omite las lejanas', () => {
+    const live = features(60, 0.6);
+    const ranked = rankSigns(live, [
+      { sign: 'A', references: [features(10, 0.05)] },
+      { sign: 'E', references: [features(70, 0.7)] },
+      { sign: 'O', references: [features(50, 0.5), features(90, 0.9)] },
+      { sign: 'U', references: [] },
+    ]);
+    expect(ranked.map((r) => r.sign).slice(0, 2).sort()).toEqual(['E', 'O']);
+    expect(ranked.every((r) => r.sign !== 'U')).toBe(true);
+    expect(ranked[0].confidence).toBeGreaterThanOrEqual(ranked[ranked.length - 1].confidence);
   });
 });

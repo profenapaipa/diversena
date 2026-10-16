@@ -63,6 +63,23 @@ export interface LoadedReferenceSet {
 }
 
 /**
+ * Todos los clips de una lengua: el dataset publicado con la app más el de
+ * este navegador, sin duplicados (una muestra importada puede estar en ambos).
+ */
+export async function loadAllSamples(language: Language): Promise<TrainingSample[]> {
+  const [bundled, local] = await Promise.all([
+    loadBundledSamples(language.id),
+    listSamples(language.id).catch(() => [] as TrainingSample[]),
+  ]);
+  const seen = new Set<string>();
+  return [...bundled, ...local].filter((sample) => {
+    if (seen.has(sample.id) || sample.languageId !== language.id) return false;
+    seen.add(sample.id);
+    return true;
+  });
+}
+
+/**
  * Une las tres fuentes de referencias de una lengua:
  *  1. el dataset publicado con la app,
  *  2. el dataset grabado/importado en este navegador (IndexedDB),
@@ -75,17 +92,8 @@ export async function loadReferenceSet(language: Language): Promise<LoadedRefere
     (references[signId] ??= []).push(...vectors);
   };
 
-  const [bundled, local] = await Promise.all([
-    loadBundledSamples(language.id),
-    listSamples(language.id).catch(() => [] as TrainingSample[]),
-  ]);
-
-  // Una muestra importada puede estar también en el publicado: no contarla dos veces.
-  const seen = new Set<string>();
   let sampleCount = 0;
-  for (const sample of [...bundled, ...local]) {
-    if (seen.has(sample.id) || sample.languageId !== language.id) continue;
-    seen.add(sample.id);
+  for (const sample of await loadAllSamples(language)) {
     const vectors = featuresFromSample(sample);
     if (vectors.length > 0) sampleCount++;
     add(sample.signId, vectors);
