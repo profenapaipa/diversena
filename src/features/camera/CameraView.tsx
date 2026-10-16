@@ -37,9 +37,9 @@ interface CameraViewProps {
 }
 
 export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena' }: CameraViewProps) {
-  const { camera, tracking, features } = useTrackedHand();
+  const { camera, tracking, recognizedHand, features } = useTrackedHand();
   const { status, error, videoRef, stream, start, stop } = camera;
-  const { status: handStatus, latestHandsRef, fps } = tracking;
+  const { status: handStatus, hands, latestHandsRef, fps } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
   const recorder = useMediaRecorder(stream, fileNamePrefix);
   const { loaded, loading: loadingReferences } = useReferenceSet(language);
@@ -117,7 +117,11 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
             Mostrar puntos de referencia
           </label>
           <p role="status" className="camera-view__status">
-            {HAND_STATUS_LABEL[handStatus]}
+            {handStatus === 'mano-detectada'
+              ? hands.length === 2
+                ? `Dos manos detectadas · se reconoce la ${recognizedHand?.side}`
+                : `Mano ${hands[0]?.side} detectada`
+              : HAND_STATUS_LABEL[handStatus]}
             {fps > 0 && <span className="camera-view__fps"> · {fps} cuadros/s</span>}
           </p>
 

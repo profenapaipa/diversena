@@ -29,13 +29,12 @@ let liveLandmarkerPromise: Promise<HandLandmarker> | null = null;
 let datasetLandmarkerPromise: Promise<HandLandmarker> | null = null;
 
 /**
- * Detector para la cámara en vivo (aprender/identificar). Sigue una sola
- * mano: las vocales se hacen con una mano y seguir una sola es notablemente
- * más rápido y evita que el resultado "salte" entre dos manos.
+ * Detector para la cámara en vivo (aprender/identificar). Sigue las dos
+ * manos; el reconocimiento elige cuál usar (ver `useTrackedHand`).
  */
 export function getHandLandmarker(): Promise<HandLandmarker> {
   if (!liveLandmarkerPromise) {
-    liveLandmarkerPromise = createHandLandmarker(1).catch((err: unknown) => {
+    liveLandmarkerPromise = createHandLandmarker(2).catch((err: unknown) => {
       liveLandmarkerPromise = null;
       throw err;
     });

@@ -1,11 +1,14 @@
 import { useEffect, useRef, type RefObject } from 'react';
-import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
+import type { TrackedHand } from '../../hooks/useHandLandmarker';
 import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
+
+// Un color por mano, para distinguirlas cuando aparecen las dos.
+const HAND_COLOR = { derecha: '#22c55e', izquierda: '#38bdf8' } as const;
 
 interface HandLandmarksCanvasProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   /** Manos más recientes; se leen en cada cuadro de animación, sin pasar por el estado de React. */
-  handsRef: RefObject<NormalizedLandmark[][]>;
+  handsRef: RefObject<TrackedHand[]>;
 }
 
 /**
@@ -23,7 +26,7 @@ export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasP
 
   useEffect(() => {
     let rafId = 0;
-    let lastDrawn: NormalizedLandmark[][] | null = null;
+    let lastDrawn: TrackedHand[] | null = null;
 
     const draw = () => {
       rafId = requestAnimationFrame(draw);
@@ -42,11 +45,11 @@ export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasP
       ctx.clearRect(0, 0, width, height);
 
       ctx.lineWidth = Math.max(2, width / 240);
-      ctx.strokeStyle = '#22c55e';
-      ctx.fillStyle = '#22c55e';
       const radius = Math.max(3, width / 180);
 
-      for (const hand of hands) {
+      for (const { landmarks: hand, side } of hands) {
+        ctx.strokeStyle = HAND_COLOR[side];
+        ctx.fillStyle = HAND_COLOR[side];
         ctx.beginPath();
         for (const { start, end } of HAND_CONNECTIONS) {
           const a = hand[start];

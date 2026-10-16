@@ -2,12 +2,15 @@ import { useMemo } from 'react';
 import type { HandFeatureVector } from '../models/handFeatures';
 import { extractHandFeatures, normalizeHandLandmarks } from '../services/recognition/landmarkProcessor';
 import { useCamera, type UseCameraResult } from './useCamera';
-import { useHandLandmarker, type UseHandLandmarkerResult } from './useHandLandmarker';
+import { useHandLandmarker, type TrackedHand, type UseHandLandmarkerResult } from './useHandLandmarker';
+import { useProfile } from './useProfile';
 
 export interface UseTrackedHandResult {
   camera: UseCameraResult;
   tracking: UseHandLandmarkerResult;
-  /** Características geométricas de la primera mano detectada, o null si no hay ninguna. */
+  /** Mano que se está reconociendo (la dominante si están las dos), o null si no hay ninguna. */
+  recognizedHand: TrackedHand | null;
+  /** Características geométricas de `recognizedHand`, o null si no hay ninguna mano. */
   features: HandFeatureVector | null;
 }
 
@@ -20,12 +23,17 @@ export interface UseTrackedHandResult {
 export function useTrackedHand(): UseTrackedHandResult {
   const camera = useCamera();
   const tracking = useHandLandmarker(camera.videoRef, camera.status === 'active');
-  const firstHand = tracking.hands[0];
+  const dominantHand = useProfile()?.dominantHand ?? 'derecha';
+
+  // Las vocales se hacen con una mano: si se ven las dos, se reconoce la
+  // dominante (según el perfil; derecha si no hay perfil).
+  const recognizedHand =
+    tracking.hands.find((hand) => hand.side === dominantHand) ?? tracking.hands[0] ?? null;
 
   const features = useMemo(() => {
-    if (!firstHand) return null;
-    return extractHandFeatures(normalizeHandLandmarks(firstHand));
-  }, [firstHand]);
+    if (!recognizedHand) return null;
+    return extractHandFeatures(normalizeHandLandmarks(recognizedHand.landmarks));
+  }, [recognizedHand]);
 
-  return { camera, tracking, features };
+  return { camera, tracking, recognizedHand, features };
 }
