@@ -25,7 +25,7 @@ export function ReferenceCapturePage() {
   const [savedTick, setSavedTick] = useState(0); // fuerza releer localStorage tras guardar/borrar
   const { camera, tracking, features } = useTrackedHand();
   const { status, error, videoRef, start, stop } = camera;
-  const { hands } = tracking;
+  const { latestHandsRef } = tracking;
 
   const language = languageId ? getLanguageById(languageId) : undefined;
   const sign = language?.signs.find((s) => s.id === signId);
@@ -78,6 +78,7 @@ export function ReferenceCapturePage() {
 
       <h2>1. Lengua de señas</h2>
       <LanguageSelector
+        allowLocked
         languages={languages}
         selectedId={languageId}
         onSelect={(id) => {
@@ -107,7 +108,7 @@ export function ReferenceCapturePage() {
           <div className="camera-view">
             <div className="camera-view__frame" data-status={status}>
               <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
-              {status === 'active' && <HandLandmarksCanvas videoRef={videoRef} hands={hands} />}
+              {status === 'active' && <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} />}
               {status !== 'active' && (
                 <p className="camera-view__overlay-text">{STATUS_LABEL[status]}</p>
               )}

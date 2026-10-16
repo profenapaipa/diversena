@@ -11,9 +11,15 @@ identificar** vocales (A, E, I, O, U) en distintas lenguas de señas, usando
 
 ## Lenguas y vocales de la primera versión
 
-- Lengua de Señas Colombiana (LSC)
-- Lengua de Señas Mexicana (LSM)
-- Lengua de Señas Ecuatoriana (LSEC)
+- **Lengua de Señas Colombiana (LSC)**: foco actual, disponible.
+- Lengua de Señas Mexicana (LSM): 🔒 Próximamente.
+- Lengua de Señas Ecuatoriana (LSEC): 🔒 Próximamente.
+
+Las lenguas "Próximamente" se ven, pero no se pueden elegir en Aprender,
+Identificar ni Explorar (`status: 'proximamente'` en
+`src/data/languages/<pais>.ts`). Para abrir una, se cambia a `'disponible'`.
+Las herramientas del equipo sí permiten elegirlas, para ir reuniendo sus
+datos de entrenamiento.
 
 Vocales: **A, E, I, O, U**.
 
@@ -23,6 +29,24 @@ muestra placeholders explícitos (`[IMAGEN PENDIENTE]`, `[VIDEO PENDIENTE]`,
 etc.) en vez de inventar contenido lingüístico.
 
 ## Estado actual
+
+**Novedades (octubre 2026):**
+
+- **Detección más rápida y estable**: GPU con respaldo a CPU, cámara a
+  640×480 y 30 fps, modelo precargado y "calentado" al abrir la app (la
+  detección arranca en ~0,5 s), solo se procesan cuadros nuevos, el canvas se
+  dibuja fuera de React, suavizado One-Euro de los puntos, tolerancia a
+  pérdidas breves de la mano y votación temporal del resultado.
+- **Perfil de usuario** (`#/perfil`): nombre, rol, mano dominante, foto de
+  perfil encuadrada con **detección** de rostro (no reconocimiento) y progreso
+  por vocal. Todo se guarda solo en el navegador.
+- **Entrenar IA** (`#/herramientas/entrenar`): grabar o subir clips
+  etiquetados, extraer los puntos de la mano, control de calidad, avance por
+  seña, exportar e importar el dataset. Ver
+  [docs/ENTRENAMIENTO-IA.md](docs/ENTRENAMIENTO-IA.md).
+- **Clasificador k-NN** que usa todos los clips de entrenamiento (dataset
+  publicado en `public/datasets/<lengua>.json` + dataset local + referencias
+  rápidas).
 
 Fases 1–7 completas: estructura, navegación, modelo de datos, cámara,
 detección de manos en vivo (MediaPipe HandLandmarker), normalización /
@@ -61,7 +85,9 @@ CameraService → HandTrackingService → LandmarkProcessor → SignRecognitionS
 - React + TypeScript + Vite
 - `react-router-dom` (HashRouter)
 - `@mediapipe/tasks-vision` (HandLandmarker) para detección de manos
-- Sin backend, sin base de datos, sin autenticación (ver Privacidad)
+- `@mediapipe/tasks-vision` (FaceDetector) para encuadrar la foto de perfil
+- Sin backend, sin base de datos, sin autenticación (ver Privacidad).
+  Perfil en `localStorage`, dataset de entrenamiento en IndexedDB
 
 ## Estructura del proyecto
 
@@ -158,6 +184,13 @@ ninguna coordenada a mano.
 - La única descarga externa es el modelo de `HandLandmarker` (WASM + archivo
   `.task`) desde CDN, una sola vez por sesión de navegador: es un activo
   estático de la librería, no contiene ni transmite datos del usuario.
+- **Rostro**: solo se *detecta* (dónde hay una cara) para recortar la foto de
+  perfil. No se calcula ninguna huella facial, no se identifica a nadie y la
+  foto no sale del navegador.
+- **Dataset de entrenamiento**: los clips quedan en el navegador de quien los
+  graba. El JSON exportado solo lleva coordenadas de la mano, sin imagen. Se
+  pide consentimiento, y el de un acudiente en el caso de menores (ver
+  docs/ENTRENAMIENTO-IA.md).
 - No hay backend, base de datos ni autenticación en esta versión.
 
 ## Colaboración
@@ -201,8 +234,8 @@ El proyecto está configurado para publicarse en
 - `vite.config.ts` define `base: '/diversena/'`.
 - El enrutamiento usa `HashRouter`, que no necesita configuración adicional
   de rutas en Pages.
-- El flujo de GitHub Actions (build + deploy) se añade en la fase de
-  despliegue.
+- `.github/workflows/deploy.yml` corre tests, compila y publica en cada push
+  a `main`: https://profenapaipa.github.io/diversena/
 
 ## Limitaciones actuales
 

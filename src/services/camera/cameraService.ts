@@ -16,8 +16,16 @@ export interface CameraHandle {
   stop: () => void;
 }
 
+// 640×480 a 30 fps: suficiente para detectar los 21 puntos de la mano con
+// precisión, y mucho más liviano que el 1080p que muchas cámaras entregan
+// por defecto (menos píxeles que copiar a la GPU en cada cuadro).
 const DEFAULT_CONSTRAINTS: MediaStreamConstraints = {
-  video: { facingMode: 'user' },
+  video: {
+    facingMode: 'user',
+    width: { ideal: 640 },
+    height: { ideal: 480 },
+    frameRate: { ideal: 30, max: 30 },
+  },
   audio: false,
 };
 

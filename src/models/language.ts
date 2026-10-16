@@ -22,9 +22,19 @@ export interface Sign {
   classificationData: SignClassificationData | null;
 }
 
+/**
+ * `disponible`: se puede aprender, practicar e identificar.
+ * `proximamente`: visible pero bloqueada para estudiantes hasta que tenga
+ * contenido educativo y datos de entrenamiento propios (hoy el foco es LSC).
+ */
+export type LanguageStatus = 'disponible' | 'proximamente';
+
 export interface Language {
   id: string;
   name: string;
+  /** Sigla habitual de la lengua (LSC, LSM, LSEC). */
+  shortName: string;
   country: string;
+  status: LanguageStatus;
   signs: Sign[];
 }

@@ -42,25 +42,59 @@ export interface SignMatch<TSign> {
   confidence: number;
 }
 
+/** Cuántas referencias más cercanas votan en el clasificador k-NN. */
+export const K_NEIGHBORS = 5;
+
 /**
- * Compara `live` contra cada entrada de `candidates` (letra → referencia) y
- * devuelve la más parecida, o `null` si ninguna referencia existe o ninguna
- * supera `CONFIDENCE_FLOOR` — nunca se inventa un resultado sin evidencia.
+ * k vecinos más cercanos: compara `live` contra TODAS las referencias de
+ * todas las señas candidatas, toma las `K_NEIGHBORS` más parecidas y gana la
+ * seña con más similitud acumulada entre ellas. Con muchos clips de
+ * entrenamiento por seña (distintas personas, manos, luces) esto es mucho
+ * más estable que comparar contra una única referencia.
+ *
+ * La confianza es la similitud de la referencia más cercana de la seña
+ * ganadora. Devuelve `null` si no hay referencias o ninguna supera
+ * `CONFIDENCE_FLOOR` — nunca se inventa un resultado sin evidencia.
  */
+export function classifyWithReferenceSet<TSign>(
+  live: HandFeatureVector,
+  candidates: Array<{ sign: TSign; references: HandFeatureVector[] }>,
+): SignMatch<TSign> | null {
+  const scored: Array<{ index: number; similarity: number }> = [];
+  candidates.forEach(({ references }, index) => {
+    for (const reference of references) {
+      scored.push({ index, similarity: similarityTo(live, reference) });
+    }
+  });
+  if (scored.length === 0) return null;
+
+  scored.sort((a, b) => b.similarity - a.similarity);
+  const neighbors = scored.slice(0, K_NEIGHBORS).filter((n) => n.similarity >= CONFIDENCE_FLOOR);
+  if (neighbors.length === 0) return null;
+
+  const votes = new Map<number, { weight: number; best: number }>();
+  for (const { index, similarity } of neighbors) {
+    const entry = votes.get(index) ?? { weight: 0, best: 0 };
+    entry.weight += similarity;
+    entry.best = Math.max(entry.best, similarity);
+    votes.set(index, entry);
+  }
+
+  let winner: { index: number; weight: number; best: number } | null = null;
+  for (const [index, entry] of votes) {
+    if (!winner || entry.weight > winner.weight) winner = { index, ...entry };
+  }
+  if (!winner) return null;
+  return { sign: candidates[winner.index].sign, confidence: winner.best };
+}
+
+/** Variante con una sola referencia (o ninguna) por seña. */
 export function classifyAgainstReferences<TSign>(
   live: HandFeatureVector,
   candidates: Array<{ sign: TSign; reference: HandFeatureVector | null }>,
 ): SignMatch<TSign> | null {
-  let best: SignMatch<TSign> | null = null;
-
-  for (const { sign, reference } of candidates) {
-    if (!reference) continue;
-    const confidence = similarityTo(live, reference);
-    if (!best || confidence > best.confidence) {
-      best = { sign, confidence };
-    }
-  }
-
-  if (!best || best.confidence < CONFIDENCE_FLOOR) return null;
-  return best;
+  return classifyWithReferenceSet(
+    live,
+    candidates.map(({ sign, reference }) => ({ sign, references: reference ? [reference] : [] })),
+  );
 }

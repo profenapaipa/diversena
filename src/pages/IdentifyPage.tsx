@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { languages, getLanguageById } from '../data/languages';
+import { languages, getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { CameraView } from '../features/camera/CameraView';
 
 export function IdentifyPage() {
-  const [languageId, setLanguageId] = useState<string | null>(null);
+  const [languageId, setLanguageId] = useState<string | null>(DEFAULT_LANGUAGE_ID);
   const language = languageId ? getLanguageById(languageId) : undefined;
 
   return (

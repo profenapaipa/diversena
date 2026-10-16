@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { languages, getLanguageById } from '../data/languages';
+import { languages, getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { VowelSelector } from '../components/VowelSelector';
 import { SignCard } from '../components/SignCard';
 import { CameraView } from '../features/camera/CameraView';
 
 export function LearnPage() {
-  const [languageId, setLanguageId] = useState<string | null>(null);
+  const [languageId, setLanguageId] = useState<string | null>(DEFAULT_LANGUAGE_ID);
   const [signId, setSignId] = useState<string | null>(null);
 
   const language = languageId ? getLanguageById(languageId) : undefined;

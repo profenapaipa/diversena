@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Language, Sign } from '../../models/language';
 import { useTrackedHand } from '../../hooks/useTrackedHand';
 import { useMediaRecorder } from '../../hooks/useMediaRecorder';
-import { getReference } from '../../services/recognition/referenceStore';
-import { classifyAgainstReferences } from '../../services/recognition/signClassifier';
+import { useReferenceSet } from '../../hooks/useReferenceSet';
+import { useStableClassification } from '../../hooks/useStableClassification';
+import { recordPracticeSuccess } from '../../services/profile/profileStore';
 import { HandLandmarksCanvas } from './HandLandmarksCanvas';
 import { RecordingControls } from './RecordingControls';
 
@@ -38,29 +39,41 @@ interface CameraViewProps {
 export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena' }: CameraViewProps) {
   const { camera, tracking, features } = useTrackedHand();
   const { status, error, videoRef, stream, start, stop } = camera;
-  const { status: handStatus, hands } = tracking;
+  const { status: handStatus, latestHandsRef, fps } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
   const recorder = useMediaRecorder(stream, fileNamePrefix);
+  const { loaded, loading: loadingReferences } = useReferenceSet(language);
 
+  // En modo practicar se compara contra TODAS las señas y se pide que gane
+  // la objetivo: así una "E" no cuenta como "A" solo por superar el umbral.
   const referenceCandidates = useMemo(() => {
     if (!language) return [];
-    const signs = targetSign ? [targetSign] : language.signs;
-    return signs.map((sign) => ({ sign, reference: getReference(language.id, sign.id) }));
-  }, [language, targetSign]);
+    return language.signs.map((sign) => ({ sign, references: loaded.references[sign.id] ?? [] }));
+  }, [language, loaded]);
 
-  const hasAnyReference = referenceCandidates.some((candidate) => candidate.reference !== null);
+  const hasAnyReference = referenceCandidates.some((candidate) => candidate.references.length > 0);
+  const targetHasReferences =
+    !targetSign || referenceCandidates.some((c) => c.sign.id === targetSign.id && c.references.length > 0);
 
-  const classification = useMemo(() => {
-    if (!features || referenceCandidates.length === 0) return null;
-    return classifyAgainstReferences(features, referenceCandidates);
-  }, [features, referenceCandidates]);
+  const stable = useStableClassification(features, referenceCandidates);
+  const classification = targetSign ? (stable?.sign.id === targetSign.id ? stable : null) : stable;
+
+  // Cada vez que la seña objetivo pasa a reconocerse de forma estable, cuenta como un acierto.
+  const wasMatchingRef = useRef(false);
+  useEffect(() => {
+    const matching = Boolean(targetSign && classification);
+    if (matching && !wasMatchingRef.current && language && targetSign) {
+      recordPracticeSuccess(language.id, targetSign.id);
+    }
+    wasMatchingRef.current = matching;
+  }, [classification, language, targetSign]);
 
   return (
     <div className="camera-view">
       <div className="camera-view__frame" data-status={status}>
         <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
         {status === 'active' && showLandmarks && (
-          <HandLandmarksCanvas videoRef={videoRef} hands={hands} />
+          <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} />
         )}
         {status !== 'active' && (
           <p className="camera-view__overlay-text">{STATUS_LABEL[status]}</p>
@@ -105,14 +118,18 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
           </label>
           <p role="status" className="camera-view__status">
             {HAND_STATUS_LABEL[handStatus]}
+            {fps > 0 && <span className="camera-view__fps"> · {fps} cuadros/s</span>}
           </p>
 
           {language && (
             <div className="camera-view__result" role="status">
-              {!hasAnyReference ? (
+              {loadingReferences && !hasAnyReference ? (
+                <p className="practice-panel__note">Cargando datos de reconocimiento…</p>
+              ) : !hasAnyReference || !targetHasReferences ? (
                 <p className="practice-panel__note">
-                  Todavía no hay referencias guardadas para {language.name}. Captúralas en
-                  «Herramientas → Referencias».
+                  Todavía no hay datos de entrenamiento para{' '}
+                  {targetSign ? `la vocal ${targetSign.letter} en ` : ''}
+                  {language.name}. El equipo los está reuniendo en «Entrenar IA».
                 </p>
               ) : targetSign ? (
                 classification ? (

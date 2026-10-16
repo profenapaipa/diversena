@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { HandFeatureVector } from '../../models/handFeatures';
-import { CONFIDENCE_FLOOR, classifyAgainstReferences, similarityTo } from './signClassifier';
+import {
+  CONFIDENCE_FLOOR,
+  classifyAgainstReferences,
+  classifyWithReferenceSet,
+  similarityTo,
+} from './signClassifier';
 
 function features(curl: number, dist: number): HandFeatureVector {
   const fingers = ['thumb', 'index', 'middle', 'ring', 'pinky'] as const;
@@ -64,5 +69,21 @@ describe('classifyAgainstReferences', () => {
     ]);
 
     expect(result).toBeNull();
+  });
+});
+
+describe('classifyWithReferenceSet', () => {
+  it('usa la mayoría de vecinos cercanos, no solo el más cercano', () => {
+    // Un clip "raro" de E queda muy cerca, pero varios clips de A quedan cerca también.
+    const live = features(20, 0.1);
+    const result = classifyWithReferenceSet(live, [
+      { sign: 'A', references: [features(24, 0.12), features(26, 0.14), features(28, 0.15), features(30, 0.16)] },
+      { sign: 'E', references: [features(21, 0.1), features(120, 1.2)] },
+    ]);
+    expect(result?.sign).toBe('A');
+  });
+
+  it('devuelve null sin referencias', () => {
+    expect(classifyWithReferenceSet(features(20, 0.1), [{ sign: 'A', references: [] }])).toBeNull();
   });
 });

@@ -4,7 +4,8 @@ import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
 
 interface HandLandmarksCanvasProps {
   videoRef: RefObject<HTMLVideoElement | null>;
-  hands: NormalizedLandmark[][];
+  /** Manos más recientes; se leen en cada cuadro de animación, sin pasar por el estado de React. */
+  handsRef: RefObject<NormalizedLandmark[][]>;
 }
 
 /**
@@ -13,41 +14,61 @@ interface HandLandmarksCanvasProps {
  * index.css): como las coordenadas normalizadas vienen del cuadro real (sin
  * espejar), espejar el canvas junto al video los mantiene alineados sin
  * tener que invertir manualmente ninguna coordenada.
+ *
+ * Tiene su propio bucle de animación: dibuja a la tasa de la pantalla aunque
+ * React solo se actualice unas pocas veces por segundo.
  */
-export function HandLandmarksCanvas({ videoRef, hands }: HandLandmarksCanvasProps) {
+export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !video || !ctx) return;
+    let rafId = 0;
+    let lastDrawn: NormalizedLandmark[][] | null = null;
 
-    canvas.width = video.videoWidth || canvas.clientWidth;
-    canvas.height = video.videoHeight || canvas.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const draw = () => {
+      rafId = requestAnimationFrame(draw);
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+      const ctx = canvas?.getContext('2d');
+      const hands = handsRef.current;
+      if (!canvas || !video || !ctx || hands === lastDrawn) return;
+      lastDrawn = hands;
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#22c55e';
-    ctx.fillStyle = '#22c55e';
+      const width = video.videoWidth || canvas.clientWidth;
+      const height = video.videoHeight || canvas.clientHeight;
+      // Cambiar width/height borra y realoca el canvas: solo si de verdad cambió.
+      if (canvas.width !== width) canvas.width = width;
+      if (canvas.height !== height) canvas.height = height;
+      ctx.clearRect(0, 0, width, height);
 
-    for (const hand of hands) {
-      for (const { start, end } of HAND_CONNECTIONS) {
-        const a = hand[start];
-        const b = hand[end];
-        if (!a || !b) continue;
+      ctx.lineWidth = Math.max(2, width / 240);
+      ctx.strokeStyle = '#22c55e';
+      ctx.fillStyle = '#22c55e';
+      const radius = Math.max(3, width / 180);
+
+      for (const hand of hands) {
         ctx.beginPath();
-        ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
-        ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
+        for (const { start, end } of HAND_CONNECTIONS) {
+          const a = hand[start];
+          const b = hand[end];
+          if (!a || !b) continue;
+          ctx.moveTo(a.x * width, a.y * height);
+          ctx.lineTo(b.x * width, b.y * height);
+        }
         ctx.stroke();
-      }
-      for (const point of hand) {
+
         ctx.beginPath();
-        ctx.arc(point.x * canvas.width, point.y * canvas.height, 3, 0, Math.PI * 2);
+        for (const point of hand) {
+          ctx.moveTo(point.x * width + radius, point.y * height);
+          ctx.arc(point.x * width, point.y * height, radius, 0, Math.PI * 2);
+        }
         ctx.fill();
       }
-    }
-  }, [hands, videoRef]);
+    };
+    rafId = requestAnimationFrame(draw);
+
+    return () => cancelAnimationFrame(rafId);
+  }, [handsRef, videoRef]);
 
   return <canvas ref={canvasRef} className="hand-landmarks-canvas" aria-hidden="true" />;
 }

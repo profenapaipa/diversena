@@ -2,6 +2,9 @@ import type { HandFeatureVector } from '../../models/handFeatures';
 
 const STORAGE_KEY = 'diversena.signReferences.v1';
 
+/** Se emite en `window` al guardar/borrar/importar referencias. */
+export const REFERENCES_CHANGED_EVENT = 'diversena:references-changed';
+
 type ReferenceMap = Record<string, HandFeatureVector>;
 
 function referenceKey(languageId: string, signId: string): string {
@@ -27,6 +30,7 @@ function readAll(): ReferenceMap {
 function writeAll(map: ReferenceMap): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+    window.dispatchEvent(new Event(REFERENCES_CHANGED_EVENT));
   } catch {
     // Almacenamiento no disponible (privado/bloqueado): la sesión sigue
     // funcionando, solo no persiste la referencia entre recargas.
