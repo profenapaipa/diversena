@@ -1,9 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
-import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
-
-// Un color por mano, para distinguirlas cuando aparecen las dos.
-const HAND_COLOR = { derecha: '#22c55e', izquierda: '#38bdf8' } as const;
+import { drawHands } from './drawHands';
 
 interface HandLandmarksCanvasProps {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -44,29 +41,7 @@ export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasP
       if (canvas.height !== height) canvas.height = height;
       ctx.clearRect(0, 0, width, height);
 
-      ctx.lineWidth = Math.max(2, width / 240);
-      const radius = Math.max(3, width / 180);
-
-      for (const { landmarks: hand, side } of hands) {
-        ctx.strokeStyle = HAND_COLOR[side];
-        ctx.fillStyle = HAND_COLOR[side];
-        ctx.beginPath();
-        for (const { start, end } of HAND_CONNECTIONS) {
-          const a = hand[start];
-          const b = hand[end];
-          if (!a || !b) continue;
-          ctx.moveTo(a.x * width, a.y * height);
-          ctx.lineTo(b.x * width, b.y * height);
-        }
-        ctx.stroke();
-
-        ctx.beginPath();
-        for (const point of hand) {
-          ctx.moveTo(point.x * width + radius, point.y * height);
-          ctx.arc(point.x * width, point.y * height, radius, 0, Math.PI * 2);
-        }
-        ctx.fill();
-      }
+      drawHands(ctx, hands, width, height);
     };
     rafId = requestAnimationFrame(draw);
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Language, Sign } from '../../models/language';
 import { useTrackedHand } from '../../hooks/useTrackedHand';
 import { useMediaRecorder } from '../../hooks/useMediaRecorder';
+import { useAnnotatedStream } from '../../hooks/useAnnotatedStream';
 import { useReferenceSet } from '../../hooks/useReferenceSet';
 import { useStableClassification } from '../../hooks/useStableClassification';
 import { recordPracticeSuccess } from '../../services/profile/profileStore';
@@ -38,10 +39,12 @@ interface CameraViewProps {
 
 export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena' }: CameraViewProps) {
   const { camera, tracking, recognizedHand, features } = useTrackedHand();
-  const { status, error, videoRef, stream, start, stop } = camera;
+  const { status, error, videoRef, start, stop } = camera;
   const { status: handStatus, hands, latestHandsRef, fps } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
-  const recorder = useMediaRecorder(stream, fileNamePrefix);
+  // Se graba la vista anotada (video + puntos), no la cámara cruda.
+  const annotatedStream = useAnnotatedStream(videoRef, latestHandsRef, status === 'active', showLandmarks);
+  const recorder = useMediaRecorder(annotatedStream, fileNamePrefix);
   const { loaded, loading: loadingReferences } = useReferenceSet(language);
 
   // En modo practicar se compara contra TODAS las señas y se pide que gane
