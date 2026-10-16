@@ -17,7 +17,7 @@ export interface SampleFrame {
   t: number;
   /** Una entrada por mano detectada en este cuadro (0, 1 o 2). */
   hands: LandmarkPoint[][];
-  /** "Left"/"Right" según MediaPipe para cada mano de `hands` (imagen sin espejar). */
+  /** "Left"/"Right" según MediaPipe para cada mano de `hands`; coincide con la mano real de la persona. */
   handedness: string[];
 }
 

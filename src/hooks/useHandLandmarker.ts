@@ -32,12 +32,12 @@ const UI_UPDATE_MS = 66;
 const HOLD_LOST_HAND_MS = 200;
 
 /**
- * MediaPipe etiqueta la mano suponiendo una imagen de cámara frontal ya
- * espejada. Le pasamos el cuadro real, sin espejar, así que sus etiquetas
- * quedan invertidas respecto a la persona: "Left" es su mano derecha.
+ * Con el cuadro real de la cámara frontal (sin espejar), la etiqueta de
+ * MediaPipe coincide con la mano de la persona: "Right" es su mano derecha.
+ * Verificado con personas reales frente a la cámara.
  */
 function sideFromLabel(label: string | undefined): DominantHand {
-  return label === 'Left' ? 'derecha' : 'izquierda';
+  return label === 'Right' ? 'derecha' : 'izquierda';
 }
 
 /**
