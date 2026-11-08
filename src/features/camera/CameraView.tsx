@@ -36,9 +36,11 @@ interface CameraViewProps {
   targetSign?: Sign;
   /** Prefijo del nombre de archivo para los videos grabados con esta vista. */
   fileNamePrefix?: string;
+  /** Modo practicar: se llama cada vez que la seña objetivo pasa a reconocerse de forma estable. */
+  onMatch?: (sign: Sign) => void;
 }
 
-export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena' }: CameraViewProps) {
+export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch }: CameraViewProps) {
   const { camera, tracking, recognizedHand, features } = useTrackedHand();
   const { status, error, videoRef, start, stop } = camera;
   const { status: handStatus, hands, latestHandsRef, fps } = tracking;
@@ -61,6 +63,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
 
   const stable = useStableClassification(features, referenceCandidates);
   const classification = targetSign ? (stable?.sign.id === targetSign.id ? stable : null) : stable;
+  const similarity = classification ? Math.round(classification.confidence * 100) : null;
 
   // "¿Quizás quisiste decir…?" (boceto del equipo): cuando no hay un
   // resultado seguro, las señas que más se parecen a lo que hace la mano.
@@ -75,9 +78,10 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
     const matching = Boolean(targetSign && classification);
     if (matching && !wasMatchingRef.current && language && targetSign) {
       recordPracticeSuccess(language.id, targetSign.id);
+      onMatch?.(targetSign);
     }
     wasMatchingRef.current = matching;
-  }, [classification, language, targetSign]);
+  }, [classification, language, targetSign, onMatch]);
 
   const handLabel =
     handStatus === 'mano-detectada'
@@ -137,9 +141,15 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                 <p className="result-panel__verdict">
                   {targetSign ? '¡Correcto!' : `Vocal ${classification.sign.letter}`}
                 </p>
-                <p className="result-panel__hint">
-                  Parecido con la referencia: {Math.round(classification.confidence * 100)} %
-                </p>
+                <p className="result-panel__pct">{similarity} %</p>
+                <span
+                  className="meter meter--wide"
+                  role="img"
+                  aria-label={`Parecido con la referencia: ${similarity} %`}
+                >
+                  <span style={{ width: `${similarity}%` }} />
+                </span>
+                <p className="result-panel__hint">Parecido con la referencia</p>
               </>
             ) : (
               <>

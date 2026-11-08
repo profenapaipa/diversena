@@ -17,13 +17,11 @@ export function SignCard({ sign }: SignCardProps) {
         )}
       </div>
 
-      <div className="sign-card__media" aria-hidden={sign.video === null}>
-        {sign.video ? (
+      {sign.video && (
+        <div className="sign-card__media">
           <video src={sign.video} controls />
-        ) : (
-          <p className="sign-card__placeholder">[VIDEO PENDIENTE]</p>
-        )}
-      </div>
+        </div>
+      )}
 
       <div>
         <h4>¿Cómo se realiza?</h4>

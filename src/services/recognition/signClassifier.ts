@@ -13,8 +13,17 @@ const DISTANCE_SCALE = 2;
 // "similitud" 0-1.
 const MAX_DISTANCE = Math.sqrt(FINGER_NAMES.length * 2);
 
-/** Por debajo de esta similitud, se considera que no hay evidencia suficiente. */
-export const CONFIDENCE_FLOOR = 0.55;
+/**
+ * Por debajo de esta similitud, se considera que no hay evidencia suficiente.
+ *
+ * Calibrado con los videos del Equipo 6 (nov. 2026): con 0,55 la mano
+ * abierta de descanso se mostraba como alguna vocal en el 99 % de los
+ * cuadros, porque casi cualquier mano supera ese parecido. Con 0,85 baja al
+ * 6 % y las vocales siguen pasando en el 99 % de los cuadros (prueba con la
+ * otra mano). Revisar cuando el dataset tenga más personas: con manos
+ * nuevas el parecido baja y quizá convenga 0,8.
+ */
+export const CONFIDENCE_FLOOR = 0.85;
 
 function distance(a: HandFeatureVector, b: HandFeatureVector): number {
   let sumSquares = 0;

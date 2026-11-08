@@ -1787,3 +1787,63 @@ main {
   gap: 0.75rem;
   max-width: 28rem;
 }
+
+/* ---------- Porcentaje de parecido y avance de la visita ---------- */
+
+.result-panel__pct {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.result-panel .meter {
+  max-width: 14rem;
+}
+
+.session-progress {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0;
+}
+
+.session-progress__title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.session-progress__list {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.session-progress__list li {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.session-progress__list li.is-done {
+  border-color: transparent;
+  background: var(--brand-sun);
+  color: #151a6e;
+}
+
+/* El dibujo de la vocal no debe ocupar todo el ancho: es una referencia, no la pantalla. */
+.sign-card__media img {
+  display: block;
+  width: 100%;
+  max-width: 13rem;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
