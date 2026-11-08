@@ -7,7 +7,7 @@ import { buildPlaceholderSigns } from './placeholderSigns';
  * Los dibujos (public/senas/lsc) los hizo el equipo con los 21 puntos de la
  * mano y el Diccionario de LSC del INSOR como referencia
  * (https://educativo.insor.gov.co/diccionario/). Los textos describen lo que
- * reconoce la página hoy, que sale de grabaciones del equipo: todavía falta
+ * reconoce la página hoy: grabaciones del equipo para E, I, O y U y, para las cinco, las fotos del INSOR (solo sus coordenadas, no las imágenes). La A es la del INSOR: todavía falta
  * validarlos con personas Sordas y docentes de LSC, y por eso en la pantalla
  * se dice. No hay video propio publicado: los videos del equipo son de una
  * persona menor de edad y no se publican, así que Aprender no muestra ese
@@ -15,9 +15,9 @@ import { buildPlaceholderSigns } from './placeholderSigns';
  */
 const CONTENIDO: Record<VowelLetter, { description: string; instructions: string }> = {
   A: {
-    description: 'Puño cerrado con el pulgar extendido al lado de los dedos.',
+    description: 'Puño cerrado con el pulgar extendido hacia arriba, al lado del índice.',
     instructions:
-      'Pon la mano completa dentro del cuadro, a la altura del pecho. Cierra los cuatro dedos en un puño y deja el pulgar extendido. Sostén la seña un segundo.',
+      'Pon la mano completa dentro del cuadro, a la altura del pecho. Cierra los cuatro dedos en un puño y levanta el pulgar junto al índice. Sostén la seña un segundo.',
   },
   E: {
     description: 'Dedos doblados como una garra sobre la palma, con el pulgar doblado debajo.',
