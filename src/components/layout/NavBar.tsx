@@ -5,7 +5,6 @@ import { Logo } from '../brand/Logo';
 import {
   IconBook,
   IconCamera,
-  IconChart,
   IconClose,
   IconFlag,
   IconGlobe,
@@ -102,10 +101,6 @@ export function SiteHeader() {
           <NavLink to="/perfil" className={navClass} onClick={close}>
             <IconUser />
             {profile ? 'Mi perfil' : 'Crear perfil'}
-          </NavLink>
-          <NavLink to="/panel" className={navClass} onClick={close}>
-            <IconChart />
-            Panel del equipo
           </NavLink>
         </nav>
       )}

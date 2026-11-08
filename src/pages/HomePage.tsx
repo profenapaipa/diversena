@@ -50,7 +50,7 @@ export function HomePage() {
       <section className="section">
         <div className="section__head">
           <p className="eyebrow">Cómo funciona</p>
-          <h2>De tu mano a la letra, en menos de un segundo</h2>
+          <h2>De tu mano a la letra</h2>
         </div>
         <ol className="steps">
           {STEPS.map((step) => (
@@ -109,7 +109,7 @@ export function HomePage() {
               {language.status === 'disponible' ? (
                 <span className="badge badge--ok">Disponible</span>
               ) : (
-                <span className="badge badge--soon">🔒 Próximamente</span>
+                <span className="badge badge--soon">Próximamente</span>
               )}
             </li>
           ))}

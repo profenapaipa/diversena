@@ -36,7 +36,7 @@ export function LanguageSelector({ languages, selectedId, onSelect, allowLocked 
               {language.name} ({language.shortName})
             </span>
             <span className="option-card__subtitle">{language.country}</span>
-            {isLocked && <span className="lock-badge">🔒 Próximamente</span>}
+            {isLocked && <span className="lock-badge">Próximamente</span>}
           </button>
         );
       })}

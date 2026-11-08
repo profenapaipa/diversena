@@ -21,6 +21,15 @@ const STATUS_LABEL: Record<string, string> = {
   error: 'No se pudo usar la cámara',
 };
 
+/** Mensaje accionable para quien no pudo encender la cámara (el del navegador suele ser técnico). */
+function friendlyCameraError(reason: string, fallback: string): string {
+  if (/denied|permission|NotAllowed/i.test(reason + fallback)) {
+    return 'Permite el acceso a la cámara en el candado de la barra de direcciones y pulsa Reintentar.';
+  }
+  if (/not-?found/i.test(reason + fallback)) return 'No encontramos una cámara en este equipo.';
+  return fallback;
+}
+
 const HAND_STATUS_LABEL: Record<string, string> = {
   inactivo: '',
   cargando: 'Preparando el detector de manos…',
@@ -134,7 +143,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
           {status !== 'active' && (
             <div className="camera-view__overlay-text">
               <IconCamera size={40} />
-              <p>{status === 'error' && error ? error.message : STATUS_LABEL[status]}</p>
+              <p>{status === 'error' && error ? friendlyCameraError(error.reason, error.message) : STATUS_LABEL[status]}</p>
               <button
                 type="button"
                 className="button"
@@ -144,6 +153,9 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
               >
                 {status === 'error' ? 'Reintentar' : 'Activar cámara'}
               </button>
+              {status !== 'error' && (
+                <p className="camera-view__note">Tu cámara no se graba ni se envía. La primera vez puede tardar unos segundos.</p>
+              )}
             </div>
           )}
           {status === 'active' && (
@@ -157,7 +169,23 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         {showResult && (
           <aside className="result-panel" aria-live="polite">
             <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Traducción'}</p>
-            {loadingReferences && !hasAnyReference ? (
+            {handStatus === 'cargando' ? (
+              <>
+                <p className="result-panel__verdict">Preparando el detector…</p>
+                <span className="meter meter--wide meter--busy" aria-hidden="true">
+                  <span />
+                </span>
+                <p className="result-panel__hint">La primera vez tarda unos segundos. No cierres la página.</p>
+              </>
+            ) : handStatus === 'error' ? (
+              <>
+                <p className="result-panel__verdict">No se pudo cargar el detector</p>
+                <p className="result-panel__hint">Revisa tu conexión a internet y vuelve a intentarlo.</p>
+                <button type="button" className="button" onClick={() => window.location.reload()}>
+                  Reintentar
+                </button>
+              </>
+            ) : loadingReferences && !hasAnyReference ? (
               <p className="result-panel__hint">Cargando datos de reconocimiento…</p>
             ) : !hasAnyReference || !targetHasReferences ? (
               <p className="result-panel__hint">

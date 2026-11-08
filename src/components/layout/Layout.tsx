@@ -28,7 +28,6 @@ export function Layout() {
           </div>
           <nav className="site-footer__links" aria-label="Enlaces del pie de página">
             <Link to="/proyecto">El proyecto</Link>
-            <Link to="/panel">Panel del equipo</Link>
             <a href="https://github.com/profenapaipa/diversena" target="_blank" rel="noreferrer">
               Código en GitHub
             </a>
