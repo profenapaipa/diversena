@@ -4,32 +4,22 @@ interface LogoMarkProps {
 }
 
 /**
- * Símbolo de DiverSeña: el ojo del boceto original del equipo (la lengua de
- * señas se ve, no se oye) con los colores de la bandera de la comunidad
- * Sorda: azul oscuro (humanidad, unión), azul claro (color mundial de la
- * comunidad Sorda) y amarillo (luz, convivencia). Ver docs/MARCA.md.
+ * Símbolo de DiverSeña, versión Encuentro (decisión del equipo del 6 de noviembre
+ * de 2026): dos manos que se encuentran alrededor de un sol, con los colores de
+ * la bandera de la comunidad Sorda. La app es oscura, así que se usa la versión
+ * para fondo oscuro (la mano de arriba en blanco). Los archivos salen del paquete
+ * de logos del equipo; ver docs/MARCA.md.
  */
 export function LogoMark({ size = 32, className }: LogoMarkProps) {
   return (
-    <svg
+    <img
       className={className}
-      width={size}
+      src={`${import.meta.env.BASE_URL}marca/simbolo.svg`}
       height={size}
-      viewBox="0 0 64 64"
+      style={{ width: 'auto' }}
+      alt=""
       aria-hidden="true"
-      focusable="false"
-    >
-      <rect width="64" height="64" rx="16" fill="var(--brand-navy)" />
-      <path
-        d="M8 33c6.5-11 15-16.5 24-16.5S49.5 22 56 33c-6.5 11-15 16.5-24 16.5S14.5 44 8 33z"
-        fill="none"
-        stroke="var(--brand-sky)"
-        strokeWidth="4.5"
-        strokeLinejoin="round"
-      />
-      <circle cx="32" cy="33" r="9" fill="var(--brand-sun)" />
-      <circle cx="32" cy="33" r="3.8" fill="var(--brand-navy)" />
-    </svg>
+    />
   );
 }
 

@@ -43,8 +43,7 @@ Ambas son gratuitas (Google Fonts).
 
 ## Símbolo y logotipo
 
-- Componente: `src/components/brand/Logo.tsx` (`<LogoMark />` y `<Logo />`).
-  Favicon: `public/favicon.svg`.
+- Símbolo elegido: **Encuentro**, dos manos alrededor de un sol (6 de noviembre de 2026). Componente: `src/components/brand/Logo.tsx`; archivos en `public/marca/` y `public/favicon.*`, tomados del paquete de logos del equipo. En la app oscura se usa la versión para fondo oscuro.
 - El nombre se escribe **DiverSeña**, con D y S mayúsculas y la ñ. En el
   logotipo, "Seña" va en azul claro.
 - Dejar alrededor del símbolo un espacio libre igual a la mitad de su ancho.
