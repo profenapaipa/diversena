@@ -34,7 +34,7 @@ const SIGNER_LABEL: Record<SignerProfile, string> = {
 };
 
 /** Fecha de la muestra final del semillero (ruta del semestre 2026-II). */
-const SHOWCASE_DATE = new Date('2026-10-28T08:00:00-05:00');
+const SHOWCASE_DATE = new Date('2026-11-09T08:00:00-05:00');
 
 function daysUntil(date: Date): number {
   return Math.ceil((date.getTime() - Date.now()) / 86_400_000);

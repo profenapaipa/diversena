@@ -121,8 +121,8 @@ export function HomePage() {
           <p className="eyebrow">Hecho en el aula</p>
           <h2>Un proyecto estudiantil que quiere crecer</h2>
           <p>
-            DiverSeña nació en el {PROJECT_ORIGIN.program} {PROJECT_ORIGIN.period}, en el equipo de{' '}
-            {PROJECT_ORIGIN.members.join(', ')} (grado {PROJECT_ORIGIN.grade}). Hoy busca convertirse en una
+            DiverSeña nació en el {PROJECT_ORIGIN.program} {PROJECT_ORIGIN.period}, en el {PROJECT_ORIGIN.members.join(', ')}
+            (grado {PROJECT_ORIGIN.grade}). Hoy busca convertirse en una
             herramienta sostenible para colegios, familias e instituciones.
           </p>
         </div>

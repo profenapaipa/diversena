@@ -11,13 +11,13 @@ export const PROJECT_ORIGIN = {
   period: '2026-II',
   team: 'Equipo 6 · Lector de lengua de señas',
   /**
-   * Los integrantes son menores de edad: en la web pública se publican con
-   * nombre e inicial del apellido. Los nombres completos están en el
-   * artículo del equipo.
+   * Los integrantes son menores de edad: la web pública no publica sus
+   * nombres, solo el equipo. Los nombres completos están en el artículo del
+   * equipo.
    */
-  members: ['Matías A.', 'Nicolás P.', 'César P.'],
+  members: ['Equipo 6'],
   grade: '9C',
-  showcase: '28 y 29 de octubre de 2026',
+  showcase: '9 de noviembre de 2026',
 };
 
 export const PROBLEM =
