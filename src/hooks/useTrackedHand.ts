@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { HandFeatureVector } from '../models/handFeatures';
 import { extractHandFeatures, normalizeHandLandmarks } from '../services/recognition/landmarkProcessor';
+import { DEFAULT_ASPECT, describePose3d, extendedFingers } from '../services/recognition/handPose3d';
 import { useCamera, type UseCameraResult } from './useCamera';
 import { useHandLandmarker, type TrackedHand, type UseHandLandmarkerResult } from './useHandLandmarker';
 import { useProfile } from './useProfile';
@@ -32,7 +33,14 @@ export function useTrackedHand(): UseTrackedHandResult {
 
   const features = useMemo(() => {
     if (!recognizedHand) return null;
-    return extractHandFeatures(normalizeHandLandmarks(recognizedHand.landmarks));
+    const video = camera.videoRef.current;
+    const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
+    return {
+      ...extractHandFeatures(normalizeHandLandmarks(recognizedHand.landmarks)),
+      pose3d: describePose3d(recognizedHand.landmarks, aspect, recognizedHand.side),
+      extended: extendedFingers(recognizedHand.landmarks),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular; cambia la lectura, no la referencia
   }, [recognizedHand]);
 
   return { camera, tracking, recognizedHand, features };

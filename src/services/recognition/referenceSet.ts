@@ -4,6 +4,7 @@ import type { HandFeatureVector } from '../../models/handFeatures';
 import type { Language } from '../../models/language';
 import { listSamples, parseDatasetFile } from '../dataset/datasetStore';
 import { extractHandFeatures, normalizeHandLandmarks } from './landmarkProcessor';
+import { DEFAULT_ASPECT, describePose3d, type HandSide } from './handPose3d';
 import { getReferencesForLanguage } from './referenceStore';
 
 /** Referencias por seña (signId → vectores de características). */
@@ -33,9 +34,13 @@ export function featuresFromSample(sample: TrainingSample): HandFeatureVector[] 
   for (let i = 0; i < core.length && picked.length < MAX_FRAMES_PER_SAMPLE; i += step) {
     picked.push(core[Math.floor(i)]);
   }
-  return picked.map((frame) =>
-    extractHandFeatures(normalizeHandLandmarks(frame.hands[0] as NormalizedLandmark[])),
-  );
+  const aspect = sample.aspect ?? DEFAULT_ASPECT;
+  return picked.map((frame) => {
+    const landmarks = frame.hands[0] as NormalizedLandmark[];
+    // La etiqueta de MediaPipe coincide con la mano de la persona (ver useHandLandmarker).
+    const side: HandSide = frame.handedness[0] === 'Left' ? 'izquierda' : 'derecha';
+    return { ...extractHandFeatures(normalizeHandLandmarks(landmarks)), pose3d: describePose3d(landmarks, aspect, side) };
+  });
 }
 
 const bundledCache = new Map<string, Promise<TrainingSample[]>>();

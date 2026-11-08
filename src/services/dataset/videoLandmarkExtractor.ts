@@ -10,6 +10,8 @@ export interface ExtractionResult {
   frames: SampleFrame[];
   durationSec: number;
   handCoverage: number;
+  /** Proporción ancho/alto del video (hace falta para describir la mano en 3D). */
+  aspect: number;
 }
 
 interface ExtractOptions {
@@ -109,7 +111,8 @@ export async function extractLandmarksFromVideo(
       onProgress?.((i + 1) / totalSteps);
     }
 
-    return { frames, durationSec, handCoverage: framesWithHand / frames.length };
+    const aspect = video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : 4 / 3;
+    return { frames, durationSec, handCoverage: framesWithHand / frames.length, aspect: Math.round(aspect * 1000) / 1000 };
   } finally {
     video.removeAttribute('src');
     video.load();

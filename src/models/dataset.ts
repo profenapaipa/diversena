@@ -53,6 +53,12 @@ export interface TrainingSample {
   durationSec: number;
   /** Cuadros por segundo con los que se muestreó el video al extraer landmarks. */
   sampleFps: number;
+  /**
+   * Proporción ancho/alto del video del que salen los puntos (x e y vienen
+   * normalizados por el ancho y el alto). Hace falta para describir la mano en
+   * 3D sin deformarla. Si falta se asume 4:3, la de la cámara de la app.
+   */
+  aspect?: number;
   /** Fracción (0-1) de cuadros en los que se detectó al menos una mano. */
   handCoverage: number;
   /** Si el video original sigue guardado en este navegador (no viaja en el JSON exportado). */

@@ -10,4 +10,13 @@ export interface HandFeatureVector {
   fingerCurl: Record<FingerName, number>;
   /** Distancia (normalizada) de cada punta de dedo a la muñeca. */
   fingertipDistance: Record<FingerName, number>;
+  /**
+   * Descripción 3D que no cambia al girar la mano (ver `handPose3d.ts`). Si
+   * existe en la lectura en vivo y en la referencia, el clasificador la usa
+   * en lugar de las dos medidas 2D de arriba, que se conservan para las
+   * referencias guardadas antes de este cambio.
+   */
+  pose3d?: number[];
+  /** Dedos largos extendidos en la lectura en vivo (ver `extendedFingers`). */
+  extended?: number;
 }

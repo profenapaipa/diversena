@@ -146,6 +146,7 @@ export function TrainingDataPage() {
         createdAt: new Date().toISOString(),
         durationSec: Math.round(result.durationSec * 100) / 100,
         sampleFps: DATASET_SAMPLE_FPS,
+        aspect: result.aspect,
         handCoverage: Math.round(result.handCoverage * 100) / 100,
         hasVideo: true,
         frames: result.frames,
