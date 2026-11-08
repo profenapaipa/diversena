@@ -1847,3 +1847,31 @@ main {
   height: auto;
   border-radius: var(--radius-sm);
 }
+
+/* ---------- Aprender: la seña y la cámara lado a lado en pantallas anchas ---------- */
+
+.learn-layout {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 62rem) {
+  .learn-layout {
+    grid-template-columns: minmax(16rem, 22rem) 1fr;
+  }
+}
+
+.lead--note {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.sign-card__source {
+  font-size: 0.92rem;
+}
+
+/* En Aprender el encabezado se compacta para que la cámara quede a la vista sin bajar. */
+.learn-layout { margin-top: 0.5rem; }
+.session-progress { flex-direction: row; display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin: 0.5rem 0; }
+.session-progress__list { margin: 0; }

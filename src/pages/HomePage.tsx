@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     title: 'Compara con lo que aprendió',
-    text: 'DiverSeña marca 21 puntos en cada mano y los compara con señas de referencia grabadas por personas que usan la lengua.',
+    text: 'DiverSeña marca 21 puntos en cada mano y los compara con las señas de referencia: las fotos del Diccionario de LSC del INSOR y grabaciones del equipo.',
   },
   {
     title: 'Te muestra la letra',
@@ -27,7 +27,7 @@ export function HomePage() {
           <p className="eyebrow">Lengua de Señas Colombiana · LSC</p>
           <h1>Aprende lengua de señas con tu cámara</h1>
           <p className="lead">
-            DiverSeña reconoce tus manos en tiempo real y te dice si la seña está bien hecha. Empezamos por
+            DiverSeña reconoce tus manos en tiempo real y te dice si tu seña se parece a la de referencia. Empezamos por
             las vocales, desde cualquier navegador y sin instalar nada.
           </p>
           <div className="hero__actions">

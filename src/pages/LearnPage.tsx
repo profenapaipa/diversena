@@ -1,16 +1,14 @@
 import { useCallback, useState } from 'react';
 import type { Sign } from '../models/language';
-import { languages, getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
-import { LanguageSelector } from '../components/LanguageSelector';
+import { getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
 import { VowelSelector } from '../components/VowelSelector';
 import { SignCard } from '../components/SignCard';
 import { CameraView } from '../features/camera/CameraView';
 
 export function LearnPage() {
-  const [languageId, setLanguageId] = useState<string | null>(DEFAULT_LANGUAGE_ID);
-  const [signId, setSignId] = useState<string | null>(null);
-
-  const language = languageId ? getLanguageById(languageId) : undefined;
+  // Hoy solo la LSC está disponible, así que no se pide elegir lengua, y la A ya viene elegida: la cámara queda a un clic.
+  const language = getLanguageById(DEFAULT_LANGUAGE_ID);
+  const [signId, setSignId] = useState<string | null>(language?.signs[0]?.id ?? null);
   const sign = language?.signs.find((s) => s.id === signId);
 
   // Avance de esta visita: las vocales que ya se reconocieron al practicar. No se guarda
@@ -21,29 +19,25 @@ export function LearnPage() {
   }, []);
   const total = language?.signs.length ?? 0;
   const done = language ? language.signs.filter((s) => practiced[s.id]).length : 0;
-  const percent = total ? Math.round((done / total) * 100) : 0;
 
   return (
     <section className="page">
       <header className="page-head">
         <p className="eyebrow">Aprender</p>
         <h1>Elige una vocal y practícala</h1>
-        <p className="lead">Mira cómo se hace la seña y luego hazla frente a la cámara: DiverSeña te dice si coincide.</p>
+        <p className="lead">
+          Elige una vocal, mira cómo se hace y hazla frente a la cámara. Los puntos amarillos muestran dónde deben quedar los
+          de tu mano.
+        </p>
+        <p className="lead lead--note">
+          Lengua de Señas Colombiana. Las señas siguen el Diccionario de LSC del INSOR y falta validarlas con personas Sordas y
+          docentes de LSC.
+        </p>
       </header>
-
-      <h2>1. Lengua de señas</h2>
-      <LanguageSelector
-        languages={languages}
-        selectedId={languageId}
-        onSelect={(id) => {
-          setLanguageId(id);
-          setSignId(null);
-        }}
-      />
 
       {language && (
         <>
-          <h2>2. Vocal</h2>
+          <h2>1. Elige una vocal</h2>
           <VowelSelector
             signs={language.signs}
             selectedId={signId}
@@ -51,11 +45,8 @@ export function LearnPage() {
           />
           <div className="session-progress" role="status">
             <p className="session-progress__title">
-              Tu avance en esta visita: {done} de {total} vocales ({percent} %)
+              Tu avance en esta visita: {done} de {total} vocales
             </p>
-            <span className="meter meter--wide" aria-hidden="true">
-              <span style={{ width: `${percent}%` }} />
-            </span>
             <ul className="session-progress__list" aria-label="Vocales practicadas">
               {language.signs.map((s) => (
                 <li key={s.id} className={practiced[s.id] ? 'is-done' : undefined}>
@@ -68,17 +59,20 @@ export function LearnPage() {
       )}
 
       {sign && (
-        <>
+        <div className="learn-layout">
           <SignCard sign={sign} />
-          <p className="practice-panel__note">
-            Referencia: Diccionario de LSC del INSOR. Falta validar estas señas con personas Sordas y docentes de LSC.
-          </p>
 
           <div className="practice-panel">
-            <h2>¿Quieres practicar?</h2>
-            <CameraView language={language} targetSign={sign} fileNamePrefix="video-aprendizaje" onMatch={handleMatch} />
+            <h2>2. Practica con tu cámara</h2>
+            <CameraView
+              language={language}
+              targetSign={sign}
+              fileNamePrefix="video-aprendizaje"
+              onMatch={handleMatch}
+              showRecording={false}
+            />
           </div>
-        </>
+        </div>
       )}
     </section>
   );

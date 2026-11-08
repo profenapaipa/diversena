@@ -29,9 +29,17 @@ export function SignCard({ sign }: SignCardProps) {
       </div>
 
       <div>
-        <h4>Instrucciones de posición</h4>
+        <h4>Cómo hacerla</h4>
         <p>{sign.instructions ?? '[INSTRUCCIONES PENDIENTES]'}</p>
       </div>
+      <a
+        className="sign-card__source"
+        href="https://educativo.insor.gov.co/diccionario/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Buscar la seña en el diccionario del INSOR
+      </a>
     </article>
   );
 }

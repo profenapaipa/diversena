@@ -1,11 +1,9 @@
-import { useState } from 'react';
-import { languages, getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
-import { LanguageSelector } from '../components/LanguageSelector';
+import { getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
 import { CameraView } from '../features/camera/CameraView';
 
 export function IdentifyPage() {
-  const [languageId, setLanguageId] = useState<string | null>(DEFAULT_LANGUAGE_ID);
-  const language = languageId ? getLanguageById(languageId) : undefined;
+  // Hoy solo la LSC está disponible: no se pide elegir lengua para no poner un paso con una sola opción.
+  const language = getLanguageById(DEFAULT_LANGUAGE_ID);
 
   return (
     <section className="page">
@@ -16,14 +14,16 @@ export function IdentifyPage() {
           Ponte frente a la cámara con la mano completa dentro del cuadro. Si no estamos seguros, te
           sugerimos las señas más parecidas.
         </p>
+        <p className="lead">
+          Por ahora solo conozco las cinco vocales de la LSC: <strong>A, E, I, O, U</strong>. Si haces otra seña, no sabré
+          cuál es.
+        </p>
       </header>
-
-      <LanguageSelector languages={languages} selectedId={languageId} onSelect={setLanguageId} />
 
       {language && (
         <div className="practice-panel">
-          <h2>{language.name}</h2>
-          <CameraView language={language} fileNamePrefix="video-seña" />
+          <h2>Lengua de Señas Colombiana (LSC)</h2>
+          <CameraView language={language} fileNamePrefix="video-seña" showRecording={false} />
         </div>
       )}
     </section>

@@ -1,11 +1,15 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
-import { drawHands } from './drawHands';
+import { drawGuide, drawHands } from './drawHands';
 
 interface HandLandmarksCanvasProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   /** Manos más recientes; se leen en cada cuadro de animación, sin pasar por el estado de React. */
   handsRef: RefObject<TrackedHand[]>;
+  /** Pose ideal de la vocal que se practica (marco de la palma); si existe, se dibuja sobre la mano. */
+  guide?: Array<[number, number, number]> | null;
+  /** Mano a la que se le pone la guía (la que se reconoce). */
+  guideSide?: TrackedHand['side'];
 }
 
 /**
@@ -18,8 +22,11 @@ interface HandLandmarksCanvasProps {
  * Tiene su propio bucle de animación: dibuja a la tasa de la pantalla aunque
  * React solo se actualice unas pocas veces por segundo.
  */
-export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasProps) {
+export function HandLandmarksCanvas({ videoRef, handsRef, guide = null, guideSide }: HandLandmarksCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // La guía llega por una referencia: cambiarla no reinicia el bucle de dibujo.
+  const guideRef = useRef({ guide, guideSide });
+  guideRef.current = { guide, guideSide };
 
   useEffect(() => {
     let rafId = 0;
@@ -41,6 +48,9 @@ export function HandLandmarksCanvas({ videoRef, handsRef }: HandLandmarksCanvasP
       if (canvas.height !== height) canvas.height = height;
       ctx.clearRect(0, 0, width, height);
 
+      const { guide: pose, guideSide: side } = guideRef.current;
+      const guided = pose ? (hands.find((h) => h.side === side) ?? hands[0]) : undefined;
+      if (pose && guided) drawGuide(ctx, guided, pose, width, height);
       drawHands(ctx, hands, width, height);
     };
     rafId = requestAnimationFrame(draw);

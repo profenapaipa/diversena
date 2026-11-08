@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DEFAULT_ASPECT, palmFrame, tipErrors } from '../../services/recognition/handPose3d';
+import { loadTargetPose } from '../../services/recognition/targetPose';
+import { GUIDE_TOLERANCE } from './drawHands';
 import type { Language, Sign } from '../../models/language';
 import { useTrackedHand } from '../../hooks/useTrackedHand';
 import { useMediaRecorder } from '../../hooks/useMediaRecorder';
@@ -38,12 +41,14 @@ interface CameraViewProps {
   fileNamePrefix?: string;
   /** Modo practicar: se llama cada vez que la seña objetivo pasa a reconocerse de forma estable. */
   onMatch?: (sign: Sign) => void;
+  /** Controles de grabar y subir video (herramientas del equipo). Por defecto se muestran. */
+  showRecording?: boolean;
 }
 
-export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch }: CameraViewProps) {
+export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch, showRecording = true }: CameraViewProps) {
   const { camera, tracking, recognizedHand, features } = useTrackedHand();
   const { status, error, videoRef, start, stop } = camera;
-  const { status: handStatus, hands, latestHandsRef, fps } = tracking;
+  const { status: handStatus, hands, latestHandsRef } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
   // Se graba la vista anotada (video + puntos), no la cámara cruda.
   const annotatedStream = useAnnotatedStream(videoRef, latestHandsRef, status === 'active', showLandmarks);
@@ -56,6 +61,32 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
     if (!language) return [];
     return language.signs.map((sign) => ({ sign, references: loaded.references[sign.id] ?? [] }));
   }, [language, loaded]);
+
+  // Guía: la pose ideal de la vocal se dibuja sobre la mano (solo en modo practicar).
+  const [guide, setGuide] = useState<Array<[number, number, number]> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setGuide(null);
+    if (language && targetSign) {
+      loadTargetPose(language, targetSign).then((pose) => {
+        if (!cancelled) setGuide(pose);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [language, targetSign]);
+
+  // Qué dedos faltan por poner en su lugar, para decirlo con palabras.
+  const fingerHint = useMemo(() => {
+    if (!guide || !recognizedHand) return null;
+    const video = camera.videoRef.current;
+    const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
+    const errors = tipErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side), guide);
+    const off = errors.filter((e) => e.error > GUIDE_TOLERANCE).sort((a, b) => b.error - a.error);
+    return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
+  }, [guide, recognizedHand]);
 
   const hasAnyReference = referenceCandidates.some((candidate) => candidate.references.length > 0);
   const targetHasReferences =
@@ -98,7 +129,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         <div className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
           {status === 'active' && showLandmarks && (
-            <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} />
+            <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} guide={guide} guideSide={recognizedHand?.side} />
           )}
           {status !== 'active' && (
             <div className="camera-view__overlay-text">
@@ -119,7 +150,6 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
             <span className="camera-chip" role="status">
               <span className={`camera-chip__dot camera-chip__dot--${handStatus}`} aria-hidden="true" />
               {handLabel}
-              {fps > 0 && <span className="camera-view__fps"> · {fps} fps</span>}
             </span>
           )}
         </div>
@@ -139,7 +169,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
               <>
                 <p className="result-panel__letter result-panel__letter--ok">{classification.sign.letter}</p>
                 <p className="result-panel__verdict">
-                  {targetSign ? '¡Correcto!' : `Vocal ${classification.sign.letter}`}
+                  {targetSign ? `¡Lo lograste! Reconocimos tu ${targetSign.letter}` : `Vocal ${classification.sign.letter}`}
                 </p>
                 <p className="result-panel__pct">{similarity} %</p>
                 <span
@@ -159,7 +189,18 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                 <p className="result-panel__verdict">
                   {!features ? 'Muestra tu mano' : targetSign ? 'Todavía no coincide' : 'No estoy seguro'}
                 </p>
-                {suggestions.length > 0 ? (
+                {targetSign && fingerHint ? (
+                  <div className="suggestions">
+                    <p className="result-panel__hint">
+                      {fingerHint.placed} de {fingerHint.total} puntas en su lugar
+                      {fingerHint.worst ? `. Ajusta el ${fingerHint.worst}.` : '.'}
+                    </p>
+                    {targetSign.description && <p className="result-panel__hint">Recuerda: {targetSign.description}</p>}
+                    {suggestions[0] && suggestions[0].sign.id !== targetSign.id && (
+                      <p className="result-panel__hint">Ahora se parece más a la {suggestions[0].sign.letter}.</p>
+                    )}
+                  </div>
+                ) : suggestions.length > 0 ? (
                   <div className="suggestions">
                     <p className="result-panel__hint">¿Quizás quisiste decir…?</p>
                     <ul>
@@ -205,7 +246,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         </div>
       )}
 
-      <RecordingControls recorder={recorder} cameraActive={status === 'active'} />
+      {showRecording && <RecordingControls recorder={recorder} cameraActive={status === 'active'} />}
     </div>
   );
 }

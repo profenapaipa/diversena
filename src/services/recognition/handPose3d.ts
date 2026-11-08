@@ -53,8 +53,17 @@ const ANGLE_WEIGHT = 1.5;
 /** Proporción (ancho/alto) que se asume si no se conoce: la cámara de la app graba a 640 x 480. */
 export const DEFAULT_ASPECT = 4 / 3;
 
-/** Los 21 puntos en el marco de la palma, ya normalizados por el tamaño de la mano. */
-export function palmFrame(landmarks: NormalizedLandmark[], aspect: number, side: HandSide): Vec3[] {
+/** Marco de la palma de una mano en el espacio de la imagen (unidades de alto). */
+export interface PalmBasis {
+  origin: Vec3;
+  size: number;
+  e1: Vec3;
+  e2: Vec3;
+  e3: Vec3;
+  mirror: 1 | -1;
+}
+
+export function palmBasis(landmarks: NormalizedLandmark[], aspect: number, side: HandSide): PalmBasis {
   const world: Vec3[] = landmarks.map((p) => [p.x * aspect, p.y, (p.z ?? 0) * aspect]);
   const origin = world[0];
   const rel = world.map((p) => sub(p, origin));
@@ -63,8 +72,40 @@ export function palmFrame(landmarks: NormalizedLandmark[], aspect: number, side:
   const n = cross(rel[5], rel[17]);
   const e3 = unit(sub(n, scale(e1, dot(n, e1))));
   const e2 = cross(e3, e1);
-  const mirror = side === 'izquierda' ? -1 : 1;
-  return rel.map((p) => [dot(p, e1) / size, dot(p, e2) / size, (dot(p, e3) / size) * mirror]);
+  return { origin, size, e1, e2, e3, mirror: side === 'izquierda' ? -1 : 1 };
+}
+
+/** Los 21 puntos en el marco de la palma, ya normalizados por el tamaño de la mano. */
+export function palmFrame(landmarks: NormalizedLandmark[], aspect: number, side: HandSide): Vec3[] {
+  const { origin, size, e1, e2, e3, mirror } = palmBasis(landmarks, aspect, side);
+  return landmarks.map((p) => {
+    const r = sub([p.x * aspect, p.y, (p.z ?? 0) * aspect], origin);
+    return [dot(r, e1) / size, dot(r, e2) / size, (dot(r, e3) / size) * mirror];
+  });
+}
+
+/**
+ * Pone una pose guardada en el marco de la palma (por ejemplo la de la foto
+ * oficial del INSOR) encima de la mano en vivo: mismo tamaño, misma posición
+ * de muñeca y misma orientación 3D. Devuelve puntos normalizados de la imagen
+ * (x por el ancho, y por el alto) listos para dibujar. Si la mano se gira, la
+ * guía se gira con ella: lo único que queda distinto es la forma de los dedos.
+ */
+export function projectPose(pose: Vec3[], live: PalmBasis, aspect: number): Array<{ x: number; y: number }> {
+  return pose.map(([c1, c2, c3]) => {
+    const k3 = c3 * live.mirror;
+    const x = live.origin[0] + live.size * (c1 * live.e1[0] + c2 * live.e2[0] + k3 * live.e3[0]);
+    const y = live.origin[1] + live.size * (c1 * live.e1[1] + c2 * live.e2[1] + k3 * live.e3[1]);
+    return { x: x / aspect, y };
+  });
+}
+
+const FINGER_LABELS = ['pulgar', 'índice', 'medio', 'anular', 'meñique'] as const;
+const TIPS = [4, 8, 12, 16, 20] as const;
+
+/** Distancia de cada punta de la mano en vivo a la de la guía, en tamaños de palma (mismo marco). */
+export function tipErrors(live: Vec3[], target: Vec3[]): Array<{ finger: (typeof FINGER_LABELS)[number]; error: number }> {
+  return TIPS.map((tip, i) => ({ finger: FINGER_LABELS[i], error: norm(sub(live[tip], target[tip])) }));
 }
 
 function angleAt(a: Vec3, vertex: Vec3, b: Vec3): number {
