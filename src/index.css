@@ -1860,7 +1860,7 @@ main {
 
 @media (min-width: 62rem) {
   .learn-layout {
-    grid-template-columns: minmax(20rem, 26rem) 1fr;
+    grid-template-columns: minmax(17rem, 20rem) 1fr;
   }
 }
 
@@ -2229,7 +2229,6 @@ main {
   .dt__icon { width: 3rem; height: 3rem; }
 }
 
-@media (min-width: 52rem) { .camera-stage .result-panel { min-height: 22rem; } }
 
 /* ---------- Contacto ---------- */
 .contact-form { display: grid; gap: 1rem; max-width: 38rem; }
@@ -2258,3 +2257,29 @@ main {
 .tips li { padding: 0.4rem 0.7rem 0.4rem 1.9rem; border-radius: 0.7rem; background: var(--surface); border: 1px solid var(--border); font-size: 0.92rem; font-weight: 700; position: relative; }
 .tips li::before { content: '↳'; position: absolute; left: 0.65rem; color: var(--brand-sky-ink); }
 .intro-result__tip { padding: 0.35rem 0.8rem; border-radius: 0.7rem; background: var(--surface); border: 1px solid var(--border); font-size: 0.9rem; font-weight: 700; justify-self: stretch; text-align: left; }
+
+/* ---------- Distribución de la cámara y el panel de resultado (computador) ---------- */
+/* Los consejos son una lista sencilla: no heredan la rejilla de letra, barra y porcentaje de las sugerencias. */
+.suggestions .tips { margin: 0.2rem 0; }
+.suggestions .tips li { display: block; grid-template-columns: none; }
+.result-panel { padding: 1rem; }
+.result-panel__letter { width: 5rem; height: 5rem; font-size: 2.8rem; margin: 0.2rem 0; border-radius: 1.3rem; }
+@media (min-width: 52rem) {
+  /* Más ancho para la cámara. */
+  .camera-stage { grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 1fr); align-items: start; }
+  /* La altura de la fila la fija solo el marco de la cámara (4:3): el panel no cuenta para ella, ocupa esa altura y, si su
+     texto crece, se desplaza por dentro. Así nada se estira ni se mueve cuando cambian los consejos. */
+  .camera-stage .result-panel:not(.result-panel--free) { height: 0; min-height: 100%; overflow-y: auto; align-self: stretch; }
+  .camera-stage .result-panel--free { height: auto; }
+}
+.result-panel .tips { margin: 0.2rem 0; }
+.result-panel .result-panel__hint { margin: 0.15rem 0; }
+
+@media (min-width: 52rem) {
+  .camera-stage { grid-template-columns: minmax(0, 2fr) minmax(14.5rem, 1fr); }
+  .result-panel__letter { width: 4.2rem; height: 4.2rem; font-size: 2.3rem; }
+  .result-panel .tips { gap: 0.25rem; }
+  .result-panel .tips li { padding: 0.3rem 0.6rem 0.3rem 1.7rem; font-size: 0.86rem; }
+  .result-panel .tips li::before { left: 0.5rem; }
+  .result-panel__verdict { font-size: 1.1rem; }
+}

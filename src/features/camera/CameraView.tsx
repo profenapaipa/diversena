@@ -225,7 +225,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         </div>
 
         {showResult && (
-          <aside className="result-panel" aria-live="polite">
+          <aside className={`result-panel${calibrationOn ? ' result-panel--free' : ''}`} aria-live="polite">
             <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Resultado'}</p>
             {status === 'active' && handStatus !== 'cargando' && handStatus !== 'error' && (needsCalibration || session.phase !== 'idle') ? (
               <CalibrationPanel
@@ -296,7 +296,6 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                         ))}
                       </ul>
                     )}
-                    {targetSign.description && <p className="result-panel__hint">Recuerda: {targetSign.description}</p>}
                     {suggestions[0] && suggestions[0].sign.id !== targetSign.id && (
                       <p className="result-panel__hint">Ahora se parece más a la {suggestions[0].sign.letter}.</p>
                     )}
