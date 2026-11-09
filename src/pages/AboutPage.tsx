@@ -29,7 +29,7 @@ export function AboutPage() {
         <details className="about-fold" open={open === 'proyecto'}>
           <summary>
             <span>El proyecto</span>
-            <small>Problema, funcionamiento y próximos pasos</small>
+            <small>Problema, pregunta y próximos pasos</small>
           </summary>
           <div className="about-fold__body">
             <ProjectContent />
