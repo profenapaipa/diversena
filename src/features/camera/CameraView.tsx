@@ -161,6 +161,8 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
       : HAND_STATUS_LABEL[handStatus];
 
   const showResult = language && status === 'active';
+  // Mientras se calibra, sobre la mano solo van los puntos de la persona: la guía amarilla de la vocal no tiene sentido todavía.
+  const calibrationOn = needsCalibration || session.phase !== 'idle';
 
   // En el celular la cámara queda muy abajo (después de elegir la vocal): al encenderla, la pantalla baja hasta ella
   // para que se vea que algo cambió y la mano quede a la vista.
@@ -181,7 +183,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         <div ref={frameRef} className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
           {status === 'active' && showLandmarks && (
-            <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} guide={guide} guideSide={recognizedHand?.side} />
+            <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} guide={calibrationOn ? null : guide} guideSide={recognizedHand?.side} />
           )}
           {status !== 'active' && (
             <div className="camera-view__overlay-text">
