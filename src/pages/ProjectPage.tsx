@@ -1,93 +1,87 @@
-import {
-  AUDIENCE,
-  DECISIONS,
-  NEXT_STEPS,
-  PROBLEM,
-  QUESTION,
-  REFERENCES,
-  REQUIREMENTS,
-} from '../data/project';
+import { DECISIONS, REFERENCES, REQUIREMENTS } from '../data/project';
 import { CountUp, Reveal } from '../components/motion';
 
 const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
 const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendiente: 'badge--crit' } as const;
 
+/** Cómo funciona, en tres cajas de pocas palabras. */
+const FLOW = [
+  { label: 'Entra', text: 'Lo que ve tu cámara, en tu equipo.' },
+  { label: 'Procesa', text: '21 puntos por mano, contra las señas de referencia.' },
+  { label: 'Sale', text: 'La letra, o sugerencias si no está segura.' },
+];
+
+/** Lo que sigue, en tres pasos. */
+const NEXT = ['Más clips con personas Sordas e intérpretes', 'Validar cada seña con la comunidad Sorda', 'Más señas y, después, otras lenguas'];
+
+/** El proyecto, en lo esencial: el problema, lo que debe hacer, cómo funciona y lo que sigue. El detalle queda plegado. */
 export function ProjectContent() {
   return (
     <div className="project">
-      <Reveal className="stats" >
+      <Reveal className="stats">
         <div className="stat"><strong><CountUp to={21} /></strong><span>puntos por mano</span></div>
         <div className="stat"><strong><CountUp to={5} /></strong><span>vocales</span></div>
         <div className="stat"><strong><CountUp to={1} />/3</strong><span>lenguas disponibles</span></div>
       </Reveal>
-      <section className="section section--split">
-        <div>
-          <h2>El problema</h2>
-          <p>{PROBLEM}</p>
-        </div>
-        <div className="card card--tint">
-          <p className="eyebrow">Pregunta de investigación</p>
-          <p className="quote">{QUESTION}</p>
-          <p className="eyebrow">Para quién</p>
-          <p>{AUDIENCE}</p>
-        </div>
+
+      <section className="section">
+        <h2>El problema</h2>
+        <p className="project__lead">A veces las personas sordas no logran que otras entiendan lo que necesitan expresar.</p>
+        <p className="note">Para familias, estudiantes y docentes, desde los 6 años.</p>
       </section>
 
       <section className="section">
-        <h2>Qué debe hacer la solución</h2>
-        <p className="note">Los tres requisitos del proyecto y cómo se comprueban.</p>
-        <div className="req-grid">
+        <h2>Qué debe hacer</h2>
+        <ul className="req-list">
           {REQUIREMENTS.map((req) => (
-            <div key={req.action} className="card">
+            <li key={req.action}>
               <span className={`badge ${REQ_TONE[req.status]}`}>{REQ_LABEL[req.status]}</span>
-              <h3>{req.action}</h3>
-              <p className="note">
-                <strong>Cómo se prueba:</strong> {req.test}
-              </p>
-              <p>{req.note}</p>
-            </div>
+              <span>{req.action}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
       <section className="section">
         <h2>Cómo funciona</h2>
         <div className="flow" role="list">
-          <div className="flow__box" role="listitem">
-            <p className="eyebrow">Entra</p>
-            <p>Lo que ve tu cámara, dentro de tu equipo: la imagen no se guarda ni se envía.</p>
-          </div>
-          <span className="flow__arrow" aria-hidden="true">→</span>
-          <div className="flow__box flow__box--core" role="listitem">
-            <p className="eyebrow">Procesa</p>
-            <p>El detector ubica 21 puntos en cada mano. De ahí en adelante solo se usan esos puntos: se comparan con las señas de referencia y se elige la más parecida.</p>
-          </div>
-          <span className="flow__arrow" aria-hidden="true">→</span>
-          <div className="flow__box" role="listitem">
-            <p className="eyebrow">Sale</p>
-            <p>La letra en pantalla para que la otra persona la lea, o sugerencias si no está segura.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2>Decisiones técnicas</h2>
-        <div className="decision-grid">
-          {DECISIONS.map((decision) => (
-            <div key={decision.title} className="card">
-              <h3>{decision.title}</h3>
-              <p>{decision.why}</p>
+          {FLOW.map((box, i) => (
+            <div key={box.label} className="contents" role="presentation">
+              <div className={`flow__box${i === 1 ? ' flow__box--core' : ''}`} role="listitem">
+                <p className="eyebrow">{box.label}</p>
+                <p>{box.text}</p>
+              </div>
+              {i < FLOW.length - 1 && <span className="flow__arrow" aria-hidden="true">→</span>}
             </div>
           ))}
         </div>
       </section>
 
+      <section className="section">
+        <h2>Lo que sigue</h2>
+        <ol className="next-line">
+          {NEXT.map((step, i) => (
+            <li key={step}>
+              <span className="next-line__num" aria-hidden="true">{i + 1}</span>
+              {step}
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <details className="section sources">
-        <summary><h2>Antecedentes y fuentes</h2><small>Investigaciones en las que se apoya el proyecto (APA 7)</small></summary>
+        <summary>
+          <h2>Decisiones y fuentes</h2>
+          <small>Para quien quiera el detalle</small>
+        </summary>
+        <ul className="decision-chips">
+          {DECISIONS.map((decision) => (
+            <li key={decision.title} className="chip-note">{decision.title}</li>
+          ))}
+        </ul>
         <ul className="references">
           {REFERENCES.map((ref) => (
             <li key={ref.doi}>
-              <p>{ref.apa}</p>
               <p className="note">
                 {ref.finding}{' '}
                 <a href={ref.doi} target="_blank" rel="noreferrer">
@@ -99,23 +93,9 @@ export function ProjectContent() {
         </ul>
       </details>
 
-      <section className="section section--split">
-        <div>
-          <h2>Lo que sigue</h2>
-          <ol className="next-steps">
-            {NEXT_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-        </div>
-        <div className="card card--tint">
-          <h3>¿Quieres ayudar?</h3>
-          <p>
-            Si eres una persona Sorda, intérprete o docente de LSC, tu mirada nos ayuda a validar cada seña. Cuéntanos
-            qué le falta a DiverSeña.
-          </p>
-        </div>
-      </section>
+      <p className="project__help">
+        <strong>¿Eres Sorda, intérprete o docente de LSC?</strong> Tu mirada nos ayuda a validar cada seña.
+      </p>
     </div>
   );
 }

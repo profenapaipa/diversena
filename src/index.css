@@ -2178,3 +2178,21 @@ main {
 .about-route__item { transition: opacity 0.25s, transform 0.5s; }
 .about-route__item--dim { opacity: 0.35; }
 .about-route__item--dim.reveal.is-visible { opacity: 0.35; }
+
+/* ---------- Quiénes somos: lo esencial ---------- */
+.contents { display: contents; }
+.project__lead { font-size: 1.1rem; font-weight: 700; margin: 0.25rem 0; }
+.req-list { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.req-list li { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.9rem; border-radius: 0.9rem; background: var(--surface-2); border: 1px solid var(--border); }
+.req-list .badge { flex: none; }
+.next-line { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.next-line li { display: flex; align-items: center; gap: 0.7rem; }
+.next-line__num { flex: none; display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--brand-sun); color: #151a6e; font-weight: 700; }
+.decision-chips { list-style: none; margin: 0.75rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip-note { padding: 0.25rem 0.8rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.88rem; font-weight: 700; }
+.project__help { margin: 1.25rem 0 0; padding: 0.9rem 1rem; border-radius: 1rem; background: var(--surface-2); border: 1px solid var(--border); }
+.identity-process--row { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+.identity-palette--row { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.identity-min { list-style: none; margin: 0.5rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.identity-min li { padding: 0.35rem 0.9rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
+.identity-use h3 { font-size: 0.95rem; }
