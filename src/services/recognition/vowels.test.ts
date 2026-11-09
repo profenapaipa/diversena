@@ -2,7 +2,7 @@ import datasetText from '../../../public/datasets/lsc.json?raw';
 import { describe, expect, it } from 'vitest';
 import type { TrainingSample } from '../../models/dataset';
 import type { HandFeatureVector } from '../../models/handFeatures';
-import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors, tiltPose, bestTiltFit } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors, tiltPose, bestTiltFit, fitTilt } from './handPose3d';
 import { REFERENCE_FLEX_MAX } from './calibration';
 import { featuresFromSample } from './referenceSet';
 import { classifyWithReferenceSet, POSE3D_FLOOR } from './signClassifier';
@@ -200,6 +200,19 @@ describe('palma inclinada (la normal de la palma se estima con error)', () => {
       const handSeen = tiltPose(target, 28, -20);
       const sum = (pose: typeof target) => fingerAngleErrors(handSeen, pose).reduce((t, e) => t + e.degrees, 0);
       expect(sum(bestTiltFit(handSeen, target)), v).toBeLessThan(sum(target) * 0.5);
+    }
+  });
+});
+
+describe('inclinación de la guía', () => {
+  it('fitTilt recupera la inclinación de la palma en pasos de 5° (no de 20°)', () => {
+    for (const v of ['a', 'e', 'i', 'o', 'u']) {
+      const target = officialFrame(v);
+      for (const [tx, ty] of [[28, -20], [-12, 17], [35, 8]]) {
+        const [fx, fy] = fitTilt(tiltPose(target, tx, ty), target);
+        expect(Math.abs(fx - tx), `${v} x ${tx}`).toBeLessThanOrEqual(8);
+        expect(Math.abs(fy - ty), `${v} y ${ty}`).toBeLessThanOrEqual(8);
+      }
     }
   });
 });

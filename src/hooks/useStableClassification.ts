@@ -6,14 +6,14 @@ import { TemporalVoter } from '../services/recognition/temporalVoter';
 
 /**
  * Clasifica cada lectura de la mano y la pasa por una votación temporal:
- * el resultado mostrado solo cambia cuando la misma seña gana varias
- * lecturas seguidas (~0.5 s), en vez de saltar con cada cuadro.
+ * el resultado mostrado solo cambia cuando la misma seña gana 3 de las
+ * últimas 5 lecturas (~0,15 s con 30 lecturas por segundo), en vez de saltar con cada cuadro.
  */
 export function useStableClassification(
   features: HandFeatureVector | null,
   candidates: Array<{ sign: Sign; references: HandFeatureVector[] }>,
 ): SignMatch<Sign> | null {
-  const voterRef = useRef(new TemporalVoter<string>(8, 5));
+  const voterRef = useRef(new TemporalVoter<string>(5, 3));
   const [stable, setStable] = useState<SignMatch<Sign> | null>(null);
 
   const raw = useMemo(

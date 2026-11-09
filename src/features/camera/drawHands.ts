@@ -1,6 +1,6 @@
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
 import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
-import { bestTiltFit, fingerFlexErrors, palmBasis, palmFrame, projectPose, retargetPose } from '../../services/recognition/handPose3d';
+import { fingerFlexErrors, fitTilt, palmBasis, palmFrame, projectPose, retargetPose, tiltPose } from '../../services/recognition/handPose3d';
 import { getCalibration } from '../../services/recognition/calibration';
 
 // Un color por mano, para distinguirlas cuando aparecen las dos.
@@ -37,6 +37,20 @@ export function drawHands(ctx: CanvasRenderingContext2D, hands: TrackedHand[], w
   }
 }
 
+/**
+ * Inclinación de la guía suavizada en el tiempo: el mejor encaje cambia de un cuadro a otro por el ruido de la profundidad
+ * y la guía temblaría. Un promedio móvil rápido (~40 ms) la deja estable sin que se note el retraso al girar la mano.
+ */
+const TILT_SMOOTHING = 0.45;
+const TILT_RESET_MS = 400;
+let tiltState: { x: number; y: number; at: number } | null = null;
+function smoothTilt([x, y]: [number, number]): [number, number] {
+  const now = performance.now();
+  if (!tiltState || now - tiltState.at > TILT_RESET_MS) tiltState = { x, y, at: now };
+  else tiltState = { x: tiltState.x + (x - tiltState.x) * TILT_SMOOTHING, y: tiltState.y + (y - tiltState.y) * TILT_SMOOTHING, at: now };
+  return [tiltState.x, tiltState.y];
+}
+
 /** Un dedo cuyos huesos se apartan menos de estos grados de la guía cuenta como bien puesto (la postura natural de una mano relajada). */
 export const GUIDE_TOLERANCE_DEG = 30;
 
@@ -65,7 +79,9 @@ export function drawGuide(
   const zScale = calibration?.zScale ?? 1;
   const basis = palmBasis(hand.landmarks, aspect, hand.side, zScale);
   const liveFrame = palmFrame(hand.landmarks, aspect, hand.side, zScale);
-  const fitted = retargetPose(liveFrame, bestTiltFit(liveFrame, guidePose), calibration?.bones);
+  const [tx, ty] = smoothTilt(fitTilt(liveFrame, guidePose));
+  const tilted = tx === 0 && ty === 0 ? guidePose : tiltPose(guidePose, tx, ty);
+  const fitted = retargetPose(liveFrame, tilted, calibration?.bones);
   const target = projectPose(fitted, basis, aspect);
   const errors = fingerFlexErrors(liveFrame, guidePose);
   const radius = Math.max(2.5, width / 220);

@@ -23,7 +23,7 @@ export interface UseHandLandmarkerResult {
 }
 
 /** Cada cuánto se publica el estado a React; el dibujo va a la tasa completa del video. */
-const UI_UPDATE_MS = 66;
+const UI_UPDATE_MS = 33;
 /**
  * Si una mano se pierde menos de este tiempo (un parpadeo del detector, un
  * dedo que tapa a otro), se mantiene su última posición en vez de "apagar"
@@ -45,7 +45,7 @@ function sideFromLabel(label: string | undefined): DominantHand {
  * hasta dos manos por cuadro de video mientras `active` sea verdadero.
  *
  * Rendimiento: solo se procesa cuando el video tiene un cuadro nuevo (no a
- * la tasa de refresco de la pantalla), y React solo se entera ~15 veces por
+ * la tasa de refresco de la pantalla), y React se entera a ~30 veces por
  * segundo — el canvas lee `latestHandsRef` directamente.
  */
 export function useHandLandmarker(

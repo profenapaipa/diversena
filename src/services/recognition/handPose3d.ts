@@ -136,16 +136,32 @@ export const REFERENCE_TILTS: Array<[number, number]> = [[0, 0], [25, 0], [-25, 
  * Así la guía no obliga a girar la mano: se muestra con la inclinación de la palma que se está viendo.
  */
 export function bestTiltFit(live: Vec3[], target: Vec3[]): Vec3[] {
-  let best = target;
+  const [degX, degY] = fitTilt(live, target);
+  return degX === 0 && degY === 0 ? target : tiltPose(target, degX, degY);
+}
+
+const tiltError = (live: Vec3[], target: Vec3[], degX: number, degY: number) =>
+  fingerAngleErrors(live, degX === 0 && degY === 0 ? target : tiltPose(target, degX, degY)).reduce((sum, e) => sum + e.degrees, 0);
+
+/**
+ * Inclinación (grados sobre cada eje) que mejor encaja la figura con la mano en vivo: una pasada gruesa de 20° y otra
+ * fina de 5° alrededor del mejor punto, así la guía sigue el giro de la palma sin saltar de 20° en 20°.
+ */
+export function fitTilt(live: Vec3[], target: Vec3[]): [number, number] {
+  let best: [number, number] = [0, 0];
   let bestError = Infinity;
   for (const degX of [-40, -20, 0, 20, 40]) {
     for (const degY of [-40, -20, 0, 20, 40]) {
-      const candidate = degX === 0 && degY === 0 ? target : tiltPose(target, degX, degY);
-      const error = fingerAngleErrors(live, candidate).reduce((sum, e) => sum + e.degrees, 0);
-      if (error < bestError) {
-        bestError = error;
-        best = candidate;
-      }
+      const error = tiltError(live, target, degX, degY);
+      if (error < bestError) [best, bestError] = [[degX, degY], error];
+    }
+  }
+  const [cx, cy] = best;
+  for (const dx of [-15, -10, -5, 0, 5, 10, 15]) {
+    for (const dy of [-15, -10, -5, 0, 5, 10, 15]) {
+      if (dx === 0 && dy === 0) continue;
+      const error = tiltError(live, target, cx + dx, cy + dy);
+      if (error < bestError) [best, bestError] = [[cx + dx, cy + dy], error];
     }
   }
   return best;

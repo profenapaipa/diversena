@@ -49,11 +49,13 @@ function lerp(from: number, to: number, t: number): number {
   return from + (to - from) * t;
 }
 
-// Ajustados para coordenadas normalizadas 0-1 a ~30 fps: con la mano quieta
-// el corte queda en 1.5 Hz (temblor fuera); con un movimiento rápido de
-// ~1 ancho de imagen/segundo sube a ~11 Hz (sin retraso perceptible).
-const MIN_CUTOFF = 1.5;
-const BETA = 10;
+// Ajustados para coordenadas normalizadas 0-1 a ~30 fps. Con la mano quieta el
+// corte queda en 3 Hz (retraso de ~50 ms, el temblor sigue fuera); en cuanto
+// la mano o un dedo se mueven, sube rápido (~33 Hz con medio ancho de imagen
+// por segundo) y el punto casi no se retrasa. Antes eran 1,5 Hz y beta 10,
+// que dejaban los puntos ~100 ms atrás al mover un dedo despacio.
+const MIN_CUTOFF = 3;
+const BETA = 60;
 const DERIVATIVE_CUTOFF = 1;
 
 /** Suaviza los 21 landmarks de una mano, cuadro a cuadro. */
