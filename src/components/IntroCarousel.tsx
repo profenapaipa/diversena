@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom';
 import { HandIllustration } from './brand/HandIllustration';
 import { LogoMark } from './brand/Logo';
-import { IconArrowRight, IconBook, IconClose } from './icons';
+import { IconArrowRight, IconBook, IconClose, IconLock } from './icons';
+import { PRIVACY_LONG } from '../data/privacy';
 import { markIntroSeen } from './introSeen';
 
 const BASE = import.meta.env.BASE_URL;
@@ -27,8 +28,39 @@ const SLIDES: Slide[] = [
         <HandIllustration className="intro-visual__hand" />
         <ul className="intro-chips">
           <li>Sin instalar nada</li>
-          <li>Tu video no sale de tu equipo</li>
+          <li>Solo usa 21 puntos de tus manos</li>
           <li>Desde el celular o el computador</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    id: 'privacidad',
+    eyebrow: 'Tu privacidad',
+    title: 'Tu imagen se queda contigo',
+    text: PRIVACY_LONG,
+    visual: (
+      <div className="intro-visual intro-visual--privacy" role="img" aria-label="De tu cámara salen solo 21 puntos de tus manos, y de ellos sale la letra. Tu imagen no se guarda ni se envía.">
+        <div className="privacy-flow" aria-hidden="true">
+          <div className="privacy-flow__step">
+            <span className="privacy-flow__icon">Cámara</span>
+            <small>Tu imagen se queda en tu equipo</small>
+          </div>
+          <span className="privacy-flow__arrow">›</span>
+          <div className="privacy-flow__step privacy-flow__step--key">
+            <HandIllustration className="privacy-flow__hand" />
+            <small>Solo 21 puntos por mano</small>
+          </div>
+          <span className="privacy-flow__arrow">›</span>
+          <div className="privacy-flow__step">
+            <span className="privacy-flow__icon privacy-flow__icon--letter">A</span>
+            <small>La letra</small>
+          </div>
+        </div>
+        <ul className="intro-chips intro-chips--ink">
+          <li><IconLock size={14} /> No se guarda</li>
+          <li><IconLock size={14} /> No se envía</li>
+          <li><IconLock size={14} /> No reconoce tu rostro</li>
         </ul>
       </div>
     ),

@@ -1,5 +1,5 @@
 /** Recuerda si esta persona ya vio la introducción en pantallas. */
-const STORAGE_KEY = 'diversena.intro.v1';
+const STORAGE_KEY = 'diversena.intro.v2';
 
 /** ¿Ya vio esta persona la introducción? (con el almacenamiento bloqueado se muestra una sola vez por pestaña) */
 let seenInTab = false;

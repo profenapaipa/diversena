@@ -3,6 +3,8 @@ import { DEFAULT_ASPECT, fingerFlexErrors, palmFrame } from '../../services/reco
 import { currentZScale } from '../../services/recognition/calibration';
 import { scaleFlexion, thumbTipDistances } from '../../services/recognition/handPose3d';
 import { CalibrationPanel } from './CalibrationPanel';
+import { PRIVACY_BEFORE_PERMISSION, PRIVACY_SHORT } from '../../data/privacy';
+import { IconLock } from '../../components/icons';
 import { useSixSevenGesture } from '../../hooks/useSixSeven';
 import { useCalibration } from '../../hooks/useCalibration';
 import { useCalibrationSession } from '../../hooks/useCalibrationSession';
@@ -170,6 +172,11 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
 
   return (
     <div className="camera-view">
+      {status === 'active' && (
+        <p className="privacy-line privacy-line--camera">
+          <IconLock size={15} /> {PRIVACY_SHORT}
+        </p>
+      )}
       <div className="camera-stage">
         <div ref={frameRef} className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
@@ -190,7 +197,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                 {status === 'error' ? 'Reintentar' : 'Activar cámara'}
               </button>
               {status !== 'error' && (
-                <p className="camera-view__note">Tu cámara no se graba ni se envía. La primera vez puede tardar unos segundos.</p>
+                <p className="camera-view__note">{PRIVACY_BEFORE_PERMISSION} La primera vez puede tardar unos segundos.</p>
               )}
             </div>
           )}

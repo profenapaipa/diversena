@@ -99,3 +99,10 @@ export const IconArrowRight = (p: IconProps) => (
     <path d="m13 6 6 6-6 6" />
   </Icon>
 );
+
+export const IconLock = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </Icon>
+);

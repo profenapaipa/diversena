@@ -20,7 +20,7 @@ export function Layout() {
             <LogoMark size={28} />
             <p>
               <strong>DiverSeña</strong> · aprender lengua de señas con la cámara. Proyecto del Semillero de
-              Tecnología del colegio Injuv.
+              Tecnología del colegio Injuv. Solo se usan 21 puntos de tus manos: tu imagen no se guarda ni se envía.
             </p>
           </div>
           <div className="flag-legend" aria-label="Colores de la bandera de la comunidad Sorda">

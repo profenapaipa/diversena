@@ -4,16 +4,17 @@ import { IntroCarousel } from '../components/IntroCarousel';
 import { hasSeenIntro } from '../components/introSeen';
 import { languages } from '../data/languages';
 import { HandIllustration } from '../components/brand/HandIllustration';
-import { IconArrowRight, IconBook, IconCamera, IconGlobe } from '../components/icons';
+import { IconArrowRight, IconBook, IconCamera, IconGlobe, IconLock } from '../components/icons';
+import { PRIVACY_SHORT } from '../data/privacy';
 
 const STEPS = [
   {
     title: 'La cámara ve tu mano',
-    text: 'Te ubicas frente a la cámara y haces la seña. No se graba ni se envía nada: todo pasa en tu equipo.',
+    text: 'Te ubicas frente a la cámara y haces la seña. Tu imagen no se guarda ni se envía: todo pasa en tu equipo.',
   },
   {
     title: 'Compara con lo que aprendió',
-    text: 'DiverSeña marca 21 puntos en cada mano y los compara con las señas de referencia: las fotos del Diccionario de LSC del INSOR y grabaciones del equipo.',
+    text: 'DiverSeña marca 21 puntos en cada mano, y solo con esos puntos hace la comparación con las señas de referencia: las fotos del Diccionario de LSC del INSOR y grabaciones del equipo.',
   },
   {
     title: 'Te muestra la letra',
@@ -43,6 +44,9 @@ export function HomePage() {
               <IconCamera /> Traducir una seña
             </Link>
           </div>
+          <p className="privacy-line">
+            <IconLock size={16} /> {PRIVACY_SHORT}
+          </p>
           <button type="button" className="link-button" onClick={() => setShowIntro(true)}>
             Ver la introducción en pantallas
           </button>

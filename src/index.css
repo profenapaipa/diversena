@@ -2065,3 +2065,18 @@ main {
 .cal-sequence__item--now { color: var(--text); font-weight: 700; }
 .cal-sequence__item--now svg { outline-color: var(--brand-sun); }
 @media (max-height: 500px) { .cal-figure__svg { width: 9rem; } }
+
+/* ---------- Privacidad: se dice donde hace falta ---------- */
+.privacy-line { display: flex; align-items: center; gap: 0.45rem; margin: 0.5rem 0 0; color: var(--muted); font-size: 0.9rem; font-weight: 700; }
+.privacy-line svg { flex: none; color: var(--brand-sky-ink); }
+.privacy-line--camera { margin: 0 0 0.4rem; font-size: 0.82rem; }
+.intro-visual--privacy { display: grid; gap: 1rem; padding: 1.5rem 1rem; background: var(--surface-2); border: 1px solid var(--border); }
+.privacy-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0.35rem; }
+.privacy-flow__step { display: grid; gap: 0.35rem; justify-items: center; text-align: center; }
+.privacy-flow__step small { font-size: 0.72rem; color: var(--muted); line-height: 1.25; }
+.privacy-flow__icon { display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1rem; background: var(--brand-navy); color: #fff; font-weight: 700; font-size: 0.8rem; }
+.privacy-flow__icon--letter { background: var(--brand-sun); color: #151a6e; font-family: var(--font-display); font-size: 2rem; }
+.privacy-flow__step--key .privacy-flow__hand { width: 4rem; height: 4rem; padding: 0.4rem; border-radius: 1rem; background: var(--brand-navy); box-sizing: border-box; }
+.privacy-flow__arrow { font-size: 1.6rem; color: var(--brand-sky-ink); font-weight: 700; }
+.intro-chips--ink li { background: var(--brand-navy); }
+.intro-chips--ink li { display: inline-flex; align-items: center; gap: 0.3rem; }
