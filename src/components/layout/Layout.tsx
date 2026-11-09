@@ -1,8 +1,10 @@
 import { Link, Outlet } from 'react-router-dom';
 import { LogoMark } from '../brand/Logo';
 import { SiteHeader, TabBar } from './NavBar';
+import { useSixSevenKeys } from '../../hooks/useSixSeven';
 
 export function Layout() {
+  useSixSevenKeys();
   return (
     <div className="app-shell">
       <a className="skip-link" href="#contenido-principal">

@@ -3,6 +3,7 @@ import { DEFAULT_ASPECT, fingerFlexErrors, palmFrame } from '../../services/reco
 import { currentZScale } from '../../services/recognition/calibration';
 import { scaleFlexion, thumbTipDistances } from '../../services/recognition/handPose3d';
 import { CalibrationPanel } from './CalibrationPanel';
+import { useSixSevenGesture } from '../../hooks/useSixSeven';
 import { useCalibration } from '../../hooks/useCalibration';
 import { useCalibrationSession } from '../../hooks/useCalibrationSession';
 import { loadTargetPose } from '../../services/recognition/targetPose';
@@ -66,6 +67,9 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   const { status, error, videoRef, start, stop } = camera;
   const { status: handStatus, hands, latestHandsRef } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
+  const frameRef = useRef<HTMLDivElement>(null);
+  // Guiño: las dos manos subiendo y bajando por turnos (six seven) inclinan la página.
+  useSixSevenGesture(hands);
   const calibration = useCalibration();
   const [skippedCalibration, setSkippedCalibration] = useState(false);
   const videoAspect = () => {
@@ -156,10 +160,18 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
 
   const showResult = language && status === 'active';
 
+  // En el celular la cámara queda muy abajo (después de elegir la vocal): al encenderla, la pantalla baja hasta ella
+  // para que se vea que algo cambió y la mano quede a la vista.
+  useEffect(() => {
+    if (status !== 'active' || !window.matchMedia('(max-width: 52rem)').matches) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    frameRef.current?.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+  }, [status]);
+
   return (
     <div className="camera-view">
       <div className="camera-stage">
-        <div className="camera-view__frame" data-status={status}>
+        <div ref={frameRef} className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
           {status === 'active' && showLandmarks && (
             <HandLandmarksCanvas videoRef={videoRef} handsRef={latestHandsRef} guide={guide} guideSide={recognizedHand?.side} />
