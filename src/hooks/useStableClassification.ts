@@ -16,10 +16,14 @@ export function useStableClassification(
   const voterRef = useRef(new TemporalVoter<string>(5, 3));
   const [stable, setStable] = useState<SignMatch<Sign> | null>(null);
 
-  const raw = useMemo(
-    () => (features && candidates.length > 0 ? classifyWithReferenceSet(features, candidates) : null),
-    [features, candidates],
-  );
+  const raw = useMemo(() => {
+    if (!features || candidates.length === 0) return null;
+    const calibrated = classifyWithReferenceSet(features, candidates);
+    // La calibración nunca debe empeorar el reconocimiento: se prueba también sin ella y gana lo que más se parece.
+    if (!features.pose3dRaw) return calibrated;
+    const plain = classifyWithReferenceSet({ ...features, pose3d: features.pose3dRaw }, candidates);
+    return !calibrated || (plain && plain.confidence > calibrated.confidence) ? plain : calibrated;
+  }, [features, candidates]);
 
   const candidatesRef = useRef(candidates);
 

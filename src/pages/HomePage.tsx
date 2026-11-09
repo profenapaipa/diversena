@@ -4,16 +4,16 @@ import { IntroCarousel } from '../components/IntroCarousel';
 import { hasSeenIntro } from '../components/introSeen';
 import { languages } from '../data/languages';
 import { HandIllustration } from '../components/brand/HandIllustration';
-import { IconArrowRight, IconBook, IconCamera, IconGlobe, IconLock } from '../components/icons';
+import { IconArrowRight, IconBook, IconCamera, IconGlobe } from '../components/icons';
 import { CountUp, Reveal, prefersReducedMotion } from '../components/motion';
 
 const VOWELS = ['A', 'E', 'I', 'O', 'U'];
 
 /** Cómo funciona, en tres nodos. Los textos son cortos: el esquema cuenta el resto. */
 const STEPS = [
-  { title: 'Te ve', text: 'Tu mano, dentro de tu equipo.' },
-  { title: 'Marca 21 puntos', text: 'Solo se usan puntos, nunca tu imagen.' },
-  { title: 'Compara', text: 'Te muestra la letra que más se parece a la referencia.' },
+  { title: 'Te ve', text: 'Tu mano, en tu celular o computador.' },
+  { title: 'Marca 21 puntos', text: 'Ubica la posición de cada dedo.' },
+  { title: 'Compara', text: 'Te muestra la letra a la que más se parece.' },
 ];
 
 export function HomePage() {
@@ -40,14 +40,9 @@ export function HomePage() {
               <IconBook /> Empezar a aprender
             </Link>
             <Link className="button button--lg button--secondary" to="/identificar">
-              <IconCamera /> Traducir una seña
+              <IconCamera /> Identificar una seña
             </Link>
           </div>
-          <ul className="seals" aria-label="Tu privacidad">
-            <li><IconLock size={15} /> <strong>21</strong> puntos por mano</li>
-            <li><IconLock size={15} /> Tu imagen no se guarda</li>
-            <li><IconLock size={15} /> Tu imagen no se envía</li>
-          </ul>
           <button type="button" className="link-button" onClick={() => setShowIntro(true)}>
             Ver la introducción
           </button>
@@ -105,9 +100,9 @@ export function HomePage() {
                 <span className="feature__arrow">›</span>
                 <span className="feature__bubble">E</span>
               </span>
-              <h3>Traducir</h3>
-              <p>Haz la seña y mira la letra.</p>
-              <span className="feature__go">Ir a traducir <IconArrowRight size={18} /></span>
+              <h3>Identificar</h3>
+              <p>Haz la seña y mira a qué letra se parece.</p>
+              <span className="feature__go">Ir a identificar <IconArrowRight size={18} /></span>
             </Link>
           </Reveal>
           <Reveal className="feature-wrap" delay={240}>
@@ -121,24 +116,21 @@ export function HomePage() {
                 ))}
               </span>
               <h3>Explorar</h3>
-              <p>La misma letra, en otras lenguas.</p>
+              <p>Cada lengua tiene sus propias letras.</p>
               <span className="feature__go">Ir a explorar <IconArrowRight size={18} /></span>
             </Link>
           </Reveal>
         </div>
-        <p className="note home__universal">Ninguna seña es universal: cada país tiene su lengua de señas. Empezamos por la colombiana.</p>
+        <p className="note home__universal">Ninguna seña es universal: cada país tiene su lengua de señas.</p>
       </section>
 
       <Reveal as="section" className="section origin-banner">
         <div>
           <p className="eyebrow">Hecho en el aula</p>
           <h2>
-            <CountUp to={5} /> vocales hoy, una comunidad mañana
+            <CountUp to={5} /> vocales hoy, más señas después
           </h2>
-          <p>
-            DiverSeña es un proyecto del Semillero de Tecnología del colegio Injuv. Busca convertirse en una herramienta
-            sostenible para colegios, familias e instituciones.
-          </p>
+          <p>DiverSeña está en construcción: falta validar cada seña con personas Sordas y docentes de LSC.</p>
         </div>
         <Link className="button button--secondary" to="/quienes-somos?abrir=proyecto">
           Conoce el proyecto <IconArrowRight size={18} />

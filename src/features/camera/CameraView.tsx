@@ -3,8 +3,7 @@ import { DEFAULT_ASPECT, fingerFlexErrors, palmFrame } from '../../services/reco
 import { currentZScale } from '../../services/recognition/calibration';
 import { scaleFlexion, thumbTipDistances } from '../../services/recognition/handPose3d';
 import { CalibrationPanel } from './CalibrationPanel';
-import { PRIVACY_BEFORE_PERMISSION, PRIVACY_SHORT } from '../../data/privacy';
-import { IconLock } from '../../components/icons';
+import { PRIVACY_BEFORE_PERMISSION } from '../../data/privacy';
 import { useSixSevenGesture } from '../../hooks/useSixSeven';
 import { useCalibration } from '../../hooks/useCalibration';
 import { useCalibrationSession } from '../../hooks/useCalibrationSession';
@@ -51,7 +50,7 @@ interface CameraViewProps {
   language?: Language;
   /**
    * Con `language`: si se da, es el modo practicar (¿la seña que hago es
-   * esta?). Si se omite, es el modo traducir (¿qué seña estoy haciendo?).
+   * esta?). Si se omite, es el modo identificar (¿qué seña estoy haciendo?).
    */
   targetSign?: Sign;
   /** Prefijo del nombre de archivo para los videos grabados con esta vista. */
@@ -174,11 +173,6 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
 
   return (
     <div className="camera-view">
-      {status === 'active' && (
-        <p className="privacy-line privacy-line--camera">
-          <IconLock size={15} /> {PRIVACY_SHORT}
-        </p>
-      )}
       <div className="camera-stage">
         <div ref={frameRef} className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />
@@ -213,7 +207,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
 
         {showResult && (
           <aside className="result-panel" aria-live="polite">
-            <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Traducción'}</p>
+            <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Resultado'}</p>
             {status === 'active' && handStatus !== 'cargando' && handStatus !== 'error' && (needsCalibration || session.phase !== 'idle') ? (
               <CalibrationPanel
                 session={session}
@@ -244,15 +238,14 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
               <p className="result-panel__hint">Cargando datos de reconocimiento…</p>
             ) : !hasAnyReference || !targetHasReferences ? (
               <p className="result-panel__hint">
-                Aún no hay datos de entrenamiento para{' '}
-                {targetSign ? `la vocal ${targetSign.letter}` : language.shortName}. El equipo los está
-                reuniendo en el Panel del equipo.
+                Todavía no tenemos datos para reconocer{' '}
+                {targetSign ? `la vocal ${targetSign.letter}` : language.shortName}. Los estamos reuniendo con personas Sordas.
               </p>
             ) : classification ? (
               <>
                 <p className="result-panel__letter result-panel__letter--ok">{classification.sign.letter}</p>
                 <p className="result-panel__verdict">
-                  {targetSign ? `¡Lo lograste! Reconocimos tu ${targetSign.letter}` : `Vocal ${classification.sign.letter}`}
+                  {targetSign ? `¡Muy bien! Tu ${targetSign.letter} se parece a la referencia` : `Vocal ${classification.sign.letter}`}
                 </p>
                 <p className="result-panel__pct">{similarity} %</p>
                 <span
@@ -270,7 +263,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                   ?
                 </p>
                 <p className="result-panel__verdict">
-                  {!features ? 'Muestra tu mano' : targetSign ? 'Todavía no coincide' : 'No estoy seguro'}
+                  {!features ? 'Muestra tu mano' : targetSign ? 'Todavía no coincide' : 'Aún no hay un parecido claro'}
                 </p>
                 {targetSign && fingerHint ? (
                   <div className="suggestions">

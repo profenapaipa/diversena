@@ -62,12 +62,12 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
         </span>
         <p className="result-panel__hint calibration__live">
           {!handVisible
-            ? 'No veo tu mano. Muéstrala a la cámara.'
+            ? 'No vemos tu mano. Muéstrala a la cámara.'
             : step.id === 'turn45' || step.id === 'turn90' || step.id === 'turn180'
               ? `Giro actual: ${run.turn}°`
               : step.id === 'thumb'
                 ? `Pulgar afuera ${run.thumbOut ? '✓' : '·'} · adentro ${run.thumbIn ? '✓' : '·'}`
-                : 'Te estoy viendo. Sostén la postura.'}
+                : 'Vemos tu mano. Sostén la postura.'}
         </p>
         {list}
         <p className="result-panel__hint">{step.purpose}</p>
@@ -93,8 +93,8 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
           Tu mano está calibrada
         </p>
         <p className="result-panel__hint">
-          Completaste {done} de {total} posturas. Desde ahora la guía y el reconocimiento se ajustan al tamaño, a los giros y a lo
-          que doblan tus dedos. Dura mientras uses este navegador; si cambias de mano, vuelve a calibrar.
+          Completaste {done} de {total} posturas. Desde ahora la guía y la comparación se ajustan al tamaño, a los giros y a lo
+          que doblan tus dedos. Queda guardada en este navegador; si cambias de mano, vuelve a calibrar.
         </p>
         {list}
         <button type="button" className="button" onClick={session.dismiss}>
@@ -109,8 +109,8 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
       <p className="eyebrow">Calibrar tu mano</p>
       <p className="result-panel__verdict">Primero, conozcamos tu mano</p>
       <p className="result-panel__hint">
-        Son {total} posturas guiadas, de unos 30 segundos en total, y se hacen una sola vez. Así medimos el tamaño de tu mano,
-        cuánto giras y cuánto doblas cada dedo, para que la guía nunca te pida una postura que tu mano no alcanza.
+        Son {total} posturas guiadas, unos 30 segundos en total. Medimos el tamaño de tu mano, cuánto giras y cuánto doblas
+        cada dedo, para que la guía se ajuste a ti.
       </p>
       {phase === 'failed' && (
         <p className="result-panel__hint calibration__warn">

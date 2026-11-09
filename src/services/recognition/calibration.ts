@@ -203,7 +203,7 @@ export const REFERENCE_FLEX_MAX = [37, 42, 113, 54, 143, 49, 51, 140, 55, 45, 14
 /** Articulaciones que piden menos de esto casi no se doblan: se dejan sin ajustar para no amplificar el ruido. */
 const MIN_FLEX_TO_ADJUST = 60;
 /** Con 0,75 la mano en vivo se estira como máximo un tercio (1/0,75): un puño suave no sesga las vocales. */
-const MIN_RATIO = 0.75;
+const MIN_RATIO = 0.85;
 
 /** Razón de flexión de cada articulación a partir de la flexión máxima medida en el puño. */
 export function flexRatios(flexMax: number[]): number[] {
@@ -241,11 +241,11 @@ export interface CalibrationStep {
 }
 
 export const CALIBRATION_STEPS: CalibrationStep[] = [
-  { id: 'open', label: 'Mano abierta', title: 'Extiende la mano completamente', hint: 'Palma hacia la cámara, dedos abiertos. Quédate quieto un momento.', purpose: 'Mide el tamaño de tu mano y el largo de cada dedo.' },
-  { id: 'turn45', label: 'Giro de 45°', title: 'Gira la mano unos 45°', hint: 'Mano abierta: gírala un poco hacia un lado, como si fueras a mostrar el borde.', purpose: 'Enseña cómo se ve tu mano cuando no está de frente.' },
-  { id: 'turn90', label: 'De canto', title: 'Ponla de canto, a 90°', hint: 'Sigue girando hasta ver la mano de lado, con la palma hacia un costado.', purpose: 'Mide la profundidad: así los giros no deforman tu mano.' },
-  { id: 'turn180', label: 'El dorso', title: 'Muestra el dorso, 180°', hint: 'Termina el giro: ahora la cámara ve el dorso de tu mano (el lado de las uñas).', purpose: 'Completa el giro para reconocer tu mano desde cualquier ángulo.' },
-  { id: 'fist', label: 'Puño', title: 'Cierra el puño completo', hint: 'Cierra los cuatro dedos firmes, hasta donde llegues con naturalidad. Quédate quieto un momento.', purpose: 'Mide cuánto dobla cada articulación de tus dedos.' },
+  { id: 'open', label: 'Mano abierta', title: 'Extiende la mano completamente', hint: 'Palma hacia la cámara, dedos abiertos. Mantén la mano quieta un momento.', purpose: 'Mide el tamaño de tu mano y el largo de cada dedo.' },
+  { id: 'turn45', label: 'Giro de 45°', title: 'Gira la mano unos 45°', hint: 'Mano abierta: gírala un poco hacia un lado, como si fueras a mostrar el borde.', purpose: 'Muestra cómo se ve tu mano cuando no está de frente.' },
+  { id: 'turn90', label: 'De canto', title: 'Ponla de canto, a 90°', hint: 'Sigue girando hasta ver la mano de lado, con la palma hacia un costado.', purpose: 'Ayuda a medir cómo cambia tu mano al girar.' },
+  { id: 'turn180', label: 'El dorso', title: 'Muestra el dorso, 180°', hint: 'Termina el giro: ahora la cámara ve el dorso de tu mano (el lado de las uñas).', purpose: 'Completa el giro para que la comparación funcione mejor con tu mano girada.' },
+  { id: 'fist', label: 'Puño', title: 'Cierra el puño completo', hint: 'Cierra los cuatro dedos hasta donde llegues con naturalidad. Mantén la mano quieta un momento.', purpose: 'Mide cuánto dobla cada articulación de tus dedos.' },
   { id: 'spread', label: 'Dedos estirados', title: 'Abre y estira los dedos al máximo', hint: 'Desde el puño, abre la mano y sepáralos todo lo que puedas.', purpose: 'Mide hasta dónde estiras y separas cada dedo.' },
   { id: 'thumb', label: 'Pulgar', title: 'Mueve el pulgar: afuera y adentro', hint: 'Sepáralo lo más que puedas de la mano y luego llévalo sobre la palma.', purpose: 'Mide el recorrido de tu pulgar, que es el que más varía entre personas.' },
 ];

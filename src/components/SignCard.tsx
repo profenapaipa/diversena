@@ -43,13 +43,13 @@ export function SignCard({ sign }: SignCardProps) {
       )}
 
       <div>
-        <h4>¿Cómo se realiza?</h4>
-        <p>{sign.description ?? '[EXPLICACIÓN PENDIENTE]'}</p>
+        <h4>¿Cómo se hace?</h4>
+        <p>{sign.description ?? 'Esta seña aún no está lista.'}</p>
       </div>
 
       <details className="sign-card__how">
         <summary>Paso a paso</summary>
-        <p>{sign.instructions ?? '[INSTRUCCIONES PENDIENTES]'}</p>
+        <p>{sign.instructions ?? 'Las instrucciones aún no están listas.'}</p>
       </details>
       <a
         className="sign-card__source"

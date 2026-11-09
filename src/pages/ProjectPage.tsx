@@ -1,4 +1,4 @@
-import { DECISIONS, REFERENCES, REQUIREMENTS } from '../data/project';
+import { AUDIENCE, DECISIONS, PROBLEM, QUESTION, REFERENCES, REQUIREMENTS } from '../data/project';
 import { CountUp, Reveal } from '../components/motion';
 
 const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
@@ -6,7 +6,7 @@ const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendient
 
 /** Cómo funciona, en tres cajas de pocas palabras. */
 const FLOW = [
-  { label: 'Entra', text: 'Lo que ve tu cámara, en tu equipo.' },
+  { label: 'Entra', text: 'Lo que ve tu cámara, en tu celular o computador.' },
   { label: 'Procesa', text: '21 puntos por mano, contra las señas de referencia.' },
   { label: 'Sale', text: 'La letra, o sugerencias si no está segura.' },
 ];
@@ -26,8 +26,13 @@ export function ProjectContent() {
 
       <section className="section">
         <h2>El problema</h2>
-        <p className="project__lead">A veces las personas sordas no logran que otras entiendan lo que necesitan expresar.</p>
-        <p className="note">Para familias, estudiantes y docentes, desde los 6 años.</p>
+        <p className="project__lead">{PROBLEM}</p>
+        <p className="note">{AUDIENCE}</p>
+      </section>
+
+      <section className="section">
+        <h2>La pregunta</h2>
+        <p className="quote">{QUESTION}</p>
       </section>
 
       <section className="section">
@@ -94,7 +99,7 @@ export function ProjectContent() {
       </details>
 
       <p className="project__help">
-        <strong>¿Eres Sorda, intérprete o docente de LSC?</strong> Tu mirada nos ayuda a validar cada seña.
+        <strong>¿Eres una persona Sorda, intérprete o docente de LSC?</strong> Tu revisión nos ayuda a validar cada seña.
       </p>
     </div>
   );

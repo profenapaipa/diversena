@@ -23,7 +23,7 @@ interface NavItem {
 const MAIN_LINKS: NavItem[] = [
   { to: '/', label: 'Inicio', icon: <IconHome />, end: true },
   { to: '/aprender', label: 'Aprender', icon: <IconBook /> },
-  { to: '/identificar', label: 'Traducir', icon: <IconCamera /> },
+  { to: '/identificar', label: 'Identificar', icon: <IconCamera /> },
   { to: '/explorar', label: 'Explorar', icon: <IconGlobe /> },
   { to: '/quienes-somos', label: 'Quiénes somos', icon: <IconFlag /> },
 ];
@@ -32,7 +32,7 @@ const MAIN_LINKS: NavItem[] = [
 const TAB_LINKS: NavItem[] = [
   { to: '/', label: 'Inicio', icon: <IconHome />, end: true },
   { to: '/aprender', label: 'Aprender', icon: <IconBook /> },
-  { to: '/identificar', label: 'Traducir', icon: <IconCamera /> },
+  { to: '/identificar', label: 'Identificar', icon: <IconCamera /> },
   { to: '/perfil', label: 'Perfil', icon: <IconUser /> },
 ];
 

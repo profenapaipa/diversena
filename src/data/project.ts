@@ -12,10 +12,10 @@ export const PROJECT_ORIGIN = {
 };
 
 export const PROBLEM =
-  'En distintos espacios, las personas sordas pueden enfrentar dificultades para comunicarse de manera clara y lograr que otras personas comprendan lo que necesitan expresar. Esta situación suele pasar desapercibida hasta que se requiere comunicación o ayuda.';
+  'Muchas personas oyentes no conocen la lengua de señas. Por eso, en la casa, el colegio o la calle, a las personas sordas les cuesta que las entiendan, aunque sepan muy bien lo que quieren decir.';
 
 export const QUESTION =
-  '¿Qué problemas tienen las personas sordas para comunicarse de manera clara, sabiendo lo que quieren expresar?';
+  '¿Cómo puede la cámara de un celular ayudar a familias, estudiantes y docentes a practicar la Lengua de Señas Colombiana y a comunicarse mejor con las personas Sordas?';
 
 export const AUDIENCE =
   'Personas desde los 6 años que necesitan o quieren entender la lengua de señas: familias, estudiantes, docentes y cualquiera que conviva con la comunidad Sorda.';
@@ -31,13 +31,13 @@ export const REQUIREMENTS: Array<{ action: string; test: string; status: Require
     note: 'Dos manos en vivo, a ~30 cuadros por segundo, en el navegador.',
   },
   {
-    action: 'Comprender las señas hechas con las manos y traducirlas a texto.',
-    test: 'Hacer cada vocal y comprobar que aparece la letra correcta.',
+    action: 'Comparar la vocal que haces con las de referencia y mostrar la letra que más se parece.',
+    test: 'Hacer cada vocal y ver a qué letra se parece.',
     status: 'en-progreso',
     note: 'El reconocedor ya funciona; falta grabar los videos de entrenamiento con personas Sordas.',
   },
   {
-    action: 'Dar sugerencias cuando no entiende la seña.',
+    action: 'Sugerir las vocales más parecidas cuando la seña no está clara.',
     test: 'Hacer una seña a medias y ver si propone opciones parecidas.',
     status: 'cumplido',
     note: '"¿Quizás quisiste decir…?" con las señas más parecidas, como en el boceto.',
@@ -52,7 +52,7 @@ export const DECISIONS: Array<{ title: string; why: string }> = [
   },
   {
     title: 'De Unity y Teachable Machine al navegador',
-    why: 'La detección de manos con MediaPipe corre directamente en la página, sin servidores y sin enviar video a ningún lado.',
+    why: 'La detección de manos corre en la propia página, sin servidores y sin enviar video.',
   },
   {
     title: 'Puntos de la mano en lugar de imágenes',
@@ -85,7 +85,7 @@ export const REFERENCES: Reference[] = [
   {
     apa: 'Ramírez Cabezas, J. A., Jiménez Bedón, A. M., Bajaña Zajía, J. X., & Cunuhay Cuchipe, W. C. (2025). Aplicación móvil para la comunicación entre oyentes y personas con discapacidad auditiva mediante reconocimiento de frases en LSEC con redes neuronales convolucionales. e-Revista Multidisciplinaria del Saber.',
     doi: 'https://doi.org/10.61286/e-rms.v3i.307',
-    finding: 'Una app reconoció 15 frases en Lengua de Señas Ecuatoriana con más del 90 % de precisión.',
+    finding: 'Una app reconoció 15 frases en Lengua de Señas Ecuatoriana; sus autores reportan más del 90 % de aciertos en sus pruebas.',
   },
   {
     apa: 'Ritmeester, J., Sümer, B., Boonstra, M., de Meulder, M., van der Aa, B., Roelofsen, F., et al. (2026). From words to sentences: Designing and evaluating a parent-facing sign language learning app. Universal Access in the Information Society.',

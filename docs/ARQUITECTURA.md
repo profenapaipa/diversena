@@ -35,7 +35,7 @@ GitHub Pages (`.github/workflows/deploy.yml`). En local:
 | --- | --- | --- |
 | `#/` | Todos | Portada |
 | `#/aprender` | Estudiantes | Elegir una vocal y practicarla con la cámara |
-| `#/identificar` | Estudiantes | Traducir una seña a texto, con sugerencias |
+| `#/identificar` | Estudiantes | Identificar una seña, con sugerencias |
 | `#/explorar` | Estudiantes | Señas por lengua |
 | `#/perfil` | Estudiantes | Perfil, foto y progreso |
 | `#/proyecto` | Público, jurados | Documentación del proyecto |

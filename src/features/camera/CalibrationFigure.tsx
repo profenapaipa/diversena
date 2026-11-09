@@ -128,10 +128,10 @@ function Hand({ shape, yaw, scale, cx, baseY }: HandProps) {
 
 /** Qué cara de la mano mira a la cámara, para decirlo con palabras. */
 function sideLabel(yaw: number): string {
-  if (yaw < 3) return 'PALMA hacia la cámara';
-  if (yaw < 80) return `PALMA, girada ${Math.round(yaw / 5) * 5}°`;
-  if (yaw < 135) return 'DE CANTO, a 90° (de lado)';
-  return 'DORSO hacia la cámara (las uñas)';
+  if (yaw < 3) return 'Palma hacia la cámara';
+  if (yaw < 80) return `Palma, girada ${Math.round(yaw / 5) * 5}°`;
+  if (yaw < 135) return 'De canto, a 90° (de lado)';
+  return 'Dorso hacia la cámara (se ven las uñas)';
 }
 
 const TURN_STEPS: Partial<Record<CalibrationStepId, number>> = { turn45: 45, turn90: 90, turn180: 180 };
@@ -194,7 +194,7 @@ export function CalibrationFigure({ step }: CalibrationFigureProps) {
     : step === 'fist' ? (k < 0.5 ? 'Mano abierta' : 'Puño cerrado')
     : step === 'spread' ? (k < 0.5 ? 'Dedos juntos' : 'Dedos separados y estirados')
     : isTurn ? sideLabel(yaw)
-    : 'PALMA hacia la cámara, dedos abiertos';
+    : 'Palma hacia la cámara, dedos abiertos';
   const target = turnTarget ?? 0;
 
   return (

@@ -10,7 +10,7 @@ const ROLE_LABEL: Record<ProfileRole, string> = {
   estudiante: 'Estudiante',
   docente: 'Docente',
   familia: 'Familia',
-  otro: 'Otro',
+  otro: 'Otra persona',
 };
 
 /** Pistas de encuadre según dónde y qué tan grande se ve la cara. */
@@ -127,9 +127,8 @@ export function ProfilePage() {
     <section className="page">
       <h1>{profile ? 'Editar perfil' : 'Crea tu perfil'}</h1>
       <p>
-        Con un perfil, DiverSeña recuerda tu progreso al practicar. La cámara detecta tu rostro solo
-        para encuadrar una foto de perfil: <strong>no te identifica ni guarda datos biométricos</strong>,
-        y la foto no sale de este navegador.
+        Con un perfil, DiverSeña recuerda en este navegador qué vocales has practicado. La cámara detecta tu rostro solo
+        para centrar la foto de perfil; no sirve para saber quién eres. La foto queda guardada solo en este navegador.
       </p>
 
       <form className="profile-form" onSubmit={handleSubmit}>
@@ -219,7 +218,7 @@ export function ProfilePage() {
                 </p>
                 <div className="video-actions">
                   <button type="button" className="button" onClick={handleCapture} disabled={!hint.ok}>
-                    📸 Tomar foto
+                    Tomar foto
                   </button>
                   <button type="button" className="button button--secondary" onClick={stopCamera}>
                     Cancelar
@@ -234,7 +233,7 @@ export function ProfilePage() {
                   onClick={startCamera}
                   disabled={cameraStatus === 'requesting'}
                 >
-                  🎥 {avatar ? 'Tomar otra foto' : 'Usar la cámara'}
+                  {avatar ? 'Tomar otra foto' : 'Usar la cámara'}
                 </button>
                 {avatar && (
                   <button type="button" className="button button--secondary" onClick={() => setAvatar(null)}>

@@ -36,7 +36,7 @@ lengua de señas.
 | # | La solución debe… | Cómo se prueba | Estado |
 | --- | --- | --- | --- |
 | 1 | Reconocer las manos y la posición de los dedos | Mostrar las manos y ver los 21 puntos siguiéndolas | Cumplido |
-| 2 | Comprender las señas y traducirlas a texto | Hacer cada vocal y ver la letra correcta | En progreso (faltan datos de entrenamiento) |
+| 2 | Comparar la vocal con las de referencia y mostrar la que más se parece | Hacer cada vocal y ver a cuál se parece | En progreso (faltan datos de entrenamiento) |
 | 3 | Dar sugerencias cuando no entiende | Hacer una seña a medias y ver opciones parecidas | Cumplido ("¿Quizás quisiste decir…?") |
 
 ## Cómo funciona (las tres cajas)
@@ -53,9 +53,9 @@ El boceto del 14 de octubre propone tres pantallas. Así quedaron en la app:
 | Boceto | En la app |
 | --- | --- |
 | Menú con foto de perfil arriba a la izquierda y menú de tres líneas a la derecha | Encabezado en celular: avatar, logo y menú hamburguesa |
-| Íconos de libro (aprender) y cámara | Barra inferior en celular: Inicio, Aprender, Traducir y Perfil |
+| Íconos de libro (aprender) y cámara | Barra inferior en celular: Inicio, Aprender, Identificar y Perfil |
 | Ondas azules y manos alrededor de un ojo | Portada con ondas; el ojo es el símbolo de la marca |
-| La cámara ve la mano y sale la letra "a" | Traducir: video con los puntos de la mano y la letra en grande al lado |
+| La cámara ve la mano y sale la letra "a" | Identificar: video con los puntos de la mano y la letra en grande al lado |
 | "¿Quizás quisiste decir…?" | Panel de sugerencias con las 3 señas más parecidas |
 
 ## Barreras que reportó el equipo y cómo se resolvieron

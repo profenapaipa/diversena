@@ -41,6 +41,7 @@ export function useTrackedHand(): UseTrackedHandResult {
     return {
       ...extractHandFeatures(normalizeHandLandmarks(recognizedHand.landmarks)),
       pose3d: describePose3d(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale(), calibration?.ratios),
+      pose3dRaw: calibration ? describePose3d(recognizedHand.landmarks, aspect, recognizedHand.side) : undefined,
       extended: extendedFingers(recognizedHand.landmarks),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular; cambia la lectura, no la referencia

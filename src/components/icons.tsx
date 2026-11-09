@@ -39,7 +39,7 @@ export const IconBook = (p: IconProps) => (
   </Icon>
 );
 
-/** Cámara del boceto: traducir/practicar. */
+/** Cámara del boceto: identificar/practicar. */
 export const IconCamera = (p: IconProps) => (
   <Icon {...p}>
     <path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />

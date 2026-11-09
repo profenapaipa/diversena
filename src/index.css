@@ -1310,6 +1310,8 @@ main {
 
 .camera-view__frame {
   position: relative;
+  /* Alto fijo por la proporción 4:3: si el panel de al lado crece o se achica, la cámara no se estira. */
+  align-self: start;
   width: 100%;
   max-width: 40rem;
   aspect-ratio: 4 / 3;
@@ -2196,3 +2198,35 @@ main {
 .identity-min { list-style: none; margin: 0.5rem 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .identity-min li { padding: 0.35rem 0.9rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
 .identity-use h3 { font-size: 0.95rem; }
+
+/* ---------- Design thinking interactivo ---------- */
+.dt { display: grid; gap: 1rem; margin-top: 1rem; }
+.dt__track { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+.dt__track::before { content: ''; position: absolute; left: 10%; right: 10%; top: 1.6rem; height: 4px; background: var(--border); border-radius: 2px; }
+.dt__stop { display: grid; justify-items: center; gap: 0.4rem; position: relative; }
+.dt__dot { width: 3.2rem; height: 3.2rem; border-radius: 50%; border: 3px solid var(--brand-sky); background: var(--surface); color: var(--text); font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; cursor: pointer; transition: transform 0.2s, background 0.2s, border-color 0.2s; }
+.dt__dot:hover { transform: translateY(-2px); }
+.dt__dot--done { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+.dt__dot--active { background: var(--brand-sun); color: #151a6e; border-color: var(--brand-sun); transform: scale(1.18); box-shadow: 0 0 0 6px rgba(255, 216, 61, 0.22); }
+.dt__dot--dim { opacity: 0.35; }
+.dt__name { font-size: 0.85rem; font-weight: 700; color: var(--muted); text-align: center; }
+.dt__name--active { color: var(--text); }
+.dt__card { display: flex; gap: 1rem; align-items: center; padding: 1.1rem 1.25rem; border-radius: 1.2rem; background: var(--surface-2); border: 1px solid var(--border); animation: dt-in 0.35s ease-out; }
+@keyframes dt-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.dt__icon { flex: none; display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: 1.1rem; background: var(--brand-navy); color: var(--brand-sun); }
+.dt__card h3 { margin: 0 0 0.15rem; font-size: 1.25rem; }
+.dt__does { margin: 0 0 0.3rem; font-weight: 700; }
+.dt__result { margin: 0; color: var(--muted); }
+.dt__loop { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.dt__loop span { display: inline-block; color: var(--brand-sky-ink); font-weight: 700; margin-right: 0.2rem; animation: dt-spin 3.2s linear infinite; }
+@keyframes dt-spin { to { transform: rotate(360deg); } }
+.dt__filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+@media (max-width: 40rem) {
+  .dt__dot { width: 2.6rem; height: 2.6rem; font-size: 1rem; }
+  .dt__track::before { top: 1.3rem; }
+  .dt__name { font-size: 0.72rem; }
+  .dt__card { align-items: flex-start; padding: 1rem; }
+  .dt__icon { width: 3rem; height: 3rem; }
+}
+
+@media (min-width: 52rem) { .camera-stage .result-panel { min-height: 22rem; } }

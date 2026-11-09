@@ -17,6 +17,8 @@ export interface HandFeatureVector {
    * referencias guardadas antes de este cambio.
    */
   pose3d?: number[];
+  /** La misma pose sin la calibración (z y flexión sin ajustar): respaldo por si la calibración de la persona quedó pobre. */
+  pose3dRaw?: number[];
   /** Dedos largos extendidos en la lectura en vivo (ver `extendedFingers`). */
   extended?: number;
 }

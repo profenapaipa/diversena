@@ -18,7 +18,7 @@ sostenible para colegios, familias e instituciones.
 
 - **Aprender:** elige una vocal, mira cómo se hace y practícala con
   retroalimentación al instante.
-- **Traducir:** haz una seña y aparece la letra. Si no está segura, sugiere
+- **Identificar:** haz una seña y mira a qué letra se parece. Si no está segura, sugiere
   las más parecidas ("¿Quizás quisiste decir…?").
 - **Perfil:** nombre, foto encuadrada con detección de rostro y progreso por
   vocal, guardados solo en el navegador.

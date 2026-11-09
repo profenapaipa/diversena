@@ -26,7 +26,7 @@ const PALETTE = [
 /** El símbolo, explicado en una línea por idea. */
 const SYMBOLS = [
   { title: 'Dos manos', text: 'Dos personas que se encuentran para comunicarse.' },
-  { title: 'Una gira sobre la otra', text: 'Ninguna manda: una enseña, la otra aprende.' },
+  { title: 'Una gira sobre la otra', text: 'Las dos aprenden y enseñan, por turnos.' },
   { title: 'El sol al centro', text: 'La luz y la convivencia de la bandera.' },
   { title: 'Una S que aparece', text: 'La S de Seña se forma sola entre las manos.' },
 ];
@@ -122,7 +122,7 @@ export function IdentityContent() {
           <p className="note">Más pequeño: símbolo simplificado.</p>
         </div>
         <div className="card card--tint">
-          <h3>Mejor evitar</h3>
+          <h3>Evita</h3>
           <ul className="identity-donts">
             {DONTS.map((item) => (
               <li key={item}>{item}</li>

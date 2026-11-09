@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom';
 import { HandIllustration } from './brand/HandIllustration';
 import { LogoMark } from './brand/Logo';
-import { IconArrowRight, IconBook, IconClose, IconLock } from './icons';
+import { IconArrowRight, IconBook, IconClose } from './icons';
 import { PRIVACY_LONG } from '../data/privacy';
 import { markIntroSeen } from './introSeen';
 
@@ -20,7 +20,7 @@ const SLIDES: Slide[] = [
   {
     id: 'que-es',
     eyebrow: 'Bienvenida',
-    title: 'Aprende lengua de señas con tu cámara',
+    title: 'Practica las vocales de la LSC con tu cámara',
     text: 'DiverSeña ve tus manos y te dice si tu seña se parece a la de referencia. Empezamos por las cinco vocales de la Lengua de Señas Colombiana.',
     visual: (
       <div className="intro-visual intro-visual--brand">
@@ -28,7 +28,7 @@ const SLIDES: Slide[] = [
         <HandIllustration className="intro-visual__hand" />
         <ul className="intro-chips">
           <li>Sin instalar nada</li>
-          <li>Solo usa 21 puntos de tus manos</li>
+          <li>Para aprender y practicar vocales</li>
           <li>Desde el celular o el computador</li>
         </ul>
       </div>
@@ -43,7 +43,7 @@ const SLIDES: Slide[] = [
       <div className="intro-visual intro-visual--privacy" role="img" aria-label="De tu cámara salen solo 21 puntos de tus manos, y de ellos sale la letra. Tu imagen no se guarda ni se envía.">
         <div className="privacy-flow" aria-hidden="true">
           <div className="privacy-flow__step">
-            <span className="privacy-flow__icon">Cámara</span>
+            <span className="privacy-flow__icon">Tu cámara</span>
             <small>Tu imagen se queda en tu equipo</small>
           </div>
           <span className="privacy-flow__arrow">›</span>
@@ -57,11 +57,6 @@ const SLIDES: Slide[] = [
             <small>La letra</small>
           </div>
         </div>
-        <ul className="intro-chips intro-chips--ink">
-          <li><IconLock size={14} /> No se guarda</li>
-          <li><IconLock size={14} /> No se envía</li>
-          <li><IconLock size={14} /> No reconoce tu rostro</li>
-        </ul>
       </div>
     ),
   },
@@ -80,10 +75,10 @@ const SLIDES: Slide[] = [
     ),
   },
   {
-    id: 'traducir',
-    eyebrow: 'Traducir',
+    id: 'identificar',
+    eyebrow: 'Identificar',
     title: 'Haz una vocal y te decimos cuál es',
-    text: 'En Traducir haces la seña y te mostramos la letra que más se parece, con su porcentaje de parecido. Si no estamos seguros, te sugerimos las más cercanas.',
+    text: 'En Identificar haces la seña y te mostramos la letra que más se parece, con su porcentaje de parecido. Si no estamos seguros, te sugerimos las más cercanas.',
     visual: (
       <div className="intro-visual intro-visual--result" role="img" aria-label="Ejemplo de resultado: la vocal A con un parecido alto con la referencia">
         <span className="intro-result__badge">Ejemplo</span>
@@ -103,15 +98,15 @@ const SLIDES: Slide[] = [
       <ol className="intro-steps">
         <li>
           <span className="intro-steps__num" aria-hidden="true">1</span>
-          <span><strong>Calibra tu mano.</strong> Unas 7 posturas guiadas, una sola vez, para que todo se ajuste a tu mano.</span>
+          <span><strong>Calibra tu mano.</strong> Siete posturas guiadas, unos 30 segundos, para que todo se ajuste a tu mano.</span>
         </li>
         <li>
           <span className="intro-steps__num" aria-hidden="true">2</span>
-          <span><strong>Elige una vocal en Aprender</strong> y sigue la guía hasta que te diga «¡Lo lograste!».</span>
+          <span><strong>Elige una vocal en Aprender</strong> y sigue la guía hasta que tu seña se parezca a la de referencia.</span>
         </li>
         <li>
           <span className="intro-steps__num" aria-hidden="true">3</span>
-          <span><strong>Prueba Traducir</strong> y mira qué vocal reconoce.</span>
+          <span><strong>Prueba Identificar</strong> y mira a qué vocal se parece tu seña.</span>
         </li>
       </ol>
     ),

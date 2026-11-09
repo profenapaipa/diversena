@@ -8,15 +8,15 @@ export function IdentifyPage() {
   return (
     <section className="page">
       <header className="page-head">
-        <p className="eyebrow">Traducir</p>
-        <h1>Haz una seña y la convertimos en texto</h1>
+        <p className="eyebrow">Identificar</p>
+        <h1>Haz una vocal y mira a cuál se parece</h1>
         <p className="lead">
           Ponte frente a la cámara con la mano completa dentro del cuadro. Si no estamos seguros, te
           sugerimos las señas más parecidas.
         </p>
         <p className="lead">
-          Por ahora solo conozco las cinco vocales de la LSC: <strong>A, E, I, O, U</strong>. Si haces otra seña, no sabré
-          cuál es.
+          Por ahora solo conocemos las cinco vocales de la LSC: <strong>A, E, I, O, U</strong>. Si haces otra seña, no
+          podremos decir cuál es.
         </p>
       </header>
 

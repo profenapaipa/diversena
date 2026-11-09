@@ -19,14 +19,8 @@ export function Layout() {
           <div className="site-footer__brand">
             <LogoMark size={28} />
             <p>
-              <strong>DiverSeña</strong> · aprender lengua de señas con la cámara. Proyecto del Semillero de
-              Tecnología del colegio Injuv. Solo se usan 21 puntos de tus manos: tu imagen no se guarda ni se envía.
+              <strong>DiverSeña</strong> · Proyecto del Semillero de Tecnología del colegio Injuv.
             </p>
-          </div>
-          <div className="flag-legend" aria-label="Colores de la bandera de la comunidad Sorda">
-            <span><i className="swatch swatch--navy" /> Humanidad y unión</span>
-            <span><i className="swatch swatch--sky" /> Comunidad Sorda</span>
-            <span><i className="swatch swatch--sun" /> Luz y convivencia</span>
           </div>
           <nav className="site-footer__links" aria-label="Enlaces del pie de página">
             <Link to="/quienes-somos">Quiénes somos</Link>
