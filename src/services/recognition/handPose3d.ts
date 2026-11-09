@@ -113,6 +113,20 @@ function angleAt(a: Vec3, vertex: Vec3, b: Vec3): number {
   return Math.acos(Math.min(1, Math.max(-1, dot(u, w) / ((norm(u) || 1) * (norm(w) || 1))))) / Math.PI;
 }
 
+
+/** Peso de las distancias pulgar a punta de cada dedo en el descriptor. */
+const TIP_WEIGHT = 2;
+
+/**
+ * Distancia de la punta del pulgar a la punta de los otros cuatro dedos, en palmas.
+ * No depende de cómo esté girada la mano, y es lo que distingue la O (el pulgar toca
+ * los dedos y forma un círculo) de las demás vocales de dedos doblados.
+ */
+export function thumbTipDistances(c: Vec3[]): number[] {
+  const palm = norm(sub(c[9], c[0])) || 1;
+  return [8, 12, 16, 20].map((tip) => norm(sub(c[4], c[tip])) / palm);
+}
+
 /**
  * Vector de 55 valores calculado desde el marco de la palma: la dirección (vector
  * unitario) de cada uno de los 15 huesos de los dedos (45) y los 10 ángulos de
@@ -129,6 +143,7 @@ export function describeFrame(c: Vec3[]): number[] {
   for (const [p, q, r, s] of CHAINS) {
     out.push(angleAt(c[p], c[q], c[r]) * ANGLE_WEIGHT, angleAt(c[q], c[r], c[s]) * ANGLE_WEIGHT);
   }
+  out.push(...thumbTipDistances(c).map((d) => d * TIP_WEIGHT));
   return out;
 }
 
@@ -274,6 +289,20 @@ export function fingerAngleErrors(live: Vec3[], target: Vec3[]): Array<{ finger:
  * grabaciones del equipo, 437 cuadros de mano abierta de descanso estaban
  * etiquetados como E y hacían que la E "se pareciera" a casi cualquier mano.
  */
+/**
+ * Cuánto se aparta cada dedo de la figura en cuanto a su FLEXIÓN (promedio de las tres
+ * articulaciones, en grados). Se mide dentro de la mano, así que no depende de cómo esté
+ * girada: el dedo está bien si está doblado como en la figura, mire donde mire la palma.
+ */
+export function fingerFlexErrors(live: Vec3[], target: Vec3[]): Array<{ finger: (typeof FINGER_LABELS)[number]; degrees: number }> {
+  const a = jointFlexions(live);
+  const b = jointFlexions(target);
+  return FINGER_LABELS.map((finger, f) => ({
+    finger,
+    degrees: (Math.abs(a[f * 3] - b[f * 3]) + Math.abs(a[f * 3 + 1] - b[f * 3 + 1]) + Math.abs(a[f * 3 + 2] - b[f * 3 + 2])) / 3,
+  }));
+}
+
 export function extendedFingers(landmarks: NormalizedLandmark[]): number {
   const w = landmarks[0];
   const far = (i: number) => Math.hypot(landmarks[i].x - w.x, landmarks[i].y - w.y);

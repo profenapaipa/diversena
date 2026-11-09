@@ -2,7 +2,7 @@ import datasetText from '../../../public/datasets/lsc.json?raw';
 import { describe, expect, it } from 'vitest';
 import type { TrainingSample } from '../../models/dataset';
 import type { HandFeatureVector } from '../../models/handFeatures';
-import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors } from './handPose3d';
 import { REFERENCE_FLEX_MAX } from './calibration';
 import { featuresFromSample } from './referenceSet';
 import { classifyWithReferenceSet, POSE3D_FLOOR } from './signClassifier';
@@ -119,6 +119,56 @@ describe('mano que dobla menos que la referencia (calibración)', () => {
       const asked = jointFlexions(officialFrame(v));
       const shown = jointFlexions(guide);
       shown.forEach((deg, j) => expect(deg).toBeLessThanOrEqual(asked[j] + 0.5));
+    }
+  });
+});
+
+describe('la guía compara la flexión de los dedos, no el ángulo de la palma', () => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  const rotate = (frame: ReturnType<typeof officialFrame>, yaw: number, pitch: number) =>
+    frame.map(([x, y, z]) => {
+      const x1 = x * Math.cos(yaw) + z * Math.sin(yaw);
+      const z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+      return [x1, y * Math.cos(pitch) - z1 * Math.sin(pitch), y * Math.sin(pitch) + z1 * Math.cos(pitch)] as [number, number, number];
+    });
+
+  it('una mano girada en el espacio con los dedos como en la figura no tiene errores', () => {
+    for (const v of vowels) {
+      const f = officialFrame(v);
+      for (const [yaw, pitch] of [[0.7, 0.2], [-1.2, 0.5], [2.4, -0.6]]) {
+        fingerFlexErrors(rotate(f, yaw, pitch), f).forEach((e) => expect(e.degrees, `${v} ${e.finger}`).toBeLessThan(1));
+      }
+    }
+  });
+
+  it('un solo dedo mal flexionado se señala solo a ese dedo', () => {
+    const f = officialFrame('a');
+    // El índice casi recto (sus tres articulaciones al 20 %): los demás dedos quedan como en la figura.
+    const ratios = new Array(15).fill(1);
+    [3, 4, 5].forEach((j) => (ratios[j] = 0.2));
+    const errors = fingerFlexErrors(scaleFlexion(f, ratios), f);
+    expect(errors.find((e) => e.finger === 'índice')!.degrees).toBeGreaterThan(30);
+    errors.filter((e) => e.finger !== 'índice').forEach((e) => expect(e.degrees).toBeLessThan(2));
+  });
+
+  it('cada vocal se reconoce con la mano girada en el espacio (se recalcula el marco de la palma, como en vivo)', () => {
+    for (const v of vowels) {
+      const sample = official(v);
+      const f = sample.frames[0];
+      const aspect = sample.aspect ?? DEFAULT_ASPECT;
+      const side = f.handedness[0] === 'Left' ? 'izquierda' : 'derecha';
+      for (const [yaw, pitch] of [[0.6, 0.2], [-0.9, 0.4], [0.3, -0.5]]) {
+        const turned = (f.hands[0] as Array<{ x: number; y: number; z: number }>).map((p) => {
+          const [x, y, z] = [p.x * aspect, p.y, p.z * aspect];
+          const x1 = x * Math.cos(yaw) + z * Math.sin(yaw);
+          const z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+          const y2 = y * Math.cos(pitch) - z1 * Math.sin(pitch);
+          const z2 = y * Math.sin(pitch) + z1 * Math.cos(pitch);
+          return { ...p, x: x1 / aspect, y: y2, z: z2 / aspect };
+        });
+        const m = classifyWithReferenceSet(live(palmFrame(turned as never, aspect, side)), candidates);
+        expect(m?.sign, `${v} yaw ${yaw} pitch ${pitch}`).toBe(v);
+      }
     }
   });
 });

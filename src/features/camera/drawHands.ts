@@ -1,6 +1,6 @@
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
 import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
-import { fingerAngleErrors, palmBasis, palmFrame, projectPose, retargetPose } from '../../services/recognition/handPose3d';
+import { fingerFlexErrors, palmBasis, palmFrame, projectPose, retargetPose } from '../../services/recognition/handPose3d';
 import { getCalibration } from '../../services/recognition/calibration';
 
 // Un color por mano, para distinguirlas cuando aparecen las dos.
@@ -38,7 +38,7 @@ export function drawHands(ctx: CanvasRenderingContext2D, hands: TrackedHand[], w
 }
 
 /** Un dedo cuyos huesos se apartan menos de estos grados de la guía cuenta como bien puesto (la postura natural de una mano relajada). */
-export const GUIDE_TOLERANCE_DEG = 25;
+export const GUIDE_TOLERANCE_DEG = 30;
 
 const GUIDE_COLOR = 'rgba(255, 216, 61, 0.55)';
 const OK_COLOR = 'rgba(34, 197, 94, 0.75)';
@@ -67,7 +67,7 @@ export function drawGuide(
   const liveFrame = palmFrame(hand.landmarks, aspect, hand.side, zScale);
   const fitted = retargetPose(liveFrame, guidePose, calibration?.bones);
   const target = projectPose(fitted, basis, aspect);
-  const errors = fingerAngleErrors(liveFrame, guidePose);
+  const errors = fingerFlexErrors(liveFrame, guidePose);
   const radius = Math.max(2.5, width / 220);
 
   ctx.save();

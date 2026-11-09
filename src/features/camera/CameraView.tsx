@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { DEFAULT_ASPECT, fingerAngleErrors, palmFrame } from '../../services/recognition/handPose3d';
+import { DEFAULT_ASPECT, fingerFlexErrors, palmFrame } from '../../services/recognition/handPose3d';
 import { currentZScale } from '../../services/recognition/calibration';
-import { scaleFlexion } from '../../services/recognition/handPose3d';
+import { scaleFlexion, thumbTipDistances } from '../../services/recognition/handPose3d';
 import { CalibrationPanel } from './CalibrationPanel';
 import { useCalibration } from '../../hooks/useCalibration';
 import { useCalibrationSession } from '../../hooks/useCalibrationSession';
@@ -108,9 +108,16 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
     if (!guide || !recognizedHand) return null;
     const video = camera.videoRef.current;
     const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
-    const errors = fingerAngleErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale()), guide);
+    const liveFrame = palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale());
+    const errors = fingerFlexErrors(liveFrame, guide);
     const off = errors.filter((e) => e.degrees > GUIDE_TOLERANCE_DEG).sort((a, b) => b.degrees - a.degrees);
-    return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null };
+    // Contacto del pulgar con los otros dedos (la O lo necesita): si todos los dedos están bien pero la punta del pulgar
+    // queda más lejos o más cerca de lo que muestra la figura, se dice.
+    const liveTips = thumbTipDistances(liveFrame);
+    const guideTips = thumbTipDistances(guide);
+    const gap = liveTips.reduce((sum, d, i) => sum + (d - guideTips[i]), 0) / liveTips.length;
+    const thumb: 'acerca' | 'separa' | null = Math.abs(gap) < 0.35 ? null : gap > 0 ? 'acerca' : 'separa';
+    return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null, thumb };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
   }, [guide, recognizedHand]);
 
@@ -249,6 +256,8 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                     <p className="result-panel__hint">
                       {fingerHint.placed} de {fingerHint.total} dedos en su lugar
                       {fingerHint.worst ? `. Ajusta el ${fingerHint.worst}.` : '.'}
+                      {!fingerHint.worst && fingerHint.thumb === 'acerca' ? ' Acerca la punta del pulgar a la de los otros dedos.' : ''}
+                      {!fingerHint.worst && fingerHint.thumb === 'separa' ? ' Separa un poco la punta del pulgar de los otros dedos.' : ''}
                     </p>
                     {targetSign.description && <p className="result-panel__hint">Recuerda: {targetSign.description}</p>}
                     {suggestions[0] && suggestions[0].sign.id !== targetSign.id && (
