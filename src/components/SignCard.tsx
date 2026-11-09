@@ -9,11 +9,30 @@ export function SignCard({ sign }: SignCardProps) {
     <article className="sign-card" aria-label={`Vocal ${sign.letter}`}>
       <h3 className="sign-card__title">Vocal {sign.letter}</h3>
 
-      <div className="sign-card__media" aria-hidden={sign.image === null}>
-        {sign.image ? (
-          <img src={sign.image} alt={`Seña de la vocal ${sign.letter}`} />
-        ) : (
-          <p className="sign-card__placeholder">[IMAGEN PENDIENTE]</p>
+      <div className="sign-card__pair">
+        {sign.officialPhoto && (
+          <figure className="sign-card__fig">
+            <img
+              src={sign.officialPhoto}
+              alt={`Foto oficial de la vocal ${sign.letter} en el Diccionario de LSC del INSOR`}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onError={(event) => {
+                (event.currentTarget.closest('figure') as HTMLElement | null)?.setAttribute('hidden', '');
+              }}
+            />
+            <figcaption>
+              <strong>Así se hace.</strong> Foto del Diccionario de LSC del INSOR.
+            </figcaption>
+          </figure>
+        )}
+        {sign.image && (
+          <figure className="sign-card__fig">
+            <img src={sign.image} alt={`Los 21 puntos de la mano en la vocal ${sign.letter}`} />
+            <figcaption>
+              <strong>Así deben quedar los puntos</strong> de tu mano.
+            </figcaption>
+          </figure>
         )}
       </div>
 

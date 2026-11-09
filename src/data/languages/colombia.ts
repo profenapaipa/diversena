@@ -41,6 +41,19 @@ const CONTENIDO: Record<VowelLetter, { description: string; instructions: string
 
 const BASE = import.meta.env.BASE_URL;
 
+/**
+ * Fotos oficiales de las vocales en el Diccionario de LSC del INSOR. Se muestran
+ * enlazadas desde el sitio del INSOR, con su fuente: no se copian al proyecto
+ * porque el sitio no declara licencia de reutilización.
+ */
+const FOTO_INSOR: Record<VowelLetter, string> = {
+  A: 'https://educativo.insor.gov.co/wp-content/uploads/2020/12/A.png',
+  E: 'https://educativo.insor.gov.co/wp-content/uploads/2021/02/letrae.jpg',
+  I: 'https://educativo.insor.gov.co/wp-content/uploads/2021/02/letrai.jpg',
+  O: 'https://educativo.insor.gov.co/wp-content/uploads/2021/02/letrao.jpg',
+  U: 'https://educativo.insor.gov.co/wp-content/uploads/2021/02/letrau.jpg',
+};
+
 export const colombia: Language = {
   id: 'lsc',
   name: 'Lengua de Señas Colombiana',
@@ -50,6 +63,7 @@ export const colombia: Language = {
   signs: buildPlaceholderSigns('lsc').map((sign) => ({
     ...sign,
     image: `${BASE}senas/lsc/${sign.letter.toLowerCase()}.svg`,
+    officialPhoto: FOTO_INSOR[sign.letter],
     description: CONTENIDO[sign.letter].description,
     instructions: CONTENIDO[sign.letter].instructions,
   })),

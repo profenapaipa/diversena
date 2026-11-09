@@ -16,6 +16,8 @@ export interface Sign {
   languageId: string;
   name: string;
   image: string | null;
+  /** Foto oficial de la seña en el Diccionario de LSC del INSOR (se enlaza desde su sitio, no se copia). */
+  officialPhoto?: string;
   video: string | null;
   description: string | null;
   instructions: string | null;

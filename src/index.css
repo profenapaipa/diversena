@@ -1858,7 +1858,7 @@ main {
 
 @media (min-width: 62rem) {
   .learn-layout {
-    grid-template-columns: minmax(16rem, 22rem) 1fr;
+    grid-template-columns: minmax(20rem, 26rem) 1fr;
   }
 }
 
@@ -1894,3 +1894,11 @@ main {
   .page .option-grid .option-card { min-height: 3.2rem; padding: 0.4rem; }
   .page .option-grid .option-card__letter { margin: 0 auto; }
 }
+
+/* La foto oficial del INSOR y el dibujo de los puntos, lado a lado. */
+.sign-card__pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+.sign-card__fig { margin: 0; }
+.sign-card__fig[hidden] { display: none; }
+.sign-card__fig img { display: block; width: 100%; max-width: none; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); background: #fff; }
+.sign-card__fig:last-child img { background: var(--brand-navy); object-fit: contain; }
+.sign-card__fig figcaption { margin-top: 0.3rem; font-size: 0.82rem; color: var(--muted); line-height: 1.3; }
