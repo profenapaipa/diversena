@@ -1,9 +1,8 @@
 import { useSearchParams } from 'react-router-dom';
 import { DesignThinking } from '../components/DesignThinking';
 import { IdentityContent } from './IdentityPage';
-import { ProjectContent } from './ProjectPage';
 
-type OpenKey = 'proyecto' | 'identidad';
+type OpenKey = 'identidad';
 
 export function AboutPage() {
   const [params] = useSearchParams();
@@ -26,15 +25,6 @@ export function AboutPage() {
       </section>
 
       <section className="section about-folds">
-        <details className="about-fold" open={open === 'proyecto'}>
-          <summary>
-            <span>El proyecto</span>
-            <small>Qué es, para quién y lo que sigue</small>
-          </summary>
-          <div className="about-fold__body">
-            <ProjectContent />
-          </div>
-        </details>
         <details className="about-fold" open={open === 'identidad'}>
           <summary>
             <span>Identidad de marca</span>

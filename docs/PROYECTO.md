@@ -3,8 +3,8 @@
 Resumen de la documentación del Equipo 6 ("Lector de lengua de señas") del
 **Semillero de Tecnología Maker 2026-II**, consolidada desde la carpeta del
 equipo en Drive (propuesta, ficha técnica, artículo base, matriz de
-antecedentes, bocetos, barreras y ruta del semestre). La versión pública está
-en la app, en `#/proyecto`. Su contenido vive en `src/data/project.ts`.
+antecedentes, bocetos, barreras y ruta del semestre). La app ya no muestra esta documentación como página pública
+(se retiró de «Quiénes somos»); su contenido sigue en `src/data/project.ts` por si se recupera.
 
 > **Privacidad:** los integrantes son menores de edad. En la web y en este
 > repositorio se nombran con nombre e inicial del apellido. Los nombres

@@ -38,7 +38,8 @@ GitHub Pages (`.github/workflows/deploy.yml`). En local:
 | `#/identificar` | Estudiantes | Identificar una seña, con sugerencias |
 | `#/explorar` | Estudiantes | Señas por lengua |
 | `#/perfil` | Estudiantes | Perfil, foto y progreso |
-| `#/proyecto` | Público, jurados | Documentación del proyecto |
+| `#/quienes-somos` | Público | El semillero, cómo trabaja y la identidad de marca |
+| `#/contacto` | Público | Formulario de contacto por correo |
 | `#/panel` | Equipo | Panel con el estado del dataset y de los requisitos |
 | `#/herramientas/entrenar` | Equipo | Grabar o subir clips de entrenamiento |
 | `#/herramientas/referencias` | Equipo | Referencias rápidas de una sola postura |

@@ -230,7 +230,6 @@ export function TeamPanelPage() {
             <div className="tool-links">
               <Link to="/herramientas/entrenar">Entrenar la IA: grabar y subir clips</Link>
               <Link to="/herramientas/referencias">Referencias rápidas (una postura)</Link>
-              <Link to="/proyecto">Documentación del proyecto</Link>
             </div>
           </div>
         </div>

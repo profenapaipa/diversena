@@ -24,7 +24,7 @@ export function App() {
           <Route path="perfil" element={<ProfilePage />} />
           <Route path="quienes-somos" element={<AboutPage />} />
           <Route path="contacto" element={<ContactPage />} />
-          <Route path="proyecto" element={<Navigate to="/quienes-somos?abrir=proyecto" replace />} />
+          <Route path="proyecto" element={<Navigate to="/quienes-somos" replace />} />
           <Route path="identidad" element={<Navigate to="/quienes-somos?abrir=identidad" replace />} />
           <Route path="panel" element={<TeamPanelPage />} />
           {/* Herramientas internas del equipo: enlazadas desde el pie de página, no del menú principal. */}

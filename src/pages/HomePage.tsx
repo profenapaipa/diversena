@@ -132,8 +132,8 @@ export function HomePage() {
           </h2>
           <p>DiverSeña está en construcción: falta validar cada seña con personas Sordas y docentes de LSC.</p>
         </div>
-        <Link className="button button--secondary" to="/quienes-somos?abrir=proyecto">
-          Conoce el proyecto <IconArrowRight size={18} />
+        <Link className="button button--secondary" to="/quienes-somos">
+          Conoce quiénes somos <IconArrowRight size={18} />
         </Link>
         <Link className="button button--secondary" to="/contacto">
           Escríbenos
