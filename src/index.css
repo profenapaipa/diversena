@@ -2337,3 +2337,45 @@ main {
 .roles__card p { margin: 0; color: var(--muted); }
 .roles__card--estudiantes { border-top-color: var(--brand-sky); }
 .roles__card--familias { border-top-color: var(--brand-sun); }
+
+/* ---------- Cámara grande, según el aparato (9 nov 2026) ---------- */
+/* Antes la cámara no pasaba de 40 rem y, en el computador, la mitad de la pantalla quedaba vacía. Ahora:
+   - Computador o celular acostado: la cámara es horizontal (16:10), ocupa todo el ancho que deja la columna de la seña y
+     el panel de resultado, y nunca es más alta que la ventana.
+   - Celular vertical: la cámara es vertical (3:4), ocupa todo el ancho y se ajusta al alto visible entre el encabezado y la
+     barra inferior. */
+main:has(.camera-view) { max-width: 100rem; }
+.app-shell:has(.camera-view) .site-header__inner,
+.app-shell:has(.camera-view) .site-footer__inner { max-width: 100rem; }
+
+@media (min-width: 52rem) and (orientation: landscape) {
+  .camera-view:not(.camera-view--calibrating) .camera-view__frame {
+    max-width: none;
+    aspect-ratio: 16 / 10;
+  }
+  .camera-view:not(.camera-view--calibrating) .camera-stage {
+    /* La primera columna crece hasta el alto de la ventana (16:10) y deja 13 rem al panel de resultado. */
+    grid-template-columns: min(calc((100svh - 7rem) * 1.6), calc(100% - 14rem)) minmax(12.5rem, 1fr);
+  }
+  /* Sin panel de resultado (cámara apagada) la cámara usa todo el ancho, siempre que quepa en el alto de la ventana. */
+  .camera-view:not(.camera-view--calibrating) .camera-stage:not(:has(.result-panel)) {
+    grid-template-columns: min(calc((100svh - 7rem) * 1.6), 100%);
+    justify-content: center;
+  }
+}
+
+@media (min-width: 62rem) {
+  .learn-layout { grid-template-columns: minmax(14rem, 16rem) minmax(0, 1fr); }
+}
+
+@media (max-width: 40rem) and (orientation: portrait) {
+  .camera-view:not(.camera-view--calibrating) .camera-view__frame {
+    max-width: none;
+    aspect-ratio: 3 / 4;
+    /* Alto visible = pantalla menos el encabezado y la barra inferior. */
+    width: min(100%, calc((100svh - 9rem) * 0.75));
+    margin-inline: auto;
+  }
+  .practice-panel { padding: 0.9rem 0.5rem; }
+  .learn-layout { gap: 0.75rem; }
+}

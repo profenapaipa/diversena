@@ -1,17 +1,19 @@
 import { HandLandmarker, type HandLandmarkerResult } from '@mediapipe/tasks-vision';
-import { createWithGpuFallback, getVisionFileset, warmUp } from './visionRuntime';
+import { createWithGpuFallback, getVisionFileset, localModelUrl, tryUrls, warmUp } from './visionRuntime';
 
-// Modelo oficial de Google para detección de landmarks de mano. Se descarga
-// una sola vez y el navegador lo cachea: es un activo estático (como una
-// fuente o un ícono), no un envío de datos del usuario.
-const MODEL_URL =
-  'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+// Modelo oficial de Google para detección de landmarks de mano. Se sirve desde el propio sitio y, si falla, desde el
+// almacenamiento de Google. Se descarga una sola vez y el navegador lo cachea: es un activo estático (como una fuente o un
+// ícono), no un envío de datos del usuario.
+const MODEL_URLS = [
+  localModelUrl('hand_landmarker.task'),
+  'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+];
 
 async function createHandLandmarker(numHands: number): Promise<HandLandmarker> {
   const fileset = await getVisionFileset();
-  const landmarker = await createWithGpuFallback((delegate) =>
+  const landmarker = await tryUrls(MODEL_URLS, (modelUrl) => createWithGpuFallback((delegate) =>
     HandLandmarker.createFromOptions(fileset, {
-      baseOptions: { modelAssetPath: MODEL_URL, delegate },
+      baseOptions: { modelAssetPath: modelUrl, delegate },
       runningMode: 'VIDEO',
       numHands,
       // Con la mano en movimiento (el six seven, un giro rápido) el detector pierde la mano si el umbral es alto. Se bajan
@@ -21,7 +23,7 @@ async function createHandLandmarker(numHands: number): Promise<HandLandmarker> {
       minHandPresenceConfidence: 0.45,
       minTrackingConfidence: 0.4,
     }),
-  );
+  ));
   warmUp(landmarker);
   return landmarker;
 }

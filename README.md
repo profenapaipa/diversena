@@ -74,7 +74,7 @@ Cada push a `main` corre las pruebas y publica en GitHub Pages
 - Los clips de entrenamiento piden consentimiento (y autorización del
   acudiente para menores). El dataset exportado contiene solo coordenadas de
   la mano, sin imagen.
-- Lo único que se descarga de internet es el modelo de MediaPipe (desde CDN)
+- El modelo y el runtime de MediaPipe se sirven desde el propio sitio (`public/mediapipe`, ~30 MB); solo si fallan se pide a un CDN (jsDelivr y Google)
   y las fuentes.
 
 ## Colaboración
