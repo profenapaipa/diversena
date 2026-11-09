@@ -2110,3 +2110,71 @@ main {
 .about-fold > summary small { color: var(--muted); font-size: 0.92rem; }
 .about-fold__body { padding: 0 1.25rem 1.25rem; }
 .about-fold__body .section { margin-top: 1.5rem; }
+
+/* ---------- Diseño con movimiento: aparición, esquemas y contadores ---------- */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+.seals { list-style: none; margin: 0.75rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.seals li { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.75rem; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.85rem; font-weight: 700; }
+.seals svg { color: var(--brand-sky-ink); flex: none; }
+
+@keyframes pop-in { from { opacity: 0; transform: scale(0.82); } to { opacity: 1; transform: scale(1); } }
+.hero__hand--pop, .hero__bubble--pop { animation: pop-in 0.45s ease-out both; }
+
+.how { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: 1.5rem; position: relative; }
+.how__node { display: grid; gap: 0.35rem; justify-items: center; text-align: center; position: relative; }
+.how__node h3 { margin: 0; font-size: 1.1rem; }
+.how__node p { margin: 0; color: var(--muted); max-width: 16rem; }
+.how__num { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--brand-sun); color: #151a6e; font-size: 0.85rem; margin-right: 0.25rem; }
+.how__icon { display: grid; place-items: center; width: 5.5rem; height: 5.5rem; border-radius: 1.5rem; background: var(--brand-navy); color: #fff; }
+.how__hand { width: 4.2rem; height: 4.2rem; }
+.how__letter { font-family: var(--font-display); font-weight: 700; font-size: 2.8rem; color: var(--brand-sun); }
+@media (min-width: 52rem) {
+  .how { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+  .how__node:not(:last-child)::after { content: ''; position: absolute; top: 2.7rem; left: calc(50% + 3.3rem); width: calc(100% - 4.6rem + 2.5rem); height: 3px; background: repeating-linear-gradient(90deg, var(--brand-sky) 0 10px, transparent 10px 18px); background-size: 36px 3px; animation: flow-dash 1.2s linear infinite; }
+}
+@media (max-width: 51.99rem) {
+  /* En celular el esquema baja: entre un nodo y otro va una flecha, no una línea que cruce los textos. */
+  .how__node:not(:last-child) { padding-bottom: 1.6rem; }
+  .how__node:not(:last-child)::after { content: '↓'; position: absolute; bottom: -0.2rem; left: 50%; transform: translateX(-50%); font-size: 1.5rem; font-weight: 700; color: var(--brand-sky-ink); animation: arrow-drop 1.2s ease-in-out infinite; }
+}
+@keyframes arrow-drop { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 5px); } }
+@keyframes flow-dash { to { background-position: 36px 0; } }
+@keyframes flow-dash-v { to { background-position: 0 36px; } }
+
+.feature-wrap { display: grid; }
+.feature-wrap > .feature { height: 100%; }
+.feature__scene { display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 4.2rem; padding: 0.6rem; border-radius: 1rem; background: var(--surface-2); margin-bottom: 0.5rem; }
+.chip-vowel { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 0.6rem; background: var(--brand-navy); color: #fff; font-family: var(--font-display); font-weight: 700; animation: chip-glow 2.5s ease-in-out infinite; }
+@keyframes chip-glow { 0%, 70%, 100% { background: var(--brand-navy); color: #fff; transform: none; } 15%, 35% { background: var(--brand-sun); color: #151a6e; transform: translateY(-3px); } }
+.feature__hand { width: 3.6rem; height: 3.6rem; }
+.feature__arrow { font-size: 1.8rem; color: var(--brand-sky-ink); font-weight: 700; }
+.feature__bubble { display: grid; place-items: center; width: 2.8rem; height: 2.8rem; border-radius: 0.8rem; background: var(--brand-sun); color: #151a6e; font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; }
+.lang-chip { padding: 0.15rem 0.6rem; border-radius: 999px; border: 1px dashed var(--muted); color: var(--muted); font-size: 0.8rem; font-weight: 700; }
+.lang-chip--on { border-style: solid; border-color: var(--brand-sky); background: var(--brand-navy); color: #fff; }
+.home__universal { margin-top: 1rem; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 0.5rem 0 0; }
+.stat { display: grid; gap: 0.1rem; justify-items: center; text-align: center; padding: 0.9rem 0.5rem; border-radius: 1rem; background: var(--surface-2); border: 1px solid var(--border); }
+.stat strong { font-family: var(--font-display); font-size: 2rem; line-height: 1; color: var(--brand-sky-ink); }
+.stat > span { font-size: 0.82rem; color: var(--muted); }
+.flow__arrow { display: inline-block; animation: arrow-nudge 1.4s ease-in-out infinite; }
+@keyframes arrow-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+.sources > summary, .sign-card__how > summary { cursor: pointer; min-height: 44px; display: flex; flex-wrap: wrap; align-items: center; gap: 0.1rem 0.6rem; }
+.sources > summary h2 { margin: 0; display: inline; font-size: 1.3rem; }
+.sources > summary small { color: var(--muted); }
+.sign-card__how > summary { font-weight: 700; }
+
+.about-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.25rem 0 0.4rem; }
+.about-chip { min-height: 44px; padding: 0.4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; transition: transform 0.12s, background 0.12s; }
+.about-chip:hover { transform: translateY(-1px); }
+.about-chip--on { color: #fff; border-color: transparent; }
+.about-chip--pedagogico.about-chip--on { background: #1d2394; }
+.about-chip--emprendimiento.about-chip--on { background: #0b6cb8; }
+.about-chip--tecnologico.about-chip--on { background: #2f6f4f; }
+.about-chip--critico.about-chip--on { background: #8a4b12; }
+.about-filter__hint { margin: 0 0 0.5rem; color: var(--muted); min-height: 1.5rem; }
+.about-route__item { transition: opacity 0.25s, transform 0.5s; }
+.about-route__item--dim { opacity: 0.35; }
+.about-route__item--dim.reveal.is-visible { opacity: 0.35; }

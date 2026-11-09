@@ -1,30 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IntroCarousel } from '../components/IntroCarousel';
 import { hasSeenIntro } from '../components/introSeen';
 import { languages } from '../data/languages';
 import { HandIllustration } from '../components/brand/HandIllustration';
 import { IconArrowRight, IconBook, IconCamera, IconGlobe, IconLock } from '../components/icons';
-import { PRIVACY_SHORT } from '../data/privacy';
+import { CountUp, Reveal, prefersReducedMotion } from '../components/motion';
 
+const VOWELS = ['A', 'E', 'I', 'O', 'U'];
+
+/** Cómo funciona, en tres nodos. Los textos son cortos: el esquema cuenta el resto. */
 const STEPS = [
-  {
-    title: 'La cámara ve tu mano',
-    text: 'Te ubicas frente a la cámara y haces la seña. Tu imagen no se guarda ni se envía: todo pasa en tu equipo.',
-  },
-  {
-    title: 'Compara con lo que aprendió',
-    text: 'DiverSeña marca 21 puntos en cada mano, y solo con esos puntos hace la comparación con las señas de referencia: las fotos del Diccionario de LSC del INSOR y grabaciones del equipo.',
-  },
-  {
-    title: 'Te muestra la letra',
-    text: 'Aparece la seña reconocida. Si no está segura, te sugiere las más parecidas: «¿quizás quisiste decir…?».',
-  },
+  { title: 'Te ve', text: 'Tu mano, dentro de tu equipo.' },
+  { title: 'Marca 21 puntos', text: 'Solo se usan puntos, nunca tu imagen.' },
+  { title: 'Compara', text: 'Te muestra la letra que más se parece a la referencia.' },
 ];
 
 export function HomePage() {
   // La primera vez se muestra la introducción; después, un botón la vuelve a abrir.
   const [showIntro, setShowIntro] = useState(() => !hasSeenIntro());
+  // La burbuja del hero recorre las cinco vocales; con «reducir movimiento» queda fija en la A.
+  const [vowel, setVowel] = useState(0);
+  useEffect(() => {
+    if (prefersReducedMotion() || showIntro) return;
+    const timer = window.setInterval(() => setVowel((v) => (v + 1) % VOWELS.length), 2400);
+    return () => window.clearInterval(timer);
+  }, [showIntro]);
+
   return (
     <div className="home">
       {showIntro && <IntroCarousel onClose={() => setShowIntro(false)} />}
@@ -32,10 +34,7 @@ export function HomePage() {
         <div className="hero__text">
           <p className="eyebrow">Lengua de Señas Colombiana · LSC</p>
           <h1>Aprende lengua de señas con tu cámara</h1>
-          <p className="lead">
-            DiverSeña reconoce tus manos en tiempo real y te dice si tu seña se parece a la de referencia. Empezamos por
-            las vocales, desde cualquier navegador y sin instalar nada.
-          </p>
+          <p className="lead">Muestra tu mano y mira si tu seña se parece a la de referencia. Empezamos por las cinco vocales.</p>
           <div className="hero__actions">
             <Link className="button button--lg" to="/aprender">
               <IconBook /> Empezar a aprender
@@ -44,17 +43,19 @@ export function HomePage() {
               <IconCamera /> Traducir una seña
             </Link>
           </div>
-          <p className="privacy-line">
-            <IconLock size={16} /> {PRIVACY_SHORT}
-          </p>
+          <ul className="seals" aria-label="Tu privacidad">
+            <li><IconLock size={15} /> <strong>21</strong> puntos por mano</li>
+            <li><IconLock size={15} /> Tu imagen no se guarda</li>
+            <li><IconLock size={15} /> Tu imagen no se envía</li>
+          </ul>
           <button type="button" className="link-button" onClick={() => setShowIntro(true)}>
-            Ver la introducción en pantallas
+            Ver la introducción
           </button>
         </div>
         <div className="hero__art" aria-hidden="true">
           <div className="hero__screen">
-            <HandIllustration className="hero__hand" />
-            <span className="hero__bubble">A</span>
+            <HandIllustration key={vowel} className="hero__hand hero__hand--pop" />
+            <span key={`b${vowel}`} className="hero__bubble hero__bubble--pop">{VOWELS[vowel]}</span>
           </div>
         </div>
       </section>
@@ -64,12 +65,17 @@ export function HomePage() {
           <p className="eyebrow">Cómo funciona</p>
           <h2>De tu mano a la letra</h2>
         </div>
-        <ol className="steps">
-          {STEPS.map((step) => (
-            <li key={step.title} className="step">
-              <h3>{step.title}</h3>
+        <ol className="how">
+          {STEPS.map((step, i) => (
+            <Reveal as="li" key={step.title} className="how__node" delay={i * 140}>
+              <span className="how__icon" aria-hidden="true">
+                {i === 0 && <IconCamera size={30} />}
+                {i === 1 && <HandIllustration className="how__hand" />}
+                {i === 2 && <span className="how__letter">A</span>}
+              </span>
+              <h3><span className="how__num">{i + 1}</span> {step.title}</h3>
               <p>{step.text}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </section>
@@ -80,58 +86,55 @@ export function HomePage() {
           <h2>Tres maneras de usar DiverSeña</h2>
         </div>
         <div className="feature-grid">
-          <Link to="/aprender" className="feature">
-            <span className="feature__icon"><IconBook size={26} /></span>
-            <h3>Aprender</h3>
-            <p>Elige una vocal, mira cómo se hace y practícala con retroalimentación al instante.</p>
-            <span className="feature__go">Ir a aprender <IconArrowRight size={18} /></span>
-          </Link>
-          <Link to="/identificar" className="feature">
-            <span className="feature__icon"><IconCamera size={26} /></span>
-            <h3>Traducir</h3>
-            <p>Haz una seña frente a la cámara y DiverSeña te dice qué letra es.</p>
-            <span className="feature__go">Ir a traducir <IconArrowRight size={18} /></span>
-          </Link>
-          <Link to="/explorar" className="feature">
-            <span className="feature__icon"><IconGlobe size={26} /></span>
-            <h3>Explorar</h3>
-            <p>Descubre cómo cambia la misma letra entre lenguas de señas de distintos países.</p>
-            <span className="feature__go">Ir a explorar <IconArrowRight size={18} /></span>
-          </Link>
-        </div>
-      </section>
-
-      <section className="section section--split">
-        <div>
-          <p className="eyebrow">Respeto por la lengua</p>
-          <h2>Cada país tiene su lengua de señas</h2>
-          <p>
-            Las lenguas de señas son lenguas completas, con su propia gramática, y cambian entre países y
-            comunidades. Por eso DiverSeña no presenta ninguna seña como universal: empezamos por la
-            Lengua de Señas Colombiana y abriremos las demás cuando tengan contenido validado por sus
-            comunidades.
-          </p>
-        </div>
-        <ul className="language-list">
-          {languages.map((language) => (
-            <li key={language.id}>
-              <span>
-                <strong>{language.shortName}</strong> {language.country}
+          <Reveal className="feature-wrap">
+            <Link to="/aprender" className="feature">
+              <span className="feature__scene" aria-hidden="true">
+                {VOWELS.map((v, i) => (
+                  <span key={v} className="chip-vowel" style={{ animationDelay: `${i * 0.5}s` }}>{v}</span>
+                ))}
               </span>
-              {language.status === 'disponible' ? (
-                <span className="badge badge--ok">Disponible</span>
-              ) : (
-                <span className="badge badge--soon">Próximamente</span>
-              )}
-            </li>
-          ))}
-        </ul>
+              <h3>Aprender</h3>
+              <p>Elige una vocal y practícala.</p>
+              <span className="feature__go">Ir a aprender <IconArrowRight size={18} /></span>
+            </Link>
+          </Reveal>
+          <Reveal className="feature-wrap" delay={120}>
+            <Link to="/identificar" className="feature">
+              <span className="feature__scene feature__scene--translate" aria-hidden="true">
+                <HandIllustration className="feature__hand" />
+                <span className="feature__arrow">›</span>
+                <span className="feature__bubble">E</span>
+              </span>
+              <h3>Traducir</h3>
+              <p>Haz la seña y mira la letra.</p>
+              <span className="feature__go">Ir a traducir <IconArrowRight size={18} /></span>
+            </Link>
+          </Reveal>
+          <Reveal className="feature-wrap" delay={240}>
+            <Link to="/explorar" className="feature">
+              <span className="feature__scene feature__scene--langs" aria-hidden="true">
+                <IconGlobe size={30} />
+                {languages.map((language) => (
+                  <span key={language.id} className={`lang-chip${language.status === 'disponible' ? ' lang-chip--on' : ''}`}>
+                    {language.shortName}
+                  </span>
+                ))}
+              </span>
+              <h3>Explorar</h3>
+              <p>La misma letra, en otras lenguas.</p>
+              <span className="feature__go">Ir a explorar <IconArrowRight size={18} /></span>
+            </Link>
+          </Reveal>
+        </div>
+        <p className="note home__universal">Ninguna seña es universal: cada país tiene su lengua de señas. Empezamos por la colombiana.</p>
       </section>
 
-      <section className="section origin-banner">
+      <Reveal as="section" className="section origin-banner">
         <div>
           <p className="eyebrow">Hecho en el aula</p>
-          <h2>Un proyecto estudiantil que quiere crecer</h2>
+          <h2>
+            <CountUp to={5} /> vocales hoy, una comunidad mañana
+          </h2>
           <p>
             DiverSeña es un proyecto del Semillero de Tecnología del colegio Injuv. Busca convertirse en una herramienta
             sostenible para colegios, familias e instituciones.
@@ -140,7 +143,7 @@ export function HomePage() {
         <Link className="button button--secondary" to="/quienes-somos?abrir=proyecto">
           Conoce el proyecto <IconArrowRight size={18} />
         </Link>
-      </section>
+      </Reveal>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   REFERENCES,
   REQUIREMENTS,
 } from '../data/project';
+import { CountUp, Reveal } from '../components/motion';
 
 const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
 const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendiente: 'badge--crit' } as const;
@@ -14,6 +15,11 @@ const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendient
 export function ProjectContent() {
   return (
     <div className="project">
+      <Reveal className="stats" >
+        <div className="stat"><strong><CountUp to={21} /></strong><span>puntos por mano</span></div>
+        <div className="stat"><strong><CountUp to={5} /></strong><span>vocales</span></div>
+        <div className="stat"><strong><CountUp to={1} />/3</strong><span>lenguas disponibles</span></div>
+      </Reveal>
       <section className="section section--split">
         <div>
           <h2>El problema</h2>
@@ -76,9 +82,8 @@ export function ProjectContent() {
         </div>
       </section>
 
-      <section className="section">
-        <h2>Antecedentes</h2>
-        <p className="note">Investigaciones en las que se apoya el proyecto (APA 7).</p>
+      <details className="section sources">
+        <summary><h2>Antecedentes y fuentes</h2><small>Investigaciones en las que se apoya el proyecto (APA 7)</small></summary>
         <ul className="references">
           {REFERENCES.map((ref) => (
             <li key={ref.doi}>
@@ -92,7 +97,7 @@ export function ProjectContent() {
             </li>
           ))}
         </ul>
-      </section>
+      </details>
 
       <section className="section section--split">
         <div>

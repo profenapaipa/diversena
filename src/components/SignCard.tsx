@@ -47,10 +47,10 @@ export function SignCard({ sign }: SignCardProps) {
         <p>{sign.description ?? '[EXPLICACIÓN PENDIENTE]'}</p>
       </div>
 
-      <div>
-        <h4>Cómo hacerla</h4>
+      <details className="sign-card__how">
+        <summary>Paso a paso</summary>
         <p>{sign.instructions ?? '[INSTRUCCIONES PENDIENTES]'}</p>
-      </div>
+      </details>
       <a
         className="sign-card__source"
         href="https://educativo.insor.gov.co/diccionario/"
