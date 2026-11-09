@@ -11,8 +11,8 @@ export interface ContactMessage {
 }
 
 export type ContactResult =
-  | { ok: true; needsActivation: boolean }
-  | { ok: false; reason: 'invalid' | 'network' | 'rejected'; detail?: string };
+  | { ok: true }
+  | { ok: false; reason: 'invalid' | 'network' | 'rejected' | 'activation'; detail?: string };
 
 /** ¿Parece un correo o un teléfono? No se valida de más: basta con poder responderle a alguien. */
 export function looksLikeContact(value: string): boolean {
@@ -34,7 +34,7 @@ export function validateContact(m: ContactMessage): string | null {
  * `fetchImpl` permite probarlo sin red.
  */
 export async function sendContact(m: ContactMessage, fetchImpl: typeof fetch = fetch): Promise<ContactResult> {
-  if (m.honey) return { ok: true, needsActivation: false }; // un robot cree que funcionó y no llega nada
+  if (m.honey) return { ok: true }; // un robot cree que funcionó y no llega nada
   if (validateContact(m)) return { ok: false, reason: 'invalid' };
 
   const reasonLabel = CONTACT_REASONS.find((r) => r.id === m.reason)?.label ?? 'Otro tema';
@@ -58,9 +58,11 @@ export async function sendContact(m: ContactMessage, fetchImpl: typeof fetch = f
     });
     const data = (await response.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
     const success = data.success === true || data.success === 'true';
+    // Mientras el formulario no esté activado, FormSubmit responde success «false» con un mensaje que habla de la activación:
+    // no es una falla del envío sino un paso pendiente de quien administra el sitio, y se dice aparte.
+    if (/activat/i.test(data.message ?? '')) return { ok: false, reason: 'activation', detail: data.message };
     if (!response.ok || !success) return { ok: false, reason: 'rejected', detail: data.message };
-    // La primera vez, FormSubmit pide activar el formulario desde el correo que recibe; el mensaje queda en espera.
-    return { ok: true, needsActivation: /activat/i.test(data.message ?? '') };
+    return { ok: true };
   } catch {
     return { ok: false, reason: 'network' };
   }

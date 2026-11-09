@@ -23,7 +23,7 @@ describe('contacto', () => {
   it('envía al servicio con el motivo en el asunto y responde a quien escribió', async () => {
     const fetchMock = reply({ success: 'true' });
     const result = await sendContact(valid, fetchMock);
-    expect(result).toEqual({ ok: true, needsActivation: false });
+    expect(result).toEqual({ ok: true });
     const [url, init] = (fetchMock as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe(CONTACT_ENDPOINT);
     const sent = JSON.parse(init.body);
@@ -32,9 +32,15 @@ describe('contacto', () => {
     expect(sent.Mensaje).toBe('Quiero participar con mi grupo.');
   });
 
-  it('avisa si es el primer envío y el servicio pide activarse', async () => {
-    const result = await sendContact(valid, reply({ success: 'true', message: 'This form needs Activation.' }));
-    expect(result).toEqual({ ok: true, needsActivation: true });
+  it('si el formulario no está activado, lo dice aparte y no lo da por enviado', async () => {
+    // Es la respuesta real de FormSubmit antes de activar: success «false» y un mensaje que habla de la activación.
+    const result = await sendContact(valid, reply({ success: 'false', message: 'This form needs Activation. Check your inbox.' }));
+    expect(result).toMatchObject({ ok: false, reason: 'activation' });
+  });
+
+  it('detecta la activación aunque el servicio responda con un código de error', async () => {
+    const result = await sendContact(valid, reply({ success: 'false', message: 'This form needs Activation.' }, false));
+    expect(result).toMatchObject({ ok: false, reason: 'activation' });
   });
 
   it('no manda nada si el campo trampa viene lleno, pero no lo delata', async () => {

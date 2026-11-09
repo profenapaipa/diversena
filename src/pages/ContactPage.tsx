@@ -51,9 +51,7 @@ export function ContactPage() {
       }
       setStatus('sent');
       setMessage(
-        result.needsActivation
-          ? 'Recibimos tu mensaje. Este es el primer envío, así que puede tardar un poco en llegar.'
-          : 'Gracias. Recibimos tu mensaje y te responderemos pronto.',
+        'Gracias. Recibimos tu mensaje y te responderemos pronto.',
       );
       setForm(EMPTY);
       setConsent(false);
@@ -62,7 +60,9 @@ export function ContactPage() {
       setMessage(
         result.reason === 'network'
           ? `No pudimos enviar el mensaje. Revisa tu conexión o escríbenos a ${CONTACT_EMAIL}.`
-          : `No pudimos enviar el mensaje. Escríbenos directamente a ${CONTACT_EMAIL}.`,
+          : result.reason === 'activation'
+            ? `El formulario todavía no está activado y tu mensaje no llegó. Por ahora escríbenos directamente a ${CONTACT_EMAIL}; ya estamos terminando de activarlo.`
+            : `No pudimos enviar el mensaje. Escríbenos directamente a ${CONTACT_EMAIL}.`,
       );
     }
   }

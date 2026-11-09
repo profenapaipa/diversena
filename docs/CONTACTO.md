@@ -14,7 +14,7 @@ El formulario de `#/contacto` manda cada mensaje por correo a `profenapaipa@gmai
 ## Activación (una sola vez)
 
 La primera vez que alguien envíe un mensaje, FormSubmit manda un correo de activación a `profenapaipa@gmail.com` con un
-botón. **Hay que abrirlo una vez**; hasta entonces los mensajes quedan en espera. Conviene enviar uno de prueba desde el sitio
+botón. **Hay que abrirlo una vez**; hasta entonces FormSubmit responde `success: "false"` con un mensaje de activación y el mensaje **no llega** (no queda en espera). La pantalla lo dice aparte y pide escribir al correo. Si el enlace del primer correo sale inválido, se pide uno nuevo enviando otro mensaje desde el sitio. Conviene enviar uno de prueba desde el sitio
 publicado y activar.
 
 Después de activar, FormSubmit entrega un código aleatorio (por ejemplo `a1b2c3…`). Se puede usar en lugar del correo en
