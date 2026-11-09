@@ -1,4 +1,5 @@
 import type { useCalibrationSession } from '../../hooks/useCalibrationSession';
+import { CalibrationFigure } from './CalibrationFigure';
 
 type Session = ReturnType<typeof useCalibrationSession>;
 
@@ -53,6 +54,7 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
         <p className="eyebrow">
           Calibrar tu mano · paso {Math.min(run.index + 1, total)} de {total}
         </p>
+        <CalibrationFigure step={step.id} />
         <p className="result-panel__verdict">{step.title}</p>
         <p className="result-panel__hint">{step.hint}</p>
         <span className="meter meter--wide" role="img" aria-label={`Paso al ${percent} %`}>

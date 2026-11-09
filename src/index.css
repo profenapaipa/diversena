@@ -2054,3 +2054,14 @@ main {
 /* Al bajar a la cámara, el encabezado fijo no debe tapar el video. */
 .camera-view__frame { scroll-margin-top: 5rem; }
 @media (max-height: 500px) { .camera-view__frame { scroll-margin-top: 0.5rem; } }
+
+/* Figuras de la calibración: dentro del panel, con colores sólidos y de tamaño contenido */
+.cal-figure { margin: 0; display: grid; gap: 0.4rem; justify-items: center; width: 100%; }
+.cal-figure__svg { width: min(100%, 13rem); height: auto; display: block; }
+.cal-figure__caption { font-weight: 700; font-size: 0.9rem; text-align: center; }
+.cal-sequence { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; width: min(100%, 16rem); }
+.cal-sequence__item { display: grid; gap: 0.15rem; justify-items: center; font-size: 0.72rem; color: var(--muted); text-align: center; }
+.cal-sequence__item svg { width: 100%; height: auto; border-radius: 0.6rem; outline: 2px solid transparent; }
+.cal-sequence__item--now { color: var(--text); font-weight: 700; }
+.cal-sequence__item--now svg { outline-color: var(--brand-sun); }
+@media (max-height: 500px) { .cal-figure__svg { width: 9rem; } }

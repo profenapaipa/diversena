@@ -1,7 +1,7 @@
 /**
  * Detector del gesto «six seven»: las dos manos con la palma hacia arriba, subiendo
  * y bajando por turnos (cuando una sube, la otra baja). Solo mira la altura de la
- * muñeca de cada mano en el último segundo y medio, sin depender de la postura de
+ * muñeca de cada mano en el último par de segundos, sin depender de la postura de
  * los dedos, así que sirve con la mano abierta o cerrada.
  */
 export interface HandHeights {
@@ -13,16 +13,16 @@ export interface HandHeights {
 }
 
 /** Ventana de tiempo que se analiza. */
-export const SIX_SEVEN_WINDOW_MS = 1500;
+export const SIX_SEVEN_WINDOW_MS = 2500;
 const MIN_SAMPLES = 12;
 /** Cuánto debe subir y bajar cada mano (fracción del alto de la imagen). */
-const MIN_RANGE = 0.07;
-/** Cambios de sentido mínimos por mano (subir, bajar y subir son dos). */
-const MIN_TURNS = 2;
+const MIN_RANGE = 0.04;
+/** Tres subidas y bajadas de cada mano son cinco cambios de sentido (subir, bajar, subir, bajar, subir, bajar). */
+const MIN_TURNS = 5;
 /** Movimientos menores a esto se toman como temblor, no como cambio de sentido. */
-const DEADBAND = 0.012;
+const DEADBAND = 0.008;
 /** Correlación máxima entre las dos manos: negativa significa que una sube mientras la otra baja. */
-const MAX_CORRELATION = -0.35;
+const MAX_CORRELATION = -0.2;
 
 const mean = (values: number[]) => values.reduce((s, v) => s + v, 0) / values.length;
 
