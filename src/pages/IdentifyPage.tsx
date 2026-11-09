@@ -23,7 +23,7 @@ export function IdentifyPage() {
       {language && (
         <div className="practice-panel">
           <h2>Lengua de Señas Colombiana (LSC)</h2>
-          <CameraView language={language} fileNamePrefix="video-seña" showRecording={false} />
+          <CameraView language={language} fileNamePrefix="video-seña" showRecording={false} requireCalibration />
         </div>
       )}
     </section>

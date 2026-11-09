@@ -67,6 +67,7 @@ export function LearnPage() {
               fileNamePrefix="video-aprendizaje"
               onMatch={handleMatch}
               showRecording={false}
+              requireCalibration
             />
           </div>
         </div>

@@ -55,3 +55,25 @@ describe('vocales con el dataset publicado', () => {
     expect(Math.max(...fingerAngleErrors(longer, fitted).map((e) => e.degrees))).toBeLessThan(1);
   });
 });
+
+describe('rango de tolerancia', () => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+
+  it('cada vocal se acepta con los dedos hasta 15° más cerrados o abiertos', () => {
+    for (const v of vowels) {
+      for (const deg of [-15, -10, 10, 15]) {
+        const m = classifyWithReferenceSet(live(flexFingers(officialFrame(v), deg)), candidates);
+        expect(m?.sign, `${v} con flexión ${deg}`).toBe(v);
+      }
+    }
+  });
+
+  it('una vocal nunca se confunde con otra, ni siquiera a ±30°: se acepta como ella o no se muestra nada', () => {
+    for (const v of vowels) {
+      for (const deg of [-30, -20, 20, 30]) {
+        const m = classifyWithReferenceSet(live(flexFingers(officialFrame(v), deg)), candidates);
+        expect(m === null || m.sign === v, `${v} con flexión ${deg} dio ${m?.sign}`).toBe(true);
+      }
+    }
+  });
+});

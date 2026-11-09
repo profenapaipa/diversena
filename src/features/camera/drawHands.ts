@@ -1,6 +1,7 @@
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
 import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
 import { fingerAngleErrors, palmBasis, palmFrame, projectPose, retargetPose } from '../../services/recognition/handPose3d';
+import { getCalibration } from '../../services/recognition/calibration';
 
 // Un color por mano, para distinguirlas cuando aparecen las dos.
 const HAND_COLOR = { derecha: 'rgba(34, 197, 94, 0.6)', izquierda: 'rgba(56, 189, 248, 0.6)' } as const;
@@ -60,9 +61,11 @@ export function drawGuide(
   height: number,
 ): void {
   const aspect = width / height;
-  const basis = palmBasis(hand.landmarks, aspect, hand.side);
-  const liveFrame = palmFrame(hand.landmarks, aspect, hand.side);
-  const fitted = retargetPose(liveFrame, guidePose);
+  const calibration = getCalibration();
+  const zScale = calibration?.zScale ?? 1;
+  const basis = palmBasis(hand.landmarks, aspect, hand.side, zScale);
+  const liveFrame = palmFrame(hand.landmarks, aspect, hand.side, zScale);
+  const fitted = retargetPose(liveFrame, guidePose, calibration?.bones);
   const target = projectPose(fitted, basis, aspect);
   const errors = fingerAngleErrors(liveFrame, guidePose);
   const radius = Math.max(2.5, width / 220);

@@ -68,8 +68,8 @@ export interface PalmBasis {
   mirror: 1 | -1;
 }
 
-export function palmBasis(landmarks: NormalizedLandmark[], aspect: number, side: HandSide): PalmBasis {
-  const world: Vec3[] = landmarks.map((p) => [p.x * aspect, p.y, (p.z ?? 0) * aspect]);
+export function palmBasis(landmarks: NormalizedLandmark[], aspect: number, side: HandSide, zScale = 1): PalmBasis {
+  const world: Vec3[] = landmarks.map((p) => [p.x * aspect, p.y, (p.z ?? 0) * aspect * zScale]);
   const origin = world[0];
   const rel = world.map((p) => sub(p, origin));
   const size = norm(rel[9]) || 1;
@@ -81,10 +81,10 @@ export function palmBasis(landmarks: NormalizedLandmark[], aspect: number, side:
 }
 
 /** Los 21 puntos en el marco de la palma, ya normalizados por el tamaño de la mano. */
-export function palmFrame(landmarks: NormalizedLandmark[], aspect: number, side: HandSide): Vec3[] {
-  const { origin, size, e1, e2, e3, mirror } = palmBasis(landmarks, aspect, side);
+export function palmFrame(landmarks: NormalizedLandmark[], aspect: number, side: HandSide, zScale = 1): Vec3[] {
+  const { origin, size, e1, e2, e3, mirror } = palmBasis(landmarks, aspect, side, zScale);
   return landmarks.map((p) => {
-    const r = sub([p.x * aspect, p.y, (p.z ?? 0) * aspect], origin);
+    const r = sub([p.x * aspect, p.y, (p.z ?? 0) * aspect * zScale], origin);
     return [dot(r, e1) / size, dot(r, e2) / size, (dot(r, e3) / size) * mirror];
   });
 }
@@ -132,8 +132,8 @@ export function describeFrame(c: Vec3[]): number[] {
   return out;
 }
 
-export function describePose3d(landmarks: NormalizedLandmark[], aspect: number = DEFAULT_ASPECT, side: HandSide = 'derecha'): number[] {
-  return describeFrame(palmFrame(landmarks, aspect, side));
+export function describePose3d(landmarks: NormalizedLandmark[], aspect: number = DEFAULT_ASPECT, side: HandSide = 'derecha', zScale = 1): number[] {
+  return describeFrame(palmFrame(landmarks, aspect, side, zScale));
 }
 
 /**
@@ -164,16 +164,17 @@ export function flexFingers(c: Vec3[], degrees: number): Vec3[] {
  * cada uno de tus huesos, y solo se toman de la referencia las direcciones.
  * Así la guía nunca pide estirar un dedo más de lo que da tu mano.
  */
-export function retargetPose(live: Vec3[], target: Vec3[]): Vec3[] {
+export function retargetPose(live: Vec3[], target: Vec3[], bones?: number[]): Vec3[] {
   const out = live.map((p) => [...p] as Vec3);
-  for (const chain of CHAINS) {
+  CHAINS.forEach((chain, f) => {
     for (let i = 0; i < 3; i++) {
-      const length = norm(sub(live[chain[i + 1]], live[chain[i]]));
+      // Con la calibración se usa el largo medido en la mano completa (estable); sin ella, el del cuadro actual.
+      const length = bones?.[f * 3 + i] ?? norm(sub(live[chain[i + 1]], live[chain[i]]));
       const dir = unit(sub(target[chain[i + 1]], target[chain[i]]));
       const from = out[chain[i]];
       out[chain[i + 1]] = [from[0] + dir[0] * length, from[1] + dir[1] * length, from[2] + dir[2] * length];
     }
-  }
+  });
   return out;
 }
 

@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_ASPECT, fingerAngleErrors, palmFrame } from '../../services/recognition/handPose3d';
+import { currentZScale, saveCalibration } from '../../services/recognition/calibration';
+import { useCalibration } from '../../hooks/useCalibration';
+import { useCalibrationSession } from '../../hooks/useCalibrationSession';
 import { loadTargetPose } from '../../services/recognition/targetPose';
 import { GUIDE_TOLERANCE_DEG } from './drawHands';
 import type { Language, Sign } from '../../models/language';
@@ -52,13 +55,24 @@ interface CameraViewProps {
   onMatch?: (sign: Sign) => void;
   /** Controles de grabar y subir video (herramientas del equipo). Por defecto se muestran. */
   showRecording?: boolean;
+  /** Pide calibrar la mano la primera vez (una vez por persona) antes de reconocer. */
+  requireCalibration?: boolean;
 }
 
-export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch, showRecording = true }: CameraViewProps) {
+export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch, showRecording = true, requireCalibration = false }: CameraViewProps) {
   const { camera, tracking, recognizedHand, features } = useTrackedHand();
   const { status, error, videoRef, start, stop } = camera;
   const { status: handStatus, hands, latestHandsRef } = tracking;
   const [showLandmarks, setShowLandmarks] = useState(true);
+  const calibration = useCalibration();
+  const [skippedCalibration, setSkippedCalibration] = useState(false);
+  const videoAspect = () => {
+    const v = camera.videoRef.current;
+    return v && v.videoWidth > 0 && v.videoHeight > 0 ? v.videoWidth / v.videoHeight : DEFAULT_ASPECT;
+  };
+  const session = useCalibrationSession(recognizedHand, videoAspect());
+  const needsCalibration = requireCalibration && !calibration && !skippedCalibration;
+  const calibrating = session.phase === 'running';
   // Se graba la vista anotada (video + puntos), no la cámara cruda.
   const annotatedStream = useAnnotatedStream(videoRef, latestHandsRef, status === 'active', showLandmarks);
   const recorder = useMediaRecorder(annotatedStream, fileNamePrefix);
@@ -91,7 +105,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
     if (!guide || !recognizedHand) return null;
     const video = camera.videoRef.current;
     const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
-    const errors = fingerAngleErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side), guide);
+    const errors = fingerAngleErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale()), guide);
     const off = errors.filter((e) => e.degrees > GUIDE_TOLERANCE_DEG).sort((a, b) => b.degrees - a.degrees);
     return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
@@ -169,7 +183,49 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         {showResult && (
           <aside className="result-panel" aria-live="polite">
             <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Traducción'}</p>
-            {handStatus === 'cargando' ? (
+            {status === 'active' && handStatus !== 'cargando' && handStatus !== 'error' && (needsCalibration || calibrating) ? (
+              <div className="calibration">
+                <p className="eyebrow">Calibrar tu mano</p>
+                {calibrating ? (
+                  <>
+                    <p className="result-panel__verdict">Abre la mano y gírala despacio</p>
+                    <p className="result-panel__hint">
+                      Muéstrala de frente y gírala suavemente hacia los lados, como mostrando el dorso y la palma. Mantén los dedos
+                      abiertos.
+                    </p>
+                    <span className="meter meter--wide" role="img" aria-label={`Calibración al ${Math.round(session.progress * 100)} %`}>
+                      <span style={{ width: `${Math.round(session.progress * 100)}%` }} />
+                    </span>
+                    <p className="result-panel__hint">
+                      {recognizedHand && session.collected > 0 ? 'Te estoy viendo. ' : 'Muestra tu mano abierta. '}
+                      Cuadros: {session.collected} de {session.needed}
+                    </p>
+                    <button type="button" className="button button--ghost" onClick={session.cancel}>
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="result-panel__verdict">Primero, conozcamos tu mano</p>
+                    <p className="result-panel__hint">
+                      Tarda unos 8 segundos y se hace una sola vez. Así medimos el tamaño y los dedos de tu mano, y la
+                      guía se ajusta a ella aunque la gires.
+                    </p>
+                    {session.phase === 'failed' && (
+                      <p className="result-panel__hint calibration__warn">
+                        No te vimos la mano abierta el tiempo suficiente. Acércala un poco y vuelve a intentar.
+                      </p>
+                    )}
+                    <button type="button" className="button" onClick={session.start} disabled={!recognizedHand}>
+                      {recognizedHand ? 'Calibrar mi mano' : 'Muestra tu mano para empezar'}
+                    </button>
+                    <button type="button" className="button button--ghost" onClick={() => setSkippedCalibration(true)}>
+                      Omitir por ahora
+                    </button>
+                  </>
+                )}
+              </div>
+            ) : handStatus === 'cargando' ? (
               <>
                 <p className="result-panel__verdict">Preparando el detector…</p>
                 <span className="meter meter--wide meter--busy" aria-hidden="true">
@@ -268,6 +324,19 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
             />
             Mostrar puntos de la mano
           </label>
+          {requireCalibration && (
+            <button
+              type="button"
+              className="button button--ghost"
+              onClick={() => {
+                setSkippedCalibration(false);
+                saveCalibration(null);
+              }}
+              title={calibration ? `Calibrada: giro visto ${calibration.turnDegrees}°` : 'Aún sin calibrar'}
+            >
+              {calibration ? 'Volver a calibrar' : 'Calibrar mi mano'}
+            </button>
+          )}
           <button type="button" className="button button--ghost" onClick={stop}>
             Apagar cámara
           </button>

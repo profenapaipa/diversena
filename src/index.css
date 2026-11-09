@@ -1902,3 +1902,8 @@ main {
 .sign-card__fig img { display: block; width: 100%; max-width: none; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); background: #fff; }
 .sign-card__fig:last-child img { background: var(--brand-navy); object-fit: contain; }
 .sign-card__fig figcaption { margin-top: 0.3rem; font-size: 0.82rem; color: var(--muted); line-height: 1.3; }
+
+/* Calibración de la mano */
+.calibration { display: grid; gap: 0.6rem; justify-items: center; text-align: center; }
+.calibration .button { min-width: 12rem; }
+.calibration__warn { color: #fb923c; }
