@@ -15,7 +15,7 @@ export const PROBLEM =
   'Muchas personas oyentes no conocen la lengua de señas. Por eso, en la casa, el colegio o la calle, a las personas sordas les cuesta que las entiendan, aunque sepan muy bien lo que quieren decir.';
 
 export const QUESTION =
-  '¿Cómo puede la cámara de un celular ayudar a familias, estudiantes y docentes a practicar la Lengua de Señas Colombiana y a comunicarse mejor con las personas Sordas?';
+  '¿Cómo puede una herramienta de software acompañar a docentes y estudiantes en el aprendizaje de la Lengua de Señas Colombiana, sin reemplazar a quien enseña?';
 
 export const AUDIENCE =
   'Personas desde los 6 años que necesitan o quieren entender la lengua de señas: familias, estudiantes, docentes y cualquiera que conviva con la comunidad Sorda.';

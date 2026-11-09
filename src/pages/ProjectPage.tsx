@@ -1,37 +1,63 @@
-import { AUDIENCE, DECISIONS, PROBLEM, QUESTION, REFERENCES, REQUIREMENTS } from '../data/project';
 import { Link } from 'react-router-dom';
+import { DECISIONS, QUESTION, REFERENCES } from '../data/project';
+import { Reveal } from '../components/motion';
 
-const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
-const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendiente: 'badge--crit' } as const;
+/** Para quién es: cada quien con lo que la herramienta le da. La docencia va primero: guía, y la herramienta acompaña. */
+const ROLES = [
+  {
+    id: 'docentes',
+    title: 'Docentes',
+    text: 'Un apoyo para sus clases: sus estudiantes practican entre sesiones con una referencia común.',
+  },
+  {
+    id: 'estudiantes',
+    title: 'Estudiantes',
+    text: 'Practican a su ritmo, con la cámara y consejos para acomodar los dedos.',
+  },
+  {
+    id: 'familias',
+    title: 'Familias',
+    text: 'Aprenden en casa, juntas, desde el celular o el computador.',
+  },
+] as const;
 
 /** Lo que sigue, en tres pasos. */
-const NEXT = ['Más clips con personas Sordas e intérpretes', 'Validar cada seña con la comunidad Sorda', 'Más señas y, después, otras lenguas'];
+const NEXT = [
+  'Probarla en clase con docentes de LSC',
+  'Validar cada seña con personas Sordas',
+  'Sumar más señas y, después, otras lenguas',
+];
 
-/** El proyecto, solo con lo que no se dice en otras páginas: el problema, la pregunta, lo que debe hacer y lo que sigue. El detalle queda plegado. */
+/**
+ * El proyecto: qué es DiverSeña como herramienta, para quién, la pregunta que la guía y lo que sigue. No habla de cómo
+ * funciona por dentro (eso está en la portada). El detalle técnico y las fuentes quedan plegados.
+ */
 export function ProjectContent() {
   return (
     <div className="project">
       <section className="section">
-        <h2>El problema</h2>
-        <p className="project__lead">{PROBLEM}</p>
-        <p className="note">{AUDIENCE}</p>
+        <h2>Qué es</h2>
+        <p className="project__lead">
+          Una herramienta de software que complementa el aprendizaje de la lengua de señas en el aula y fuera de ella.
+        </p>
+        <p className="note">No reemplaza a quien enseña: la docencia guía y DiverSeña acompaña la práctica.</p>
+      </section>
+
+      <section className="section">
+        <h2>Para quién</h2>
+        <ul className="roles">
+          {ROLES.map((role, i) => (
+            <Reveal as="li" key={role.id} className={`roles__card roles__card--${role.id}`} delay={i * 100}>
+              <h3>{role.title}</h3>
+              <p>{role.text}</p>
+            </Reveal>
+          ))}
+        </ul>
       </section>
 
       <section className="section">
         <h2>La pregunta</h2>
         <p className="quote">{QUESTION}</p>
-      </section>
-
-      <section className="section">
-        <h2>Qué debe hacer</h2>
-        <ul className="req-list">
-          {REQUIREMENTS.map((req) => (
-            <li key={req.action}>
-              <span className={`badge ${REQ_TONE[req.status]}`}>{REQ_LABEL[req.status]}</span>
-              <span>{req.action}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="section">
@@ -72,7 +98,7 @@ export function ProjectContent() {
 
       <div className="project__help">
         <p>
-          <strong>¿Eres una persona Sorda, intérprete o docente de LSC?</strong> Tu revisión nos ayuda a validar cada seña.
+          <strong>¿Eres docente de LSC, intérprete o una persona Sorda?</strong> Queremos probarla contigo y que revises cada seña.
         </p>
         <Link className="button button--secondary" to="/contacto">Escríbenos</Link>
       </div>

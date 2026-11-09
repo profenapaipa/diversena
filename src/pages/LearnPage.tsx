@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Sign } from '../models/language';
 import { getLanguageById, DEFAULT_LANGUAGE_ID } from '../data/languages';
 import { VowelSelector } from '../components/VowelSelector';
@@ -17,6 +18,20 @@ export function LearnPage() {
   const handleMatch = useCallback((matched: Sign) => {
     setPracticed((current) => (current[matched.id] ? current : { ...current, [matched.id]: true }));
   }, []);
+  const navigate = useNavigate();
+  const index = language && sign ? language.signs.findIndex((s) => s.id === sign.id) : -1;
+  const previousSign = language && index > 0 ? language.signs[index - 1] : undefined;
+  const nextSign = language && index >= 0 ? language.signs[index + 1] : undefined;
+  const approved = sign ? practiced[sign.id] === true : false;
+  // «Anterior» desde la segunda vocal; «Siguiente» solo cuando la vocal actual ya se aprobó. En la última, el paso natural es probar en Identificar.
+  const lessonNav = {
+    previous: previousSign ? { label: `Vocal ${previousSign.letter}`, onClick: () => setSignId(previousSign.id) } : undefined,
+    next: approved
+      ? nextSign
+        ? { label: `Siguiente: vocal ${nextSign.letter}`, onClick: () => setSignId(nextSign.id) }
+        : { label: 'Probar en Identificar', onClick: () => navigate('/identificar') }
+      : undefined,
+  };
   const total = language?.signs.length ?? 0;
   const done = language ? language.signs.filter((s) => practiced[s.id]).length : 0;
 
@@ -71,6 +86,7 @@ export function LearnPage() {
               onMatch={handleMatch}
               showRecording={false}
               requireCalibration
+              lessonNav={lessonNav}
             />
           </div>
         </div>

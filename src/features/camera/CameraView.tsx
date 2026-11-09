@@ -62,9 +62,14 @@ interface CameraViewProps {
   showRecording?: boolean;
   /** Pide calibrar la mano la primera vez (una vez por persona) antes de reconocer. */
   requireCalibration?: boolean;
+  /** Pasar de una vocal a otra sin volver al selector: «Anterior» siempre que haya una vocal antes y «Siguiente» cuando la actual ya se aprobó. */
+  lessonNav?: {
+    previous?: { label: string; onClick: () => void };
+    next?: { label: string; onClick: () => void };
+  };
 }
 
-export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch, showRecording = true, requireCalibration = false }: CameraViewProps) {
+export function CameraView({ language, targetSign, fileNamePrefix = 'video-diversena', onMatch, showRecording = true, requireCalibration = false, lessonNav }: CameraViewProps) {
   const { camera, tracking, recognizedHand, features } = useTrackedHand();
   const { status, error, videoRef, start, stop } = camera;
   const { status: handStatus, hands, latestHandsRef } = tracking;
@@ -343,6 +348,23 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
           </aside>
         )}
       </div>
+
+      {lessonNav && (lessonNav.previous || lessonNav.next) && (
+        <nav className="lesson-nav" aria-label="Cambiar de vocal">
+          {lessonNav.previous ? (
+            <button type="button" className="button button--secondary" onClick={lessonNav.previous.onClick}>
+              <span aria-hidden="true">‹</span> {lessonNav.previous.label}
+            </button>
+          ) : (
+            <span />
+          )}
+          {lessonNav.next && (
+            <button type="button" className="button button--lg lesson-nav__next" onClick={lessonNav.next.onClick}>
+              {lessonNav.next.label} <span aria-hidden="true">›</span>
+            </button>
+          )}
+        </nav>
+      )}
 
       {status === 'active' && (
         <div className="camera-toolbar">
