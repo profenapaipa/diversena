@@ -29,7 +29,7 @@ const UI_UPDATE_MS = 33;
  * dedo que tapa a otro), se mantiene su última posición en vez de "apagar"
  * todo y volver a encender: el resultado no titila.
  */
-const HOLD_LOST_HAND_MS = 200;
+const HOLD_LOST_HAND_MS = 250;
 
 /**
  * Con el cuadro real de la cámara frontal (sin espejar), la etiqueta de
@@ -62,6 +62,7 @@ export function useHandLandmarker(
 
     let cancelled = false;
     let rafId = 0;
+    let videoCallbackId = 0;
     setStatus('cargando');
 
     // Un suavizador y un "último visto" por mano, para que la derecha y la
@@ -133,9 +134,20 @@ export function useHandLandmarker(
               setStatus(current.length > 0 ? 'mano-detectada' : 'sin-mano');
             }
           }
-          rafId = requestAnimationFrame(loop);
+          schedule();
         };
-        rafId = requestAnimationFrame(loop);
+        // Se procesa justo cuando el video entrega un cuadro nuevo (requestVideoFrameCallback), en lugar de esperar al
+        // siguiente refresco de la pantalla: quita hasta un cuadro de retraso y no se pierden ni se repiten cuadros.
+        const schedule = () => {
+          const video = videoRef.current;
+          if (cancelled) return;
+          if (video && 'requestVideoFrameCallback' in video) {
+            videoCallbackId = video.requestVideoFrameCallback(loop);
+          } else {
+            rafId = requestAnimationFrame(loop);
+          }
+        };
+        schedule();
       })
       .catch(() => {
         if (!cancelled) setStatus('error');
@@ -144,6 +156,7 @@ export function useHandLandmarker(
     return () => {
       cancelled = true;
       cancelAnimationFrame(rafId);
+      if (videoCallbackId) videoRef.current?.cancelVideoFrameCallback?.(videoCallbackId);
       latestHandsRef.current = [];
     };
   }, [active, videoRef]);

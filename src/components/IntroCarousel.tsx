@@ -77,15 +77,16 @@ const SLIDES: Slide[] = [
   {
     id: 'identificar',
     eyebrow: 'Identificar',
-    title: 'Haz una vocal y te decimos cuál es',
-    text: 'En Identificar haces la seña y te mostramos la letra que más se parece, con su porcentaje de parecido. Si no estamos seguros, te sugerimos las más cercanas.',
+    title: 'Haz una vocal y mira a cuál se parece',
+    text: 'En Identificar haces la seña y te mostramos a qué letra se parece, con su porcentaje. Si todavía no se parece lo suficiente, te damos consejos para acomodar los dedos.',
     visual: (
-      <div className="intro-visual intro-visual--result" role="img" aria-label="Ejemplo de resultado: la vocal A con un parecido alto con la referencia">
+      <div className="intro-visual intro-visual--result" role="img" aria-label="Ejemplo de resultado: se parece más a la vocal A, con el consejo de doblar un poco el índice">
         <span className="intro-result__badge">Ejemplo</span>
         <span className="intro-result__letter">A</span>
-        <span className="intro-result__label">Parecido con la referencia</span>
-        <span className="meter meter--wide"><span style={{ width: '88%' }} /></span>
-        <span className="intro-result__hint">«¿Quizás quisiste decir…?» cuando no hay una seguridad suficiente</span>
+        <span className="intro-result__label">Se parece más a la A (62 %)</span>
+        <span className="meter meter--wide"><span style={{ width: '62%' }} /></span>
+        <span className="intro-result__tip">↳ Dobla un poco el índice.</span>
+        <span className="intro-result__tip">↳ Acerca el pulgar al índice.</span>
       </div>
     ),
   },

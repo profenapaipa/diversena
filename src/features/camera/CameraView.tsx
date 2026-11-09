@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { DEFAULT_ASPECT, fingerFlexErrors, palmFrame } from '../../services/recognition/handPose3d';
+import { DEFAULT_ASPECT, palmFrame } from '../../services/recognition/handPose3d';
+import { adviceFromPoses } from '../../services/recognition/advice';
 import { currentZScale } from '../../services/recognition/calibration';
-import { scaleFlexion, thumbTipDistances } from '../../services/recognition/handPose3d';
+import { scaleFlexion } from '../../services/recognition/handPose3d';
 import { CalibrationPanel } from './CalibrationPanel';
 import { PRIVACY_BEFORE_PERMISSION } from '../../data/privacy';
 import { useSixSevenGesture } from '../../hooks/useSixSeven';
@@ -109,20 +110,15 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   }, [language, targetSign]);
 
   // Qué dedos faltan por poner en su lugar, para decirlo con palabras.
-  const fingerHint = useMemo(() => {
-    if (!guide || !recognizedHand) return null;
+  // Consejos para acercar la mano a la figura de la vocal que se practica.
+  const liveFrameOf = (hand: NonNullable<typeof recognizedHand>) => {
     const video = camera.videoRef.current;
     const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
-    const liveFrame = palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale());
-    const errors = fingerFlexErrors(liveFrame, guide);
-    const off = errors.filter((e) => e.degrees > GUIDE_TOLERANCE_DEG).sort((a, b) => b.degrees - a.degrees);
-    // Contacto del pulgar con los otros dedos (la O lo necesita): si todos los dedos están bien pero la punta del pulgar
-    // queda más lejos o más cerca de lo que muestra la figura, se dice.
-    const liveTips = thumbTipDistances(liveFrame);
-    const guideTips = thumbTipDistances(guide);
-    const gap = liveTips.reduce((sum, d, i) => sum + (d - guideTips[i]), 0) / liveTips.length;
-    const thumb: 'acerca' | 'separa' | null = Math.abs(gap) < 0.35 ? null : gap > 0 ? 'acerca' : 'separa';
-    return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null, thumb };
+    return palmFrame(hand.landmarks, aspect, hand.side, currentZScale());
+  };
+  const fingerHint = useMemo(() => {
+    if (!guide || !recognizedHand) return null;
+    return adviceFromPoses(liveFrameOf(recognizedHand), guide, GUIDE_TOLERANCE_DEG);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
   }, [guide, recognizedHand]);
 
@@ -134,12 +130,35 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   const classification = targetSign ? (stable?.sign.id === targetSign.id ? stable : null) : stable;
   const similarity = classification ? Math.round(classification.confidence * 100) : null;
 
-  // "¿Quizás quisiste decir…?" (boceto del equipo): cuando no hay un
+  // Cuando no hay un resultado seguro: a qué vocal se parece más y cómo acomodar los dedos (boceto del equipo: «¿quizás quisiste decir…?»). Cuando no hay un
   // resultado seguro, las señas que más se parecen a lo que hace la mano.
   const suggestions = useMemo(() => {
     if (!features || classification) return [];
     return rankSigns(features, referenceCandidates, 3);
   }, [features, classification, referenceCandidates]);
+
+  // Consejos hacia la vocal que más se parece (solo al identificar, sin una vocal elegida): se carga su figura y se compara.
+  const topSuggestion = !targetSign ? (suggestions[0]?.sign ?? null) : null;
+  const topSuggestionId = topSuggestion?.id;
+  const [suggestionPose, setSuggestionPose] = useState<Array<[number, number, number]> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setSuggestionPose(null);
+    if (language && topSuggestion) {
+      loadTargetPose(language, topSuggestion).then((pose) => {
+        if (!cancelled) setSuggestionPose(pose);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo cambia cuando cambia la vocal más parecida
+  }, [language, topSuggestionId]);
+  const suggestionAdvice = useMemo(() => {
+    if (!suggestionPose || !recognizedHand) return null;
+    return adviceFromPoses(liveFrameOf(recognizedHand), suggestionPose, GUIDE_TOLERANCE_DEG);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
+  }, [suggestionPose, recognizedHand]);
 
   // Cada vez que la seña objetivo pasa a reconocerse de forma estable, cuenta como un acierto.
   const wasMatchingRef = useRef(false);
@@ -268,11 +287,15 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                 {targetSign && fingerHint ? (
                   <div className="suggestions">
                     <p className="result-panel__hint">
-                      {fingerHint.placed} de {fingerHint.total} dedos en su lugar
-                      {fingerHint.worst ? `. Ajusta el ${fingerHint.worst}.` : '.'}
-                      {!fingerHint.worst && fingerHint.thumb === 'acerca' ? ' Acerca la punta del pulgar a la de los otros dedos.' : ''}
-                      {!fingerHint.worst && fingerHint.thumb === 'separa' ? ' Separa un poco la punta del pulgar de los otros dedos.' : ''}
+                      <strong>{fingerHint.placed} de {fingerHint.total} dedos en su lugar.</strong>
                     </p>
+                    {fingerHint.tips.length > 0 && (
+                      <ul className="tips">
+                        {fingerHint.tips.map((tip) => (
+                          <li key={tip}>{tip}</li>
+                        ))}
+                      </ul>
+                    )}
                     {targetSign.description && <p className="result-panel__hint">Recuerda: {targetSign.description}</p>}
                     {suggestions[0] && suggestions[0].sign.id !== targetSign.id && (
                       <p className="result-panel__hint">Ahora se parece más a la {suggestions[0].sign.letter}.</p>
@@ -280,18 +303,32 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                   </div>
                 ) : suggestions.length > 0 ? (
                   <div className="suggestions">
-                    <p className="result-panel__hint">¿Quizás quisiste decir…?</p>
-                    <ul>
-                      {suggestions.map(({ sign, confidence }) => (
-                        <li key={sign.id}>
-                          <span className="suggestions__letter">{sign.letter}</span>
-                          <span className="meter" aria-hidden="true">
-                            <span style={{ width: `${Math.round(confidence * 100)}%` }} />
-                          </span>
-                          <span className="suggestions__pct">{Math.round(confidence * 100)} %</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="result-panel__hint">
+                      <strong>Se parece más a la {suggestions[0].sign.letter}</strong> ({Math.round(suggestions[0].confidence * 100)} %)
+                    </p>
+                    {suggestionAdvice && suggestionAdvice.tips.length > 0 && (
+                      <ul className="tips">
+                        {suggestionAdvice.tips.map((tip) => (
+                          <li key={tip}>{tip}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {suggestions.length > 1 && (
+                      <>
+                        <p className="result-panel__hint">También se parece a:</p>
+                        <ul>
+                          {suggestions.slice(1).map(({ sign, confidence }) => (
+                            <li key={sign.id}>
+                              <span className="suggestions__letter">{sign.letter}</span>
+                              <span className="meter" aria-hidden="true">
+                                <span style={{ width: `${Math.round(confidence * 100)}%` }} />
+                              </span>
+                              <span className="suggestions__pct">{Math.round(confidence * 100)} %</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
                   </div>
                 ) : (
                   features && (

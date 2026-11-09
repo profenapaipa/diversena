@@ -1,4 +1,5 @@
 import { AUDIENCE, DECISIONS, PROBLEM, QUESTION, REFERENCES, REQUIREMENTS } from '../data/project';
+import { Link } from 'react-router-dom';
 import { CountUp, Reveal } from '../components/motion';
 
 const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
@@ -98,9 +99,12 @@ export function ProjectContent() {
         </ul>
       </details>
 
-      <p className="project__help">
-        <strong>¿Eres una persona Sorda, intérprete o docente de LSC?</strong> Tu revisión nos ayuda a validar cada seña.
-      </p>
+      <div className="project__help">
+        <p>
+          <strong>¿Eres una persona Sorda, intérprete o docente de LSC?</strong> Tu revisión nos ayuda a validar cada seña.
+        </p>
+        <Link className="button button--secondary" to="/contacto">Escríbenos</Link>
+      </div>
     </div>
   );
 }

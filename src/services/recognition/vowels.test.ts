@@ -4,6 +4,7 @@ import type { TrainingSample } from '../../models/dataset';
 import type { HandFeatureVector } from '../../models/handFeatures';
 import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors, tiltPose, bestTiltFit, fitTilt } from './handPose3d';
 import { REFERENCE_FLEX_MAX } from './calibration';
+import { adviceFromPoses } from './advice';
 import { featuresFromSample } from './referenceSet';
 import { classifyWithReferenceSet, POSE3D_FLOOR } from './signClassifier';
 
@@ -214,5 +215,40 @@ describe('inclinación de la guía', () => {
         expect(Math.abs(fy - ty), `${v} y ${ty}`).toBeLessThanOrEqual(8);
       }
     }
+  });
+});
+
+describe('consejos para acomodar los dedos', () => {
+  const ratiosFor = (joints: number[], ratio: number) => {
+    const r = new Array(15).fill(1);
+    joints.forEach((j) => (r[j] = ratio));
+    return r;
+  };
+
+  it('con todo como en la figura no hay consejos y los cinco dedos están en su lugar', () => {
+    const f = officialFrame('a');
+    const a = adviceFromPoses(f, f, 30);
+    expect(a.tips).toEqual([]);
+    expect(a.placed).toBe(5);
+  });
+
+  it('un dedo más doblado de lo debido: se pide estirarlo, y solo ese dedo', () => {
+    const f = officialFrame('a');
+    // En la A los dedos ya están casi al tope de su flexión, así que se prueba con una tolerancia menor.
+    const a = adviceFromPoses(scaleFlexion(f, ratiosFor([3, 4, 5], 1.5)), f, 10);
+    expect(a.tips).toEqual(['Estira un poco el índice.']);
+    expect(a.placed).toBe(4);
+  });
+
+  it('un dedo más recto de lo debido: se pide doblarlo', () => {
+    const f = officialFrame('a');
+    const a = adviceFromPoses(scaleFlexion(f, ratiosFor([6, 7, 8], 0.2)), f, 30);
+    expect(a.tips).toEqual(['Dobla un poco el dedo medio.']);
+  });
+
+  it('da como máximo dos consejos de dedos, del que más falta al que menos', () => {
+    const f = officialFrame('a');
+    const a = adviceFromPoses(scaleFlexion(f, ratiosFor([3, 4, 5, 6, 7, 8, 9, 10, 11], 0.2)), f, 30);
+    expect(a.tips.length).toBeLessThanOrEqual(2);
   });
 });

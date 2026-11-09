@@ -106,3 +106,10 @@ export const IconLock = (p: IconProps) => (
     <path d="M8 11V8a4 4 0 0 1 8 0v3" />
   </Icon>
 );
+
+export const IconMail = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="m3 7 9 6 9-6" />
+  </Icon>
+);

@@ -9,6 +9,7 @@ import {
   IconFlag,
   IconGlobe,
   IconHome,
+  IconMail,
   IconMenu,
   IconUser,
 } from '../icons';
@@ -26,6 +27,7 @@ const MAIN_LINKS: NavItem[] = [
   { to: '/identificar', label: 'Identificar', icon: <IconCamera /> },
   { to: '/explorar', label: 'Explorar', icon: <IconGlobe /> },
   { to: '/quienes-somos', label: 'Quiénes somos', icon: <IconFlag /> },
+  { to: '/contacto', label: 'Contacto', icon: <IconMail /> },
 ];
 
 /** Barra inferior en celular: las dos acciones del boceto (libro y cámara) a un toque. */

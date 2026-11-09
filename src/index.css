@@ -2230,3 +2230,31 @@ main {
 }
 
 @media (min-width: 52rem) { .camera-stage .result-panel { min-height: 22rem; } }
+
+/* ---------- Contacto ---------- */
+.contact-form { display: grid; gap: 1rem; max-width: 38rem; }
+.contact-form__reasons { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.contact-form__reasons legend { font-weight: 700; margin-bottom: 0.5rem; padding: 0; }
+.contact-chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0.4rem 1rem; border-radius: 999px; border: 2px solid var(--border); background: var(--surface); font-weight: 700; cursor: pointer; }
+.contact-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.contact-chip:has(input:focus-visible) { outline: 3px solid var(--brand-sky); outline-offset: 2px; }
+.contact-chip--on { background: var(--brand-navy); color: #fff; border-color: transparent; }
+.contact-field { display: grid; gap: 0.3rem; font-weight: 700; }
+.contact-field input, .contact-field textarea { font: inherit; font-weight: 400; padding: 0.7rem 0.85rem; border-radius: 0.8rem; border: 2px solid var(--border); background: var(--surface); color: var(--text); min-height: 44px; }
+.contact-field input:focus, .contact-field textarea:focus { outline: 3px solid var(--brand-sky); outline-offset: 1px; border-color: transparent; }
+.contact-field small { font-weight: 400; color: var(--muted); justify-self: end; }
+.contact-honey { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.contact-consent { display: flex; gap: 0.7rem; align-items: flex-start; font-size: 0.92rem; }
+.contact-consent input { flex: none; width: 1.4rem; height: 1.4rem; margin-top: 0.1rem; }
+.contact-error { margin: 0; padding: 0.7rem 0.9rem; border-radius: 0.8rem; background: rgba(239, 68, 68, 0.14); border: 1px solid #ef4444; font-weight: 700; }
+.contact-done { display: grid; gap: 0.6rem; justify-items: start; padding: 1.5rem; border-radius: 1.2rem; background: var(--surface-2); border: 1px solid var(--border); max-width: 38rem; }
+.contact-done__check { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: #16a34a; color: #fff; font-size: 1.6rem; font-weight: 700; }
+.contact-done h2 { margin: 0; }
+.project__help { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; }
+.project__help p { margin: 0; flex: 1 1 16rem; }
+
+/* Consejos para acomodar los dedos */
+.tips { list-style: none; margin: 0.3rem 0; padding: 0; display: grid; gap: 0.35rem; text-align: left; width: 100%; }
+.tips li { padding: 0.4rem 0.7rem 0.4rem 1.9rem; border-radius: 0.7rem; background: var(--surface); border: 1px solid var(--border); font-size: 0.92rem; font-weight: 700; position: relative; }
+.tips li::before { content: '↳'; position: absolute; left: 0.65rem; color: var(--brand-sky-ink); }
+.intro-result__tip { padding: 0.35rem 0.8rem; border-radius: 0.7rem; background: var(--surface); border: 1px solid var(--border); font-size: 0.9rem; font-weight: 700; justify-self: stretch; text-align: left; }

@@ -135,6 +135,9 @@ export function HomePage() {
         <Link className="button button--secondary" to="/quienes-somos?abrir=proyecto">
           Conoce el proyecto <IconArrowRight size={18} />
         </Link>
+        <Link className="button button--secondary" to="/contacto">
+          Escríbenos
+        </Link>
       </Reveal>
     </div>
   );

@@ -14,11 +14,12 @@ async function createHandLandmarker(numHands: number): Promise<HandLandmarker> {
       baseOptions: { modelAssetPath: MODEL_URL, delegate },
       runningMode: 'VIDEO',
       numHands,
-      // Umbrales algo más exigentes que los de fábrica (0.5): menos
-      // "manos fantasma" y menos saltos cuando la mano entra o sale.
-      minHandDetectionConfidence: 0.6,
-      minHandPresenceConfidence: 0.6,
-      minTrackingConfidence: 0.5,
+      // Con la mano en movimiento (el six seven, un giro rápido) el detector pierde la mano si el umbral es alto. Se bajan
+      // un poco los umbrales de presencia y de seguimiento: se mantiene la mano más tiempo; las manos fantasma se siguen
+      // filtrando con el suavizado y la votación del reconocimiento.
+      minHandDetectionConfidence: 0.55,
+      minHandPresenceConfidence: 0.45,
+      minTrackingConfidence: 0.4,
     }),
   );
   warmUp(landmarker);

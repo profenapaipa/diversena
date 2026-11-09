@@ -40,3 +40,28 @@ describe('detectSixSeven', () => {
     expect(detectSixSeven(run(wave(0), wave(Math.PI)), NOW + 5000)).toBe(false);
   });
 });
+
+describe('detectSixSeven con lecturas imperfectas', () => {
+  /** Muestras con huecos (el detector pierde cuadros al mover rápido) y un poco de ruido en la altura. */
+  function gappy(seconds: number, dropEvery: number, noise: number): HandHeights[] {
+    let seed = 7;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5) * 2;
+    const out: HandHeights[] = [];
+    for (let i = 0; i < Math.round(seconds * 30); i++) {
+      if (i % dropEvery === 0) continue;
+      const t = i * 33;
+      out.push({ t, left: wave(0, 0.05, 1.5)(t) + rand() * noise, right: wave(Math.PI, 0.05, 1.5)(t) + rand() * noise });
+    }
+    return out;
+  }
+
+  it('se activa aunque falte una de cada tres lecturas', () => {
+    expect(detectSixSeven(gappy(2.6, 3, 0.002), 2.6 * 30 * 33)).toBe(true);
+  });
+  it('se activa con ruido de la lectura del orden de medio punto porcentual', () => {
+    expect(detectSixSeven(gappy(2.6, 5, 0.004), 2.6 * 30 * 33)).toBe(true);
+  });
+  it('con la mitad de las lecturas perdidas ya no hay datos suficientes y no se activa', () => {
+    expect(detectSixSeven(gappy(2.6, 2, 0.002).slice(0, 8), 2.6 * 30 * 33)).toBe(false);
+  });
+});

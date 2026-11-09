@@ -13,7 +13,7 @@ export interface HandHeights {
 }
 
 /** Ventana de tiempo que se analiza. */
-export const SIX_SEVEN_WINDOW_MS = 2500;
+export const SIX_SEVEN_WINDOW_MS = 3000;
 const MIN_SAMPLES = 12;
 /** Cuánto debe subir y bajar cada mano (fracción del alto de la imagen). */
 const MIN_RANGE = 0.04;
