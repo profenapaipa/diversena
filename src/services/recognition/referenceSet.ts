@@ -4,7 +4,7 @@ import type { HandFeatureVector } from '../../models/handFeatures';
 import type { Language } from '../../models/language';
 import { listSamples, parseDatasetFile } from '../dataset/datasetStore';
 import { extractHandFeatures, normalizeHandLandmarks } from './landmarkProcessor';
-import { DEFAULT_ASPECT, describePose3d, type HandSide } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, type HandSide } from './handPose3d';
 import { getReferencesForLanguage } from './referenceStore';
 
 /** Referencias por seña (signId → vectores de características). */
@@ -35,11 +35,17 @@ export function featuresFromSample(sample: TrainingSample): HandFeatureVector[] 
     picked.push(core[Math.floor(i)]);
   }
   const aspect = sample.aspect ?? DEFAULT_ASPECT;
-  return picked.map((frame) => {
+  const official = sample.contributor.alias === OFFICIAL_ALIAS;
+  return picked.flatMap((frame) => {
     const landmarks = frame.hands[0] as NormalizedLandmark[];
     // La etiqueta de MediaPipe coincide con la mano de la persona (ver useHandLandmarker).
     const side: HandSide = frame.handedness[0] === 'Left' ? 'izquierda' : 'derecha';
-    return { ...extractHandFeatures(normalizeHandLandmarks(landmarks)), pose3d: describePose3d(landmarks, aspect, side) };
+    const classic = extractHandFeatures(normalizeHandLandmarks(landmarks));
+    const frameOfPalm = palmFrame(landmarks, aspect, side);
+    // Una seña oficial sale de una sola foto: se suman versiones con los dedos ±10° y ±20° más cerrados o abiertos,
+    // para aceptar la postura natural de una mano relajada y rechazar lo que se aleja de verdad (ver flexFingers).
+    const variants = official ? [0, -20, -10, 10, 20] : [0];
+    return variants.map((deg) => ({ ...classic, pose3d: describeFrame(deg === 0 ? frameOfPalm : flexFingers(frameOfPalm, deg)) }));
   });
 }
 

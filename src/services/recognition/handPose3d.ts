@@ -37,6 +37,8 @@ const scale = (a: Vec3, k: number): Vec3 => [a[0] * k, a[1] * k, a[2] * k];
 const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const unit = (a: Vec3): Vec3 => scale(a, 1 / (norm(a) || 1));
 
+const FINGER_LABELS = ['pulgar', 'índice', 'medio', 'anular', 'meñique'] as const;
+
 /** Cadenas de landmarks por dedo: base, articulación media, distal y punta. */
 const CHAINS = [
   [1, 2, 3, 4],
@@ -46,9 +48,12 @@ const CHAINS = [
   [17, 18, 19, 20],
 ] as const;
 
-/** Peso de las posiciones y de los ángulos en la distancia (calibrado en el análisis 3D). */
-const POSITION_WEIGHT = 1;
+/** Peso de las direcciones de los huesos y de los ángulos en la distancia (calibrado en el análisis 3D). */
+const DIRECTION_WEIGHT = 1;
 const ANGLE_WEIGHT = 1.5;
+
+/** Alias con el que van en el dataset las fotos oficiales del Diccionario de LSC del INSOR. */
+export const OFFICIAL_ALIAS = 'insor-referencia';
 
 /** Proporción (ancho/alto) que se asume si no se conoce: la cámara de la app graba a 640 x 480. */
 export const DEFAULT_ASPECT = 4 / 3;
@@ -100,13 +105,7 @@ export function projectPose(pose: Vec3[], live: PalmBasis, aspect: number): Arra
   });
 }
 
-const FINGER_LABELS = ['pulgar', 'índice', 'medio', 'anular', 'meñique'] as const;
-const TIPS = [4, 8, 12, 16, 20] as const;
 
-/** Distancia de cada punta de la mano en vivo a la de la guía, en tamaños de palma (mismo marco). */
-export function tipErrors(live: Vec3[], target: Vec3[]): Array<{ finger: (typeof FINGER_LABELS)[number]; error: number }> {
-  return TIPS.map((tip, i) => ({ finger: FINGER_LABELS[i], error: norm(sub(live[tip], target[tip])) }));
-}
 
 function angleAt(a: Vec3, vertex: Vec3, b: Vec3): number {
   const u = sub(a, vertex);
@@ -115,19 +114,80 @@ function angleAt(a: Vec3, vertex: Vec3, b: Vec3): number {
 }
 
 /**
- * Vector de 40 valores: posición 3D de las 5 puntas y de las 5 articulaciones
- * distales en el marco de la palma (30) y 10 ángulos de articulación (dos por
- * dedo). Se compara con distancia euclidiana.
+ * Vector de 55 valores calculado desde el marco de la palma: la dirección (vector
+ * unitario) de cada uno de los 15 huesos de los dedos (45) y los 10 ángulos de
+ * articulación. Usa direcciones y no posiciones a propósito: no dependen de lo
+ * largos que sean los dedos de cada persona, y por eso una A hecha en una postura
+ * natural con una mano pequeña, grande, delgada o ancha da lo mismo. Se compara
+ * con distancia euclidiana.
  */
-export function describePose3d(landmarks: NormalizedLandmark[], aspect: number = DEFAULT_ASPECT, side: HandSide = 'derecha'): number[] {
-  const c = palmFrame(landmarks, aspect, side);
+export function describeFrame(c: Vec3[]): number[] {
   const out: number[] = [];
-  for (const chain of CHAINS) out.push(...c[chain[3]].map((v) => v * POSITION_WEIGHT));
-  for (const chain of CHAINS) out.push(...c[chain[2]].map((v) => v * POSITION_WEIGHT));
+  for (const chain of CHAINS) {
+    for (let i = 0; i < 3; i++) out.push(...unit(sub(c[chain[i + 1]], c[chain[i]])).map((v) => v * DIRECTION_WEIGHT));
+  }
   for (const [p, q, r, s] of CHAINS) {
     out.push(angleAt(c[p], c[q], c[r]) * ANGLE_WEIGHT, angleAt(c[q], c[r], c[s]) * ANGLE_WEIGHT);
   }
   return out;
+}
+
+export function describePose3d(landmarks: NormalizedLandmark[], aspect: number = DEFAULT_ASPECT, side: HandSide = 'derecha'): number[] {
+  return describeFrame(palmFrame(landmarks, aspect, side));
+}
+
+/**
+ * Dobla los cuatro dedos largos `degrees` grados en cada articulación (hacia la
+ * palma si es positivo, hacia atrás si es negativo). Con las señas oficiales, que
+ * vienen de una sola foto, se generan versiones de ±10° y ±20°: es la variación
+ * natural de una mano relajada. Medido: con eso se acepta la vocal con los dedos
+ * hasta 20 a 30° más cerrados o más abiertos, y a 45° ya no.
+ */
+export function flexFingers(c: Vec3[], degrees: number): Vec3[] {
+  const out = c.map((p) => [...p] as Vec3);
+  const th = (degrees * Math.PI) / 180;
+  const [cos, sin] = [Math.cos(th), Math.sin(th)];
+  for (const chain of CHAINS.slice(1)) {
+    for (let j = 1; j < 4; j++) {
+      const pivot = [...out[chain[j - 1]]] as Vec3;
+      for (let k = j; k < 4; k++) {
+        const r = sub(out[chain[k]], pivot);
+        out[chain[k]] = [pivot[0] + r[0] * cos + r[2] * sin, pivot[1] + r[1], pivot[2] - r[0] * sin + r[2] * cos];
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * La pose ideal ajustada a TU mano: se conservan tus nudillos y el largo de
+ * cada uno de tus huesos, y solo se toman de la referencia las direcciones.
+ * Así la guía nunca pide estirar un dedo más de lo que da tu mano.
+ */
+export function retargetPose(live: Vec3[], target: Vec3[]): Vec3[] {
+  const out = live.map((p) => [...p] as Vec3);
+  for (const chain of CHAINS) {
+    for (let i = 0; i < 3; i++) {
+      const length = norm(sub(live[chain[i + 1]], live[chain[i]]));
+      const dir = unit(sub(target[chain[i + 1]], target[chain[i]]));
+      const from = out[chain[i]];
+      out[chain[i + 1]] = [from[0] + dir[0] * length, from[1] + dir[1] * length, from[2] + dir[2] * length];
+    }
+  }
+  return out;
+}
+
+/** Cuánto se aparta (en grados, promedio de sus tres huesos) la dirección de cada dedo de la mano en vivo de la de la guía. */
+export function fingerAngleErrors(live: Vec3[], target: Vec3[]): Array<{ finger: (typeof FINGER_LABELS)[number]; degrees: number }> {
+  return CHAINS.map((chain, f) => {
+    let sum = 0;
+    for (let i = 0; i < 3; i++) {
+      const a = unit(sub(live[chain[i + 1]], live[chain[i]]));
+      const b = unit(sub(target[chain[i + 1]], target[chain[i]]));
+      sum += (Math.acos(Math.min(1, Math.max(-1, dot(a, b)))) * 180) / Math.PI;
+    }
+    return { finger: FINGER_LABELS[f], degrees: sum / 3 };
+  });
 }
 
 /**

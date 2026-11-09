@@ -1,9 +1,9 @@
 import type { TrackedHand } from '../../hooks/useHandLandmarker';
 import { HAND_CONNECTIONS } from '../../services/mediapipe/handTrackingService';
-import { palmBasis, palmFrame, projectPose, tipErrors } from '../../services/recognition/handPose3d';
+import { fingerAngleErrors, palmBasis, palmFrame, projectPose, retargetPose } from '../../services/recognition/handPose3d';
 
 // Un color por mano, para distinguirlas cuando aparecen las dos.
-const HAND_COLOR = { derecha: '#22c55e', izquierda: '#38bdf8' } as const;
+const HAND_COLOR = { derecha: 'rgba(34, 197, 94, 0.6)', izquierda: 'rgba(56, 189, 248, 0.6)' } as const;
 
 /**
  * Dibuja los landmarks y sus conexiones en coordenadas del cuadro real (sin
@@ -11,8 +11,8 @@ const HAND_COLOR = { derecha: '#22c55e', izquierda: '#38bdf8' } as const;
  * se vean iguales.
  */
 export function drawHands(ctx: CanvasRenderingContext2D, hands: TrackedHand[], width: number, height: number): void {
-  ctx.lineWidth = Math.max(2, width / 240);
-  const radius = Math.max(3, width / 180);
+  ctx.lineWidth = Math.max(1.5, width / 320);
+  const radius = Math.max(2.5, width / 220);
 
   for (const { landmarks: hand, side } of hands) {
     ctx.strokeStyle = HAND_COLOR[side];
@@ -36,19 +36,21 @@ export function drawHands(ctx: CanvasRenderingContext2D, hands: TrackedHand[], w
   }
 }
 
-/** Una punta a menos de esta distancia de la guía (en tamaños de palma) cuenta como bien puesta. */
-export const GUIDE_TOLERANCE = 0.45;
+/** Un dedo cuyos huesos se apartan menos de estos grados de la guía cuenta como bien puesto (la postura natural de una mano relajada). */
+export const GUIDE_TOLERANCE_DEG = 25;
 
-const GUIDE_COLOR = '#ffd83d';
-const OK_COLOR = '#22c55e';
-const OFF_COLOR = '#fb923c';
+const GUIDE_COLOR = 'rgba(255, 216, 61, 0.55)';
+const OK_COLOR = 'rgba(34, 197, 94, 0.75)';
+const OFF_COLOR = 'rgba(251, 146, 60, 0.8)';
 const TIPS = [4, 8, 12, 16, 20];
 
 /**
- * Dibuja la pose ideal de la vocal (guía amarilla, punteada) sobre la mano en
- * vivo, con el mismo tamaño y la misma orientación 3D que la mano. Las puntas
- * de los dedos de la mano en vivo se pintan verdes si ya están donde deben y
- * naranja, con una línea hasta su lugar, si les falta ajustar.
+ * Dibuja la pose ideal de la vocal (guía amarilla, punteada y translúcida) sobre
+ * la mano en vivo. La guía NO es la mano de la foto puesta encima: se arma con
+ * tus nudillos y el largo de cada uno de tus huesos (ver `retargetPose`), y solo
+ * toma de la referencia hacia dónde apunta cada hueso. Así lo que pide siempre
+ * cabe en tu mano. Las puntas se pintan verdes si el dedo ya apunta donde debe
+ * (con 25° de margen) y naranja, con una línea hasta su lugar, si no.
  */
 export function drawGuide(
   ctx: CanvasRenderingContext2D,
@@ -59,14 +61,15 @@ export function drawGuide(
 ): void {
   const aspect = width / height;
   const basis = palmBasis(hand.landmarks, aspect, hand.side);
-  const target = projectPose(guidePose, basis, aspect);
   const liveFrame = palmFrame(hand.landmarks, aspect, hand.side);
-  const errors = tipErrors(liveFrame, guidePose);
-  const radius = Math.max(3, width / 180);
+  const fitted = retargetPose(liveFrame, guidePose);
+  const target = projectPose(fitted, basis, aspect);
+  const errors = fingerAngleErrors(liveFrame, guidePose);
+  const radius = Math.max(2.5, width / 220);
 
   ctx.save();
-  ctx.setLineDash([radius * 2, radius * 1.5]);
-  ctx.lineWidth = Math.max(2, width / 260);
+  ctx.setLineDash([radius * 2, radius * 1.6]);
+  ctx.lineWidth = Math.max(1.5, width / 340);
   ctx.strokeStyle = GUIDE_COLOR;
   ctx.beginPath();
   for (const { start, end } of HAND_CONNECTIONS) {
@@ -75,17 +78,15 @@ export function drawGuide(
   }
   ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(255, 216, 61, 0.35)';
-  ctx.lineWidth = 2;
+  ctx.fillStyle = 'rgba(255, 216, 61, 0.25)';
   for (const p of target) {
     ctx.beginPath();
-    ctx.arc(p.x * width, p.y * height, radius * 1.3, 0, Math.PI * 2);
+    ctx.arc(p.x * width, p.y * height, radius * 1.2, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
   }
 
   TIPS.forEach((tip, i) => {
-    const ok = errors[i].error <= GUIDE_TOLERANCE;
+    const ok = errors[i].degrees <= GUIDE_TOLERANCE_DEG;
     const live = hand.landmarks[tip];
     const goal = target[tip];
     ctx.strokeStyle = ok ? OK_COLOR : OFF_COLOR;
@@ -99,7 +100,7 @@ export function drawGuide(
       ctx.setLineDash([]);
     }
     ctx.beginPath();
-    ctx.arc(live.x * width, live.y * height, radius * 1.9, 0, Math.PI * 2);
+    ctx.arc(live.x * width, live.y * height, radius * 1.6, 0, Math.PI * 2);
     ctx.fill();
   });
   ctx.restore();

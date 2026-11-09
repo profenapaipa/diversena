@@ -1,11 +1,8 @@
 import type { Language, Sign } from '../../models/language';
 import { loadAllSamples } from './referenceSet';
-import { DEFAULT_ASPECT, palmFrame, type HandSide } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, palmFrame, type HandSide } from './handPose3d';
 
 type Vec3 = [number, number, number];
-
-/** Alias con el que van en el dataset las fotos oficiales del Diccionario de LSC del INSOR. */
-export const OFFICIAL_ALIAS = 'insor-referencia';
 
 const cache = new Map<string, Promise<Vec3[] | null>>();
 

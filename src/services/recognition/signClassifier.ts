@@ -154,20 +154,20 @@ export function rankSigns<TSign>(
 // ---------------------------------------------------------------------------
 
 /**
- * Ancho del parecido: a esta distancia (en el espacio de 40 medidas) el parecido
- * de una seña cae a 37 %. Calibrado con el análisis 3D del equipo: una seña
- * bien hecha, con la otra mano o girada 45°, queda en 0,2 a 0,9 de distancia.
+ * Ancho del parecido: a esta distancia (en el espacio de 55 medidas, direcciones
+ * de huesos y ángulos) el parecido de una seña cae a 37 %. Calibrado con el
+ * análisis 3D del equipo (entrenamiento/analisis3d).
  */
-export const POSE3D_WIDTH = 0.9;
+export const POSE3D_WIDTH = 2.0;
 
 /**
- * Parecido mínimo para mostrar una vocal. Con 0,7 y el ancho de arriba, las
- * vocales se aceptan en el 84 % de los cuadros (63 % con la mano girada 45° y
- * ruido en z) y una mano abierta se muestra como vocal en el 4 %; además, con
+ * Parecido mínimo para mostrar una vocal. Con 0,6 y el ancho de arriba, las
+ * vocales se aceptan en el 94 % de los cuadros (82 % con la mano girada 45° y
+ * ruido en z) y una mano abierta se muestra como vocal en el 7 %; además, con
  * tres o más dedos extendidos nunca se muestra una vocal, y la votación en el
  * tiempo baja el resto.
  */
-export const POSE3D_FLOOR = 0.7;
+export const POSE3D_FLOOR = 0.6;
 export const POSE3D_SUGGESTION_FLOOR = 0.25;
 
 /**

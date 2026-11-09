@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { DEFAULT_ASPECT, palmFrame, tipErrors } from '../../services/recognition/handPose3d';
+import { DEFAULT_ASPECT, fingerAngleErrors, palmFrame } from '../../services/recognition/handPose3d';
 import { loadTargetPose } from '../../services/recognition/targetPose';
-import { GUIDE_TOLERANCE } from './drawHands';
+import { GUIDE_TOLERANCE_DEG } from './drawHands';
 import type { Language, Sign } from '../../models/language';
 import { useTrackedHand } from '../../hooks/useTrackedHand';
 import { useMediaRecorder } from '../../hooks/useMediaRecorder';
@@ -91,8 +91,8 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
     if (!guide || !recognizedHand) return null;
     const video = camera.videoRef.current;
     const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
-    const errors = tipErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side), guide);
-    const off = errors.filter((e) => e.error > GUIDE_TOLERANCE).sort((a, b) => b.error - a.error);
+    const errors = fingerAngleErrors(palmFrame(recognizedHand.landmarks, aspect, recognizedHand.side), guide);
+    const off = errors.filter((e) => e.degrees > GUIDE_TOLERANCE_DEG).sort((a, b) => b.degrees - a.degrees);
     return { placed: errors.length - off.length, total: errors.length, worst: off[0]?.finger ?? null };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular
   }, [guide, recognizedHand]);
@@ -220,7 +220,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
                 {targetSign && fingerHint ? (
                   <div className="suggestions">
                     <p className="result-panel__hint">
-                      {fingerHint.placed} de {fingerHint.total} puntas en su lugar
+                      {fingerHint.placed} de {fingerHint.total} dedos en su lugar
                       {fingerHint.worst ? `. Ajusta el ${fingerHint.worst}.` : '.'}
                     </p>
                     {targetSign.description && <p className="result-panel__hint">Recuerda: {targetSign.description}</p>}
