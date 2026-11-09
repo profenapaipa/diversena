@@ -2,7 +2,8 @@ import datasetText from '../../../public/datasets/lsc.json?raw';
 import { describe, expect, it } from 'vitest';
 import type { TrainingSample } from '../../models/dataset';
 import type { HandFeatureVector } from '../../models/handFeatures';
-import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion } from './handPose3d';
+import { REFERENCE_FLEX_MAX } from './calibration';
 import { featuresFromSample } from './referenceSet';
 import { classifyWithReferenceSet, POSE3D_FLOOR } from './signClassifier';
 
@@ -74,6 +75,50 @@ describe('rango de tolerancia', () => {
         const m = classifyWithReferenceSet(live(flexFingers(officialFrame(v), deg)), candidates);
         expect(m === null || m.sign === v, `${v} con flexión ${deg} dio ${m?.sign}`).toBe(true);
       }
+    }
+  });
+});
+
+describe('mano que dobla menos que la referencia (calibración)', () => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  // Una persona cuyos dedos solo doblan el 75 % de lo que piden las referencias en las articulaciones grandes.
+  const limited = REFERENCE_FLEX_MAX.map((m) => (m >= 60 ? 0.75 : 1));
+
+  it('scaleFlexion con razón 1 no cambia la mano y con la inversa la devuelve', () => {
+    for (const v of vowels) {
+      const f = officialFrame(v);
+      const same = scaleFlexion(f, new Array(15).fill(1));
+      same.forEach((p, i) => p.forEach((x, k) => expect(x).toBeCloseTo(f[i][k], 6)));
+      const back = scaleFlexion(scaleFlexion(f, limited), limited.map((r) => 1 / r));
+      const err = Math.max(...back.map((p, i) => Math.hypot(p[0] - f[i][0], p[1] - f[i][1], p[2] - f[i][2])));
+      expect(err).toBeLessThan(0.05);
+    }
+  });
+
+  it('las flexiones medidas bajan con la razón', () => {
+    const f = officialFrame('a');
+    const before = jointFlexions(f);
+    const after = jointFlexions(scaleFlexion(f, limited));
+    before.forEach((deg, j) => {
+      if (limited[j] < 1 && deg > 20) expect(after[j]).toBeLessThan(deg * 0.9);
+    });
+  });
+
+  it('con la calibración, la mano limitada se reconoce como cada vocal', () => {
+    for (const v of vowels) {
+      const handOfThePerson = scaleFlexion(officialFrame(v), limited);
+      const calibrated = describeFrame(scaleFlexion(handOfThePerson, limited.map((r) => 1 / r)));
+      const m = classifyWithReferenceSet({ ...live(handOfThePerson), pose3d: calibrated }, candidates);
+      expect(m?.sign, v).toBe(v);
+    }
+  });
+
+  it('la guía acortada nunca pide más flexión de la que la persona alcanza', () => {
+    for (const v of vowels) {
+      const guide = scaleFlexion(officialFrame(v), limited);
+      const asked = jointFlexions(officialFrame(v));
+      const shown = jointFlexions(guide);
+      shown.forEach((deg, j) => expect(deg).toBeLessThanOrEqual(asked[j] + 0.5));
     }
   });
 });

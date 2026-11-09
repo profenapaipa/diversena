@@ -1,64 +1,60 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TrackedHand } from './useHandLandmarker';
 import {
-  CALIBRATION_MIN_FRAMES,
-  CALIBRATION_SECONDS,
-  fitCalibration,
-  isCalibrationFrame,
+  CALIBRATION_STEPS,
+  advanceRun,
+  finalizeRun,
+  isRunFinished,
   saveCalibration,
-  type CalibrationFrame,
+  skipStep,
+  startRun,
+  type CalibrationRun,
 } from '../services/recognition/calibration';
 
-export type CalibrationPhase = 'idle' | 'running' | 'failed';
+/** idle: sin sesión · running: pasos guiados · done: listo, con los checks a la vista · failed: no alcanzó para calibrar. */
+export type CalibrationPhase = 'idle' | 'running' | 'done' | 'failed';
 
 /**
- * Sesión de calibración: durante unos 8 segundos junta los cuadros de la mano
- * abierta (la mano que se está reconociendo) y al terminar ajusta y guarda la
+ * Sesión de calibración guiada: siete posturas, una por una. Cada lectura de la mano
+ * avanza el paso actual; al completar (o omitir) el último, se ajusta y guarda la
  * calibración. `aspect` es la proporción ancho/alto del video.
  */
 export function useCalibrationSession(hand: TrackedHand | null, aspect: number) {
   const [phase, setPhase] = useState<CalibrationPhase>('idle');
-  const [progress, setProgress] = useState(0);
-  const [collected, setCollected] = useState(0);
-  const framesRef = useRef<CalibrationFrame[]>([]);
-  const startRef = useRef(0);
+  const [run, setRun] = useState<CalibrationRun>(startRun);
+  const runRef = useRef<CalibrationRun>(run);
+
+  const update = useCallback((next: CalibrationRun) => {
+    if (isRunFinished(runRef.current)) return;
+    runRef.current = next;
+    setRun(next);
+    if (!isRunFinished(next)) return;
+    const result = finalizeRun(next);
+    if (result) {
+      saveCalibration(result);
+      setPhase('done');
+    } else {
+      setPhase('failed');
+    }
+  }, []);
 
   const start = useCallback(() => {
-    framesRef.current = [];
-    startRef.current = performance.now();
-    setCollected(0);
-    setProgress(0);
+    const fresh = startRun();
+    runRef.current = fresh;
+    setRun(fresh);
     setPhase('running');
   }, []);
 
+  const skip = useCallback(() => update(skipStep(runRef.current)), [update]);
   const cancel = useCallback(() => setPhase('idle'), []);
+  const dismiss = useCallback(() => setPhase('idle'), []);
 
-  // Cada lectura nueva de la mano abierta suma un cuadro.
+  // Cada lectura nueva (o la falta de mano) hace avanzar el paso actual.
   useEffect(() => {
-    if (phase !== 'running' || !hand || !isCalibrationFrame(hand.landmarks)) return;
-    framesRef.current.push({ landmarks: hand.landmarks.map((p) => ({ ...p })), aspect, side: hand.side });
-    setCollected(framesRef.current.length);
-  }, [hand, phase, aspect]);
+    if (phase !== 'running' || isRunFinished(runRef.current)) return;
+    const frame = hand ? { landmarks: hand.landmarks.map((p) => ({ ...p })), aspect, side: hand.side } : null;
+    update(advanceRun(runRef.current, frame));
+  }, [hand, phase, aspect, update]);
 
-  // El reloj de la sesión: avanza la barra y, al llegar a los segundos, cierra.
-  useEffect(() => {
-    if (phase !== 'running') return;
-    const timer = window.setInterval(() => {
-      const elapsed = (performance.now() - startRef.current) / 1000;
-      setProgress(Math.min(1, elapsed / CALIBRATION_SECONDS));
-      if (elapsed >= CALIBRATION_SECONDS) {
-        window.clearInterval(timer);
-        const result = fitCalibration(framesRef.current);
-        if (result) {
-          saveCalibration(result);
-          setPhase('idle');
-        } else {
-          setPhase('failed');
-        }
-      }
-    }, 150);
-    return () => window.clearInterval(timer);
-  }, [phase]);
-
-  return { phase, progress, collected, needed: CALIBRATION_MIN_FRAMES, start, cancel };
+  return { phase, run, steps: CALIBRATION_STEPS, start, skip, cancel, dismiss };
 }

@@ -28,6 +28,7 @@ export function Layout() {
           </div>
           <nav className="site-footer__links" aria-label="Enlaces del pie de página">
             <Link to="/proyecto">El proyecto</Link>
+            <Link to="/identidad">Identidad</Link>
           </nav>
         </div>
       </footer>

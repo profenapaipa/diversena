@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { IntroCarousel } from '../components/IntroCarousel';
+import { hasSeenIntro } from '../components/introSeen';
 import { languages } from '../data/languages';
 import { HandIllustration } from '../components/brand/HandIllustration';
 import { IconArrowRight, IconBook, IconCamera, IconGlobe } from '../components/icons';
@@ -19,8 +22,11 @@ const STEPS = [
 ];
 
 export function HomePage() {
+  // La primera vez se muestra la introducción; después, un botón la vuelve a abrir.
+  const [showIntro, setShowIntro] = useState(() => !hasSeenIntro());
   return (
     <div className="home">
+      {showIntro && <IntroCarousel onClose={() => setShowIntro(false)} />}
       <section className="hero">
         <div className="hero__text">
           <p className="eyebrow">Lengua de Señas Colombiana · LSC</p>
@@ -37,6 +43,9 @@ export function HomePage() {
               <IconCamera /> Traducir una seña
             </Link>
           </div>
+          <button type="button" className="link-button" onClick={() => setShowIntro(true)}>
+            Ver la introducción en pantallas
+          </button>
         </div>
         <div className="hero__art" aria-hidden="true">
           <div className="hero__screen">

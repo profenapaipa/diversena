@@ -132,8 +132,16 @@ export function describeFrame(c: Vec3[]): number[] {
   return out;
 }
 
-export function describePose3d(landmarks: NormalizedLandmark[], aspect: number = DEFAULT_ASPECT, side: HandSide = 'derecha', zScale = 1): number[] {
-  return describeFrame(palmFrame(landmarks, aspect, side, zScale));
+export function describePose3d(
+  landmarks: NormalizedLandmark[],
+  aspect: number = DEFAULT_ASPECT,
+  side: HandSide = 'derecha',
+  zScale = 1,
+  /** Razones de flexión de la persona (calibración): la mano se lleva a la escala de las referencias antes de describirla. */
+  flexRatios?: number[],
+): number[] {
+  const frame = palmFrame(landmarks, aspect, side, zScale);
+  return describeFrame(flexRatios ? scaleFlexion(frame, flexRatios.map((r) => 1 / r)) : frame);
 }
 
 /**
@@ -156,6 +164,74 @@ export function flexFingers(c: Vec3[], degrees: number): Vec3[] {
       }
     }
   }
+  return out;
+}
+
+
+/** Gira `v` alrededor del eje unitario `axis` el ángulo `angle` (radianes), fórmula de Rodrigues. */
+function rotate(v: Vec3, axis: Vec3, angle: number): Vec3 {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  const k = cross(axis, v);
+  const d = dot(axis, v) * (1 - c);
+  return [v[0] * c + k[0] * s + axis[0] * d, v[1] * c + k[1] * s + axis[1] * d, v[2] * c + k[2] * s + axis[2] * d];
+}
+
+const angleBetweenDeg = (a: Vec3, b: Vec3) => (Math.acos(Math.min(1, Math.max(-1, dot(a, b)))) * 180) / Math.PI;
+
+/** Cantidad de articulaciones medidas: 3 por dedo (la base respecto de la palma, la media y la de la punta). */
+export const JOINT_COUNT = 15;
+
+/**
+ * Flexión de cada articulación en grados (0 = dedo recto), en el orden de los
+ * dedos (pulgar, índice, medio, anular, meñique) y, dentro de cada uno, base,
+ * media y punta. La base se mide contra la dirección muñeca → nudillo.
+ */
+export function jointFlexions(c: Vec3[]): number[] {
+  const out: number[] = [];
+  for (const chain of CHAINS) {
+    let previous = unit(sub(c[chain[0]], c[0]));
+    for (let i = 0; i < 3; i++) {
+      const bone = unit(sub(c[chain[i + 1]], c[chain[i]]));
+      out.push(angleBetweenDeg(previous, bone));
+      previous = bone;
+    }
+  }
+  return out;
+}
+
+/**
+ * Multiplica la flexión de cada articulación por su razón (15 valores, mismo orden
+ * que `jointFlexions`) sin cambiar el largo de los huesos ni el plano en el que se
+ * dobla cada dedo. Con razón < 1 la mano se "abre" un poco; con razón > 1, se "cierra".
+ * Sirve para pasar una mano a la escala de otra: la guía se acorta a lo que la persona
+ * alcanza a doblar, y la mano en vivo se estira a la escala de las referencias.
+ */
+export function scaleFlexion(c: Vec3[], ratios: number[]): Vec3[] {
+  const out = c.map((p) => [...p] as Vec3);
+  CHAINS.forEach((chain, f) => {
+    let previous = unit(sub(c[chain[0]], c[0]));
+    const turns: Array<[Vec3, number]> = [];
+    for (let i = 0; i < 3; i++) {
+      const length = norm(sub(c[chain[i + 1]], c[chain[i]]));
+      // El hueso original, movido por los giros ya aplicados a las articulaciones de antes.
+      let bone = unit(sub(c[chain[i + 1]], c[chain[i]]));
+      for (const [axis, angle] of turns) bone = rotate(bone, axis, angle);
+      const flex = angleBetweenDeg(previous, bone);
+      const ratio = ratios[f * 3 + i] ?? 1;
+      const axis = cross(previous, bone);
+      if (flex > 1 && norm(axis) > 1e-9 && ratio !== 1) {
+        const unitAxis = unit(axis);
+        // Ninguna articulación pasa de 175°: una flexión mayor no existe y solo amplificaría el ruido.
+        const delta = ((Math.min(175, flex * ratio) - flex) * Math.PI) / 180;
+        turns.push([unitAxis, delta]);
+        bone = rotate(bone, unitAxis, delta);
+      }
+      const from = out[chain[i]];
+      out[chain[i + 1]] = [from[0] + bone[0] * length, from[1] + bone[1] * length, from[2] + bone[2] * length];
+      previous = bone;
+    }
+  });
   return out;
 }
 

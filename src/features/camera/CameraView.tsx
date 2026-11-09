@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_ASPECT, fingerAngleErrors, palmFrame } from '../../services/recognition/handPose3d';
-import { currentZScale, saveCalibration } from '../../services/recognition/calibration';
+import { currentZScale } from '../../services/recognition/calibration';
+import { scaleFlexion } from '../../services/recognition/handPose3d';
+import { CalibrationPanel } from './CalibrationPanel';
 import { useCalibration } from '../../hooks/useCalibration';
 import { useCalibrationSession } from '../../hooks/useCalibrationSession';
 import { loadTargetPose } from '../../services/recognition/targetPose';
@@ -72,7 +74,6 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   };
   const session = useCalibrationSession(recognizedHand, videoAspect());
   const needsCalibration = requireCalibration && !calibration && !skippedCalibration;
-  const calibrating = session.phase === 'running';
   // Se graba la vista anotada (video + puntos), no la cámara cruda.
   const annotatedStream = useAnnotatedStream(videoRef, latestHandsRef, status === 'active', showLandmarks);
   const recorder = useMediaRecorder(annotatedStream, fileNamePrefix);
@@ -86,7 +87,9 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   }, [language, loaded]);
 
   // Guía: la pose ideal de la vocal se dibuja sobre la mano (solo en modo practicar).
-  const [guide, setGuide] = useState<Array<[number, number, number]> | null>(null);
+  const [rawGuide, setGuide] = useState<Array<[number, number, number]> | null>(null);
+  // La guía se acorta a lo que esta persona alcanza a doblar (calibración): nunca pide más de lo que su mano da.
+  const guide = useMemo(() => (rawGuide && calibration?.ratios ? scaleFlexion(rawGuide, calibration.ratios) : rawGuide), [rawGuide, calibration]);
   useEffect(() => {
     let cancelled = false;
     setGuide(null);
@@ -183,48 +186,16 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
         {showResult && (
           <aside className="result-panel" aria-live="polite">
             <p className="eyebrow">{targetSign ? `Practicando la ${targetSign.letter}` : 'Traducción'}</p>
-            {status === 'active' && handStatus !== 'cargando' && handStatus !== 'error' && (needsCalibration || calibrating) ? (
-              <div className="calibration">
-                <p className="eyebrow">Calibrar tu mano</p>
-                {calibrating ? (
-                  <>
-                    <p className="result-panel__verdict">Abre la mano y gírala despacio</p>
-                    <p className="result-panel__hint">
-                      Muéstrala de frente y gírala suavemente hacia los lados, como mostrando el dorso y la palma. Mantén los dedos
-                      abiertos.
-                    </p>
-                    <span className="meter meter--wide" role="img" aria-label={`Calibración al ${Math.round(session.progress * 100)} %`}>
-                      <span style={{ width: `${Math.round(session.progress * 100)}%` }} />
-                    </span>
-                    <p className="result-panel__hint">
-                      {recognizedHand && session.collected > 0 ? 'Te estoy viendo. ' : 'Muestra tu mano abierta. '}
-                      Cuadros: {session.collected} de {session.needed}
-                    </p>
-                    <button type="button" className="button button--ghost" onClick={session.cancel}>
-                      Cancelar
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <p className="result-panel__verdict">Primero, conozcamos tu mano</p>
-                    <p className="result-panel__hint">
-                      Tarda unos 8 segundos y se hace una sola vez. Así medimos el tamaño y los dedos de tu mano, y la
-                      guía se ajusta a ella aunque la gires.
-                    </p>
-                    {session.phase === 'failed' && (
-                      <p className="result-panel__hint calibration__warn">
-                        No te vimos la mano abierta el tiempo suficiente. Acércala un poco y vuelve a intentar.
-                      </p>
-                    )}
-                    <button type="button" className="button" onClick={session.start} disabled={!recognizedHand}>
-                      {recognizedHand ? 'Calibrar mi mano' : 'Muestra tu mano para empezar'}
-                    </button>
-                    <button type="button" className="button button--ghost" onClick={() => setSkippedCalibration(true)}>
-                      Omitir por ahora
-                    </button>
-                  </>
-                )}
-              </div>
+            {status === 'active' && handStatus !== 'cargando' && handStatus !== 'error' && (needsCalibration || session.phase !== 'idle') ? (
+              <CalibrationPanel
+                session={session}
+                handVisible={recognizedHand !== null}
+                firstTime={!calibration}
+                onSkipForNow={() => {
+                  session.cancel();
+                  setSkippedCalibration(true);
+                }}
+              />
             ) : handStatus === 'cargando' ? (
               <>
                 <p className="result-panel__verdict">Preparando el detector…</p>
@@ -330,9 +301,10 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
               className="button button--ghost"
               onClick={() => {
                 setSkippedCalibration(false);
-                saveCalibration(null);
+                session.start();
               }}
-              title={calibration ? `Calibrada: giro visto ${calibration.turnDegrees}°` : 'Aún sin calibrar'}
+              disabled={session.phase === 'running'}
+              title={calibration ? `Calibrada (${calibration.stepsDone ?? 0} de 7 posturas)` : 'Aún sin calibrar'}
             >
               {calibration ? 'Volver a calibrar' : 'Calibrar mi mano'}
             </button>

@@ -40,7 +40,7 @@ export function useTrackedHand(): UseTrackedHandResult {
     const aspect = video && video.videoWidth > 0 && video.videoHeight > 0 ? video.videoWidth / video.videoHeight : DEFAULT_ASPECT;
     return {
       ...extractHandFeatures(normalizeHandLandmarks(recognizedHand.landmarks)),
-      pose3d: describePose3d(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale()),
+      pose3d: describePose3d(recognizedHand.landmarks, aspect, recognizedHand.side, currentZScale(), calibration?.ratios),
       extended: extendedFingers(recognizedHand.landmarks),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- el video se lee al calcular; cambia la lectura, no la referencia
