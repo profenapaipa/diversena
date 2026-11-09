@@ -114,6 +114,43 @@ function angleAt(a: Vec3, vertex: Vec3, b: Vec3): number {
 }
 
 
+/**
+ * Inclina toda la mano (alrededor de la muñeca, el origen del marco de la palma) `degX` grados sobre el eje de
+ * los nudillos y `degY` sobre el eje de los dedos. Modela el error al estimar hacia dónde mira la palma: la foto
+ * de una referencia tomada en ángulo, o una mano vista casi de canto, dan una normal algo inclinada.
+ */
+export function tiltPose(c: Vec3[], degX: number, degY: number): Vec3[] {
+  const [ax, ay] = [(degX * Math.PI) / 180, (degY * Math.PI) / 180];
+  return c.map(([x, y, z]) => {
+    const y1 = y * Math.cos(ax) - z * Math.sin(ax);
+    const z1 = y * Math.sin(ax) + z * Math.cos(ax);
+    return [x * Math.cos(ay) + z1 * Math.sin(ay), y1, -x * Math.sin(ay) + z1 * Math.cos(ay)] as Vec3;
+  });
+}
+
+/** Inclinaciones con las que se acepta una referencia oficial (además de la original). */
+export const REFERENCE_TILTS: Array<[number, number]> = [[0, 0], [25, 0], [-25, 0], [0, 25], [0, -25]];
+
+/**
+ * La inclinación de la figura que mejor encaja con la mano en vivo (menor error de dirección de los dedos).
+ * Así la guía no obliga a girar la mano: se muestra con la inclinación de la palma que se está viendo.
+ */
+export function bestTiltFit(live: Vec3[], target: Vec3[]): Vec3[] {
+  let best = target;
+  let bestError = Infinity;
+  for (const degX of [-40, -20, 0, 20, 40]) {
+    for (const degY of [-40, -20, 0, 20, 40]) {
+      const candidate = degX === 0 && degY === 0 ? target : tiltPose(target, degX, degY);
+      const error = fingerAngleErrors(live, candidate).reduce((sum, e) => sum + e.degrees, 0);
+      if (error < bestError) {
+        bestError = error;
+        best = candidate;
+      }
+    }
+  }
+  return best;
+}
+
 /** Peso de las distancias pulgar a punta de cada dedo en el descriptor. */
 const TIP_WEIGHT = 2;
 

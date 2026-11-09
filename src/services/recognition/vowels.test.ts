@@ -2,7 +2,7 @@ import datasetText from '../../../public/datasets/lsc.json?raw';
 import { describe, expect, it } from 'vitest';
 import type { TrainingSample } from '../../models/dataset';
 import type { HandFeatureVector } from '../../models/handFeatures';
-import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, retargetPose, fingerAngleErrors, jointFlexions, scaleFlexion, fingerFlexErrors, tiltPose, bestTiltFit } from './handPose3d';
 import { REFERENCE_FLEX_MAX } from './calibration';
 import { featuresFromSample } from './referenceSet';
 import { classifyWithReferenceSet, POSE3D_FLOOR } from './signClassifier';
@@ -169,6 +169,37 @@ describe('la guía compara la flexión de los dedos, no el ángulo de la palma',
         const m = classifyWithReferenceSet(live(palmFrame(turned as never, aspect, side)), candidates);
         expect(m?.sign, `${v} yaw ${yaw} pitch ${pitch}`).toBe(v);
       }
+    }
+  });
+});
+
+describe('palma inclinada (la normal de la palma se estima con error)', () => {
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+
+  it('cada vocal se reconoce con la palma inclinada hasta 25° en cualquier sentido', () => {
+    for (const v of vowels) {
+      for (const [tx, ty] of [[25, 0], [-25, 0], [0, 25], [0, -25], [18, 18], [-18, 18]]) {
+        const m = classifyWithReferenceSet(live(tiltPose(officialFrame(v), tx, ty)), candidates);
+        expect(m?.sign, `${v} inclinada ${tx},${ty}`).toBe(v);
+      }
+    }
+  });
+
+  it('con la palma inclinada 45° una vocal no se confunde con otra', () => {
+    for (const v of vowels) {
+      for (const [tx, ty] of [[45, 0], [-45, 0], [0, 45], [0, -45]]) {
+        const m = classifyWithReferenceSet(live(tiltPose(officialFrame(v), tx, ty)), candidates);
+        expect(m === null || m.sign === v, `${v} inclinada ${tx},${ty} dio ${m?.sign}`).toBe(true);
+      }
+    }
+  });
+
+  it('la guía se inclina como la palma que se ve y deja de pedir un giro', () => {
+    for (const v of vowels) {
+      const target = officialFrame(v);
+      const handSeen = tiltPose(target, 28, -20);
+      const sum = (pose: typeof target) => fingerAngleErrors(handSeen, pose).reduce((t, e) => t + e.degrees, 0);
+      expect(sum(bestTiltFit(handSeen, target)), v).toBeLessThan(sum(target) * 0.5);
     }
   });
 });

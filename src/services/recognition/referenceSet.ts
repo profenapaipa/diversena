@@ -4,7 +4,7 @@ import type { HandFeatureVector } from '../../models/handFeatures';
 import type { Language } from '../../models/language';
 import { listSamples, parseDatasetFile } from '../dataset/datasetStore';
 import { extractHandFeatures, normalizeHandLandmarks } from './landmarkProcessor';
-import { DEFAULT_ASPECT, OFFICIAL_ALIAS, describeFrame, flexFingers, palmFrame, type HandSide } from './handPose3d';
+import { DEFAULT_ASPECT, OFFICIAL_ALIAS, REFERENCE_TILTS, describeFrame, flexFingers, palmFrame, tiltPose, type HandSide } from './handPose3d';
 import { getReferencesForLanguage } from './referenceStore';
 
 /** Referencias por seña (signId → vectores de características). */
@@ -44,8 +44,16 @@ export function featuresFromSample(sample: TrainingSample): HandFeatureVector[] 
     const frameOfPalm = palmFrame(landmarks, aspect, side);
     // Una seña oficial sale de una sola foto: se suman versiones con los dedos ±10° y ±20° más cerrados o abiertos,
     // para aceptar la postura natural de una mano relajada y rechazar lo que se aleja de verdad (ver flexFingers).
+    // También con la palma inclinada unos 25°: la foto de la referencia se tomó en ángulo y su profundidad se estima, así que
+    // hacia dónde mira la palma tiene error; la persona no debería tener que girar la mano para compensarlo.
     const variants = official ? [0, -20, -10, 10, 20] : [0];
-    return variants.map((deg) => ({ ...classic, pose3d: describeFrame(deg === 0 ? frameOfPalm : flexFingers(frameOfPalm, deg)) }));
+    const tilts = official ? REFERENCE_TILTS : ([[0, 0]] as Array<[number, number]>);
+    return variants.flatMap((deg) =>
+      tilts.map(([tx, ty]) => {
+        const flexed = deg === 0 ? frameOfPalm : flexFingers(frameOfPalm, deg);
+        return { ...classic, pose3d: describeFrame(tx === 0 && ty === 0 ? flexed : tiltPose(flexed, tx, ty)) };
+      }),
+    );
   });
 }
 

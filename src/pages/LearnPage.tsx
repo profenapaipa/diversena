@@ -25,7 +25,10 @@ export function LearnPage() {
       <header className="page-head">
         <p className="eyebrow">Aprender</p>
         <h1>Elige una vocal y practícala</h1>
-        <p className="lead">Los puntos amarillos muestran dónde deben quedar los de tu mano.</p>
+        <p className="lead">
+          Los puntos amarillos muestran dónde deben quedar los de tu mano. Puedes hacer la seña de frente o girada: lo que se revisa es cómo
+          están doblados tus dedos.
+        </p>
         <p className="lead lead--note">
           Lengua de Señas Colombiana. Las señas siguen el Diccionario de LSC del INSOR y falta validarlas con personas Sordas y
           docentes de LSC.
