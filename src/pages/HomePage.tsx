@@ -137,7 +137,7 @@ export function HomePage() {
             sostenible para colegios, familias e instituciones.
           </p>
         </div>
-        <Link className="button button--secondary" to="/proyecto">
+        <Link className="button button--secondary" to="/quienes-somos?abrir=proyecto">
           Conoce el proyecto <IconArrowRight size={18} />
         </Link>
       </section>

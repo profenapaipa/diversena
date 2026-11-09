@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 const BASE = import.meta.env.BASE_URL;
 const logo = (file: string) => `${BASE}marca/logos/${file}`;
 
@@ -65,18 +63,9 @@ const DONTS = [
   'Recortar el aire que el archivo ya trae alrededor.',
 ];
 
-export function IdentityPage() {
+export function IdentityContent() {
   return (
-    <article className="page identity">
-      <header className="page-head">
-        <p className="eyebrow">Identidad de marca</p>
-        <h1>Así se ve y qué significa DiverSeña</h1>
-        <p className="lead">
-          El logo, sus colores y sus usos, y la historia de por qué quedó como quedó. Todo lo que se diseñe para DiverSeña sale de
-          esta misma idea.
-        </p>
-      </header>
-
+    <div className="identity">
       <section className="identity-hero" aria-label="El logotipo">
         <div className="identity-hero__tile identity-hero__tile--white">
           <img src={logo('diversena_horizontal_color.svg')} alt="Logotipo de DiverSeña a color" />
@@ -249,11 +238,8 @@ export function IdentityPage() {
           <a className="button button--lg" href={`${BASE}marca/diversena-logos.zip`} download>
             Descargar paquete (ZIP)
           </a>
-          <Link className="button button--lg button--secondary" to="/proyecto">
-            Volver al proyecto
-          </Link>
         </div>
       </section>
-    </article>
+    </div>
   );
 }

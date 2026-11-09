@@ -25,8 +25,7 @@ const MAIN_LINKS: NavItem[] = [
   { to: '/aprender', label: 'Aprender', icon: <IconBook /> },
   { to: '/identificar', label: 'Traducir', icon: <IconCamera /> },
   { to: '/explorar', label: 'Explorar', icon: <IconGlobe /> },
-  { to: '/proyecto', label: 'El proyecto', icon: <IconFlag /> },
-  { to: '/identidad', label: 'Identidad', icon: <IconFlag /> },
+  { to: '/quienes-somos', label: 'Quiénes somos', icon: <IconFlag /> },
 ];
 
 /** Barra inferior en celular: las dos acciones del boceto (libro y cámara) a un toque. */

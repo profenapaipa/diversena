@@ -7,8 +7,8 @@ import { ExplorePage } from '../pages/ExplorePage';
 import { ReferenceCapturePage } from '../pages/ReferenceCapturePage';
 import { ProfilePage } from '../pages/ProfilePage';
 import { TrainingDataPage } from '../pages/TrainingDataPage';
-import { IdentityPage } from '../pages/IdentityPage';
-import { ProjectPage } from '../pages/ProjectPage';
+import { AboutPage } from '../pages/AboutPage';
+import { Navigate } from 'react-router-dom';
 import { TeamPanelPage } from '../pages/TeamPanelPage';
 
 export function App() {
@@ -21,8 +21,9 @@ export function App() {
           <Route path="identificar" element={<IdentifyPage />} />
           <Route path="explorar" element={<ExplorePage />} />
           <Route path="perfil" element={<ProfilePage />} />
-          <Route path="proyecto" element={<ProjectPage />} />
-          <Route path="identidad" element={<IdentityPage />} />
+          <Route path="quienes-somos" element={<AboutPage />} />
+          <Route path="proyecto" element={<Navigate to="/quienes-somos?abrir=proyecto" replace />} />
+          <Route path="identidad" element={<Navigate to="/quienes-somos?abrir=identidad" replace />} />
           <Route path="panel" element={<TeamPanelPage />} />
           {/* Herramientas internas del equipo: enlazadas desde el pie de página, no del menú principal. */}
           <Route path="herramientas/entrenar" element={<TrainingDataPage />} />

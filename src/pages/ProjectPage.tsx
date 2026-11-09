@@ -11,17 +11,9 @@ import {
 const REQ_LABEL = { cumplido: 'Cumplido', 'en-progreso': 'En progreso', pendiente: 'Pendiente' } as const;
 const REQ_TONE = { cumplido: 'badge--ok', 'en-progreso': 'badge--warn', pendiente: 'badge--crit' } as const;
 
-export function ProjectPage() {
+export function ProjectContent() {
   return (
-    <article className="page project">
-      <header className="page-head">
-        <p className="eyebrow">Semillero de Tecnología · colegio Injuv</p>
-        <h1>El proyecto</h1>
-        <p className="lead">
-          DiverSeña es un prototipo web que reconoce las vocales de la lengua de señas con la cámara.
-        </p>
-      </header>
-
+    <div className="project">
       <section className="section section--split">
         <div>
           <h2>El problema</h2>
@@ -57,12 +49,12 @@ export function ProjectPage() {
         <div className="flow" role="list">
           <div className="flow__box" role="listitem">
             <p className="eyebrow">Entra</p>
-            <p>La imagen de la cámara con la persona haciendo una seña.</p>
+            <p>Lo que ve tu cámara, dentro de tu equipo: la imagen no se guarda ni se envía.</p>
           </div>
           <span className="flow__arrow" aria-hidden="true">→</span>
           <div className="flow__box flow__box--core" role="listitem">
             <p className="eyebrow">Procesa</p>
-            <p>Toma los 21 puntos de cada mano, los compara con las señas de referencia y elige la más parecida.</p>
+            <p>El detector ubica 21 puntos en cada mano. De ahí en adelante solo se usan esos puntos: se comparan con las señas de referencia y se elige la más parecida.</p>
           </div>
           <span className="flow__arrow" aria-hidden="true">→</span>
           <div className="flow__box" role="listitem">
@@ -119,6 +111,6 @@ export function ProjectPage() {
           </p>
         </div>
       </section>
-    </article>
+    </div>
   );
 }

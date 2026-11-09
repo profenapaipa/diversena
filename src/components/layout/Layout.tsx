@@ -29,8 +29,8 @@ export function Layout() {
             <span><i className="swatch swatch--sun" /> Luz y convivencia</span>
           </div>
           <nav className="site-footer__links" aria-label="Enlaces del pie de página">
-            <Link to="/proyecto">El proyecto</Link>
-            <Link to="/identidad">Identidad</Link>
+            <Link to="/quienes-somos">Quiénes somos</Link>
+            <Link to="/quienes-somos?abrir=identidad">Identidad</Link>
           </nav>
         </div>
       </footer>

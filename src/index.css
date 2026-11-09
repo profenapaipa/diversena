@@ -2080,3 +2080,33 @@ main {
 .privacy-flow__arrow { font-size: 1.6rem; color: var(--brand-sky-ink); font-weight: 700; }
 .intro-chips--ink li { background: var(--brand-navy); }
 .intro-chips--ink li { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+/* ---------- Quiénes somos ---------- */
+.about-route { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: 0; position: relative; }
+.about-route__item { display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1.4rem; position: relative; }
+.about-route__item:not(:last-child)::before { content: ''; position: absolute; left: 1.2rem; top: 2.5rem; bottom: 0; width: 3px; background: var(--brand-sky); border-radius: 2px; }
+.about-route__num { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--brand-sun); color: #151a6e; font-family: var(--font-display); font-weight: 700; z-index: 1; }
+.about-route__body h3 { margin: 0.1rem 0 0.25rem; }
+.about-route__body p { margin: 0 0 0.5rem; }
+.about-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.about-tag { padding: 0.15rem 0.65rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; color: #fff; background: var(--brand-navy); }
+.about-tag--pedagogico { background: #1d2394; }
+.about-tag--emprendimiento { background: #0b6cb8; }
+.about-tag--tecnologico { background: #2f6f4f; }
+.about-tag--critico { background: #8a4b12; }
+.about-contrib { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.about-contrib__card { border-top: 6px solid var(--brand-navy); }
+.about-contrib__card h3 { margin-top: 0; }
+.about-contrib__card--emprendimiento { border-top-color: #0b6cb8; }
+.about-contrib__card--tecnologico { border-top-color: #2f6f4f; }
+.about-contrib__card--critico { border-top-color: #8a4b12; }
+.about-folds { display: grid; gap: 0.75rem; }
+.about-fold { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.about-fold > summary { display: grid; gap: 0.15rem; padding: 1rem 1.25rem; cursor: pointer; list-style: none; min-height: 44px; }
+.about-fold > summary::-webkit-details-marker { display: none; }
+.about-fold > summary span { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
+.about-fold > summary span::after { content: ' ▾'; color: var(--brand-sky-ink); }
+.about-fold[open] > summary span::after { content: ' ▴'; }
+.about-fold > summary small { color: var(--muted); font-size: 0.92rem; }
+.about-fold__body { padding: 0 1.25rem 1.25rem; }
+.about-fold__body .section { margin-top: 1.5rem; }
