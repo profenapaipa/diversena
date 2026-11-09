@@ -2283,3 +2283,44 @@ main {
   .result-panel .tips li::before { left: 0.5rem; }
   .result-panel__verdict { font-size: 1.1rem; }
 }
+
+/* ---------- Calibración: espacio propio, sin recortes ---------- */
+/* Mientras se calibra, la cámara baja de tamaño y el panel pasa a ocupar todo el ancho debajo: figura a la izquierda y texto a
+   la derecha, con la lista de pasos al pie. Así nada compite por una columna angosta ni queda cortado. */
+.calibration__body { display: grid; gap: 0.75rem; justify-items: center; width: 100%; }
+.calibration__text { display: grid; gap: 0.35rem; justify-items: center; width: 100%; }
+@media (min-width: 52rem) {
+  .camera-view--calibrating .camera-stage { grid-template-columns: 1fr; justify-items: center; }
+  .camera-view--calibrating .camera-view__frame { max-width: 24rem; }
+  .camera-view--calibrating .result-panel { width: 100%; max-width: 44rem; height: auto; min-height: 0; overflow: visible; }
+  .camera-view--calibrating .calibration__body { grid-template-columns: 13rem 1fr; align-items: center; justify-items: stretch; text-align: left; }
+  .camera-view--calibrating .calibration__text { justify-items: start; text-align: left; }
+  .camera-view--calibrating .calibration__actions { justify-content: flex-start; }
+}
+.camera-stage .result-panel { scrollbar-width: thin; }
+
+/* Calibración en pantallas bajas y en celular */
+.camera-view--calibrating .calibration .button { min-width: 0; }
+@media (min-width: 52rem) and (max-height: 780px) {
+  .camera-view--calibrating .camera-view__frame { max-width: 18rem; }
+  .camera-view--calibrating .calibration__body { grid-template-columns: 10.5rem 1fr; gap: 0.6rem; }
+  .camera-view--calibrating .cal-figure__svg { width: 9.5rem; }
+  .camera-view--calibrating .result-panel__hint { font-size: 0.9rem; }
+}
+@media (max-width: 51.99rem) {
+  /* En celular la cámara se queda fija arriba y el panel se desplaza por debajo: así te ves la mano mientras lees el paso. */
+  .camera-view--calibrating .camera-view__frame { position: sticky; top: 4.3rem; z-index: 4; max-width: 13rem; margin-inline: auto; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); }
+  .camera-view--calibrating .cal-figure__svg { width: 9.5rem; }
+  .camera-view--calibrating .calibration__actions .button { flex: 1; justify-content: center; }
+}
+
+/* Durante la calibración el título «Practicando la X» sobra: ya hay un título de paso. */
+.result-panel--free > .eyebrow { display: none; }
+@media (max-width: 51.99rem) {
+  .camera-view--calibrating .camera-chip { font-size: 0.7rem; padding: 0.2rem 0.55rem; left: 0.4rem; bottom: 0.4rem; max-width: calc(100% - 0.8rem); }
+  .camera-view--calibrating .cal-figure__svg { width: 8rem; }
+  .camera-view--calibrating .cal-figure__caption { font-size: 0.82rem; }
+  .camera-view--calibrating .result-panel__verdict { font-size: 1.1rem; }
+  .camera-view--calibrating .calibration__actions .button { padding-inline: 0.6rem; font-size: 0.9rem; min-height: 44px; }
+  .camera-view--calibrating .cal-steps { gap: 0.3rem 0.5rem; }
+}

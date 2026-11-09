@@ -191,7 +191,7 @@ export function CameraView({ language, targetSign, fileNamePrefix = 'video-diver
   }, [status]);
 
   return (
-    <div className="camera-view">
+    <div className={`camera-view${calibrationOn ? ' camera-view--calibrating' : ''}`}>
       <div className="camera-stage">
         <div ref={frameRef} className="camera-view__frame" data-status={status}>
           <video ref={videoRef} className="camera-view__video" autoPlay muted playsInline />

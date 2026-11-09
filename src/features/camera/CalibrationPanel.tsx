@@ -54,7 +54,9 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
         <p className="eyebrow">
           Calibrar tu mano · paso {Math.min(run.index + 1, total)} de {total}
         </p>
-        <CalibrationFigure step={step.id} />
+        <div className="calibration__body">
+          <CalibrationFigure step={step.id} />
+          <div className="calibration__text">
         <p className="result-panel__verdict">{step.title}</p>
         <p className="result-panel__hint">{step.hint}</p>
         <span className="meter meter--wide" role="img" aria-label={`Paso al ${percent} %`}>
@@ -69,8 +71,6 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
                 ? `Pulgar afuera ${run.thumbOut ? '✓' : '·'} · adentro ${run.thumbIn ? '✓' : '·'}`
                 : 'Vemos tu mano. Sostén la postura.'}
         </p>
-        {list}
-        <p className="result-panel__hint">{step.purpose}</p>
         <div className="calibration__actions">
           <button type="button" className="button button--ghost" onClick={session.skip}>
             Omitir este paso
@@ -79,6 +79,9 @@ export function CalibrationPanel({ session, handVisible, firstTime, onSkipForNow
             Cancelar
           </button>
         </div>
+          </div>
+        </div>
+        {list}
       </div>
     );
   }
