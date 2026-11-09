@@ -230,13 +230,6 @@ export function TeamPanelPage() {
             <div className="tool-links">
               <Link to="/herramientas/entrenar">Entrenar la IA: grabar y subir clips</Link>
               <Link to="/herramientas/referencias">Referencias rápidas (una postura)</Link>
-              <a
-                href="https://github.com/profenapaipa/diversena/blob/main/docs/ENTRENAMIENTO-IA.md"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Guía de grabación (GitHub)
-              </a>
               <Link to="/proyecto">Documentación del proyecto</Link>
             </div>
           </div>

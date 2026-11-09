@@ -17,8 +17,8 @@ export function Layout() {
           <div className="site-footer__brand">
             <LogoMark size={28} />
             <p>
-              <strong>DiverSeña</strong> · aprender lengua de señas con la cámara. Nació en el Semillero de
-              Tecnología Maker 2026-II.
+              <strong>DiverSeña</strong> · aprender lengua de señas con la cámara. Proyecto del Semillero de
+              Tecnología del colegio Injuv.
             </p>
           </div>
           <div className="flag-legend" aria-label="Colores de la bandera de la comunidad Sorda">
@@ -28,9 +28,6 @@ export function Layout() {
           </div>
           <nav className="site-footer__links" aria-label="Enlaces del pie de página">
             <Link to="/proyecto">El proyecto</Link>
-            <a href="https://github.com/profenapaipa/diversena" target="_blank" rel="noreferrer">
-              Código en GitHub
-            </a>
           </nav>
         </div>
       </footer>

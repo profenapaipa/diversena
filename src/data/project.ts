@@ -1,7 +1,6 @@
 /**
  * Contenido de la página "El proyecto", tomado de la documentación del
- * Equipo 6 en el Drive del Semillero de Tecnología Maker 2026-II (propuesta,
- * ficha técnica, artículo base, matriz de antecedentes y ruta del semestre).
+ * documentación del proyecto.
  * Se mantiene aquí, separado del diseño, para que el equipo lo actualice sin
  * tocar componentes. Ver docs/PROYECTO.md.
  */
@@ -9,14 +8,6 @@
 export const PROJECT_ORIGIN = {
   program: 'Semillero de Tecnología Maker',
   period: '2026-II',
-  team: 'Equipo 6 · Lector de lengua de señas',
-  /**
-   * Los integrantes son menores de edad: la web pública no publica sus
-   * nombres, solo el equipo. Los nombres completos están en el artículo del
-   * equipo.
-   */
-  members: ['Equipo 6'],
-  grade: '9C',
   showcase: '9 de noviembre de 2026',
 };
 
@@ -50,53 +41,6 @@ export const REQUIREMENTS: Array<{ action: string; test: string; status: Require
     test: 'Hacer una seña a medias y ver si propone opciones parecidas.',
     status: 'cumplido',
     note: '"¿Quizás quisiste decir…?" con las señas más parecidas, como en el boceto.',
-  },
-];
-
-export interface Phase {
-  name: string;
-  dates: string;
-  did: string;
-  produced: string;
-}
-
-/** Ruta Design Thinking del semestre, con lo que hizo el equipo en cada fase. */
-export const PHASES: Phase[] = [
-  {
-    name: 'Empatizar',
-    dates: '15 – 23 jul',
-    did: 'Observación del contexto y propuesta escrita en dos versiones.',
-    produced: 'Público definido: quienes necesitan comunicarse y quienes quieren aprender.',
-  },
-  {
-    name: 'Definir',
-    dates: '29 – 30 jul',
-    did: 'Problema, pregunta de investigación y primeros antecedentes.',
-    produced: 'Pregunta de investigación y tres artículos de referencia.',
-  },
-  {
-    name: 'Idear',
-    dates: '5 – 13 ago',
-    did: 'Alternativas, matriz de antecedentes y bocetos en papel de la interfaz.',
-    produced: 'Boceto: menú con perfil, aprender (libro), cámara y sugerencias.',
-  },
-  {
-    name: 'Prototipar',
-    dates: '19 ago – 24 sep',
-    did: 'Ficha técnica, cambio de Unity a página web, cámara y clasificador.',
-    produced: 'Prototipo web con detección de manos y reconocimiento por referencias.',
-  },
-  {
-    name: 'Evaluar e iterar',
-    dates: '30 sep – 22 oct',
-    did: 'Prueba cruzada, ajustes y recolección de datos de entrenamiento.',
-    produced: 'Versión estable, perfil, panel y espacio para entrenar la IA.',
-  },
-  {
-    name: 'Muestra final',
-    dates: '28 – 29 oct',
-    did: 'Presentación del proyecto y del artículo de desarrollo tecnológico.',
-    produced: 'Entrega final.',
   },
 ];
 

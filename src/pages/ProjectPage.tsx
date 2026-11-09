@@ -1,11 +1,8 @@
-import { Link } from 'react-router-dom';
 import {
   AUDIENCE,
   DECISIONS,
   NEXT_STEPS,
-  PHASES,
   PROBLEM,
-  PROJECT_ORIGIN,
   QUESTION,
   REFERENCES,
   REQUIREMENTS,
@@ -18,16 +15,10 @@ export function ProjectPage() {
   return (
     <article className="page project">
       <header className="page-head">
-        <p className="eyebrow">
-          {PROJECT_ORIGIN.program} · {PROJECT_ORIGIN.period}
-        </p>
+        <p className="eyebrow">Semillero de Tecnología · colegio Injuv</p>
         <h1>El proyecto</h1>
         <p className="lead">
-          DiverSeña empezó como el «Lector de lengua de señas» del Equipo 6 y hoy es un prototipo web que
-          reconoce señas con la cámara. Esta es su historia, documentada fase por fase.
-        </p>
-        <p className="team-line">
-          <strong>Equipo:</strong> {PROJECT_ORIGIN.members.join(', ')} · grado {PROJECT_ORIGIN.grade}
+          DiverSeña es un prototipo web que reconoce las vocales de la lengua de señas con la cámara.
         </p>
       </header>
 
@@ -46,7 +37,7 @@ export function ProjectPage() {
 
       <section className="section">
         <h2>Qué debe hacer la solución</h2>
-        <p className="note">Los tres requisitos de la ficha técnica del equipo y cómo se comprueban.</p>
+        <p className="note">Los tres requisitos del proyecto y cómo se comprueban.</p>
         <div className="req-grid">
           {REQUIREMENTS.map((req) => (
             <div key={req.action} className="card">
@@ -79,23 +70,6 @@ export function ProjectPage() {
             <p>La letra en pantalla para que la otra persona la lea, o sugerencias si no está segura.</p>
           </div>
         </div>
-      </section>
-
-      <section className="section">
-        <h2>Ruta del semestre</h2>
-        <p className="note">Metodología Design Thinking: lo que hizo el equipo en cada fase y lo que produjo.</p>
-        <ol className="timeline">
-          {PHASES.map((phase) => (
-            <li key={phase.name}>
-              <span className="timeline__date">{phase.dates}</span>
-              <div>
-                <h3>{phase.name}</h3>
-                <p>{phase.did}</p>
-                <p className="note">Resultado: {phase.produced}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
       </section>
 
       <section className="section">
@@ -140,12 +114,9 @@ export function ProjectPage() {
         <div className="card card--tint">
           <h3>¿Quieres ayudar?</h3>
           <p>
-            Si eres una persona Sorda o intérprete de LSC, puedes grabar clips de entrenamiento para que
-            DiverSeña reconozca mejor cada seña.
+            Si eres una persona Sorda, intérprete o docente de LSC, tu mirada nos ayuda a validar cada seña. Cuéntanos
+            qué le falta a DiverSeña.
           </p>
-          <Link className="button" to="/panel">
-            Ir al panel del equipo
-          </Link>
         </div>
       </section>
     </article>

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { languages } from '../data/languages';
-import { PROJECT_ORIGIN } from '../data/project';
 import { HandIllustration } from '../components/brand/HandIllustration';
 import { IconArrowRight, IconBook, IconCamera, IconGlobe } from '../components/icons';
 
@@ -121,9 +120,8 @@ export function HomePage() {
           <p className="eyebrow">Hecho en el aula</p>
           <h2>Un proyecto estudiantil que quiere crecer</h2>
           <p>
-            DiverSeña nació en el {PROJECT_ORIGIN.program} {PROJECT_ORIGIN.period}, en el {PROJECT_ORIGIN.members.join(', ')}
-            (grado {PROJECT_ORIGIN.grade}). Hoy busca convertirse en una
-            herramienta sostenible para colegios, familias e instituciones.
+            DiverSeña es un proyecto del Semillero de Tecnología del colegio Injuv. Busca convertirse en una herramienta
+            sostenible para colegios, familias e instituciones.
           </p>
         </div>
         <Link className="button button--secondary" to="/proyecto">
